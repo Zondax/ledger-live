@@ -1,4 +1,4 @@
-import React, { useCallback, memo, useMemo } from "react";
+import React, { useCallback, memo, useMemo, useEffect } from "react";
 import { FlatList } from "react-native";
 import { useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
@@ -8,12 +8,11 @@ import {
   listTokens,
   useCurrenciesByMarketcap,
 } from "@ledgerhq/live-common/lib/currencies";
-import { Box, Flex, Icons, Text } from "@ledgerhq/native-ui";
+import { Flex } from "@ledgerhq/native-ui";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Trans, useTranslation } from "react-i18next";
 import { useRefreshAccountsOrdering } from "../../actions/general";
-import { accountsSelector, isUpToDateSelector } from "../../reducers/accounts";
+import { accountsSelector } from "../../reducers/accounts";
 import TrackScreen from "../../analytics/TrackScreen";
 
 import { withDiscreetMode } from "../../context/DiscreetModeContext";
@@ -27,10 +26,8 @@ type Props = {
 const listSupportedTokens = () =>
   listTokens().filter(t => isCurrencySupported(t.parentCurrency));
 
-function Accounts({ navigation }: Props) {
+function Accounts({ navigation, route }: Props) {
   const accounts = useSelector(accountsSelector);
-
-  const { t } = useTranslation();
 
   const refreshAccountsOrdering = useRefreshAccountsOrdering();
   useFocusEffect(refreshAccountsOrdering);
@@ -52,7 +49,7 @@ function Accounts({ navigation }: Props) {
       })),
     [sortedCryptoCurrencies],
   );
-  console.log("accounts list", assets);
+  console.log("accounts list", assets[1].currency.units);
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => (
@@ -60,6 +57,11 @@ function Accounts({ navigation }: Props) {
     ),
     [navigation],
   );
+
+  useEffect(() => {
+    console.log("effect");
+    return () => console.log("cleanup");
+  }, [navigation, route]);
 
   return (
     <SafeAreaView

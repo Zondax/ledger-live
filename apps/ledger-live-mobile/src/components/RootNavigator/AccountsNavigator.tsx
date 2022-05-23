@@ -13,7 +13,11 @@ import NftGalleryHeaderTitle from "../../screens/Nft/NftGallery/NftGalleryHeader
 import { getStackNavigatorConfig } from "../../navigation/navigatorConfig";
 import AccountHeaderRight from "../../screens/Account/AccountHeaderRight";
 import AccountHeaderTitle from "../../screens/Account/AccountHeaderTitle";
+
+import ReadOnlyAccountHeaderRight from "../../screens/Account/ReadOnlyAccountHeaderRight";
+import ReadOnlyAccountHeaderTitle from "../../screens/Account/ReadOnlyAccountHeaderTitle";
 import ReadOnlyAccounts from "../../screens/Accounts/ReadOnlyAccounts";
+import ReadOnlyAccount from "../../screens/Account/ReadOnlyAccount";
 import { readOnlyModeEnabledSelector } from "../../reducers/settings";
 
 export default function AccountsNavigator() {
@@ -24,7 +28,7 @@ export default function AccountsNavigator() {
   // const readOnlyModeEnabled = useSelector(readOnlyModeEnabledSelector);
 
   const readOnlyModeEnabled = true;
-  console.log("accounts readOnlyMode", readOnlyModeEnabled);
+  // console.log("accounts readOnlyMode", readOnlyModeEnabled);
   return (
     <Stack.Navigator screenOptions={stackNavConfig}>
       <Stack.Screen
@@ -36,10 +40,20 @@ export default function AccountsNavigator() {
       />
       <Stack.Screen
         name={ScreenName.Account}
-        component={/* readOnlyModeEnabled ? ReadOnlyAccount : */ Account}
+        component={readOnlyModeEnabled ? ReadOnlyAccount : Account}
         options={{
-          headerTitle: () => <AccountHeaderTitle />,
-          headerRight: () => <AccountHeaderRight />,
+          headerTitle: () =>
+            readOnlyModeEnabled ? (
+              <ReadOnlyAccountHeaderTitle />
+            ) : (
+              <AccountHeaderTitle />
+            ),
+          headerRight: () =>
+            readOnlyModeEnabled ? (
+              <ReadOnlyAccountHeaderRight />
+            ) : (
+              <AccountHeaderRight />
+            ),
         }}
       />
       <Stack.Screen
