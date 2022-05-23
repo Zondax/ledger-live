@@ -5,6 +5,9 @@ import {
   BalanceResponse,
   BroadcastTransactionRequest,
   BroadcastTransactionResponse,
+  BurnChainRewardsResponse,
+  BurnChainSlotHoldersResponse,
+  BurnChainTotalRewards,
   EstimatedFeesRequest,
   EstimatedFeesResponse,
   NetworkStatusResponse,
@@ -111,6 +114,33 @@ export const broadcastTx = async (
   const response = await sendRaw<BroadcastTransactionResponse>(
     `/v2/transactions`,
     message
+  );
+  return response; // TODO Validate if the response fits this interface
+};
+
+export const getBurnChainRewards = async (
+  addr: string
+): Promise<BurnChainRewardsResponse> => {
+  const response = await fetch<BurnChainRewardsResponse>(
+    `/extended/v1/burnchain/rewards/${addr}`
+  );
+  return response; // TODO Validate if the response fits this interface
+};
+
+export const getBurnChainTotalRewards = async (
+  addr: string
+): Promise<BurnChainTotalRewards> => {
+  const response = await fetch<BurnChainTotalRewards>(
+    `/extended/v1/burnchain/rewards/${addr}/total`
+  );
+  return response; // TODO Validate if the response fits this interface
+};
+
+export const getBurnChainSlotHolders = async (
+  addr: string
+): Promise<BurnChainSlotHoldersResponse> => {
+  const response = await fetch<BurnChainSlotHoldersResponse>(
+    `/extended/v1/burnchain/reward_slot_holders/${addr}`
   );
   return response; // TODO Validate if the response fits this interface
 };

@@ -8,6 +8,11 @@ import {
   TransactionCommon,
   TransactionCommonRaw,
 } from "../../types";
+import {
+  BurnChainRewards,
+  BurnChainSlotHolders,
+  BurnChainTotalRewards,
+} from "./bridge/utils/types";
 
 type FamilyType = "stacks";
 
@@ -43,3 +48,15 @@ export type CoreAccountSpecifics = Record<string, never>;
 export type CoreOperationSpecifics = Record<string, never>;
 export type CoreCurrencySpecifics = Record<string, never>;
 export const reflect = (_declare: any) => {};
+
+export interface StacksResources {
+  burnchain_rewards: BurnChainRewards[];
+  burnchain_slot_holders: BurnChainSlotHolders[];
+  burnchain_total_rewards: BurnChainTotalRewards;
+}
+
+export interface StacksResourcesRaw {
+  burnchain_rewards: BurnChainRewards[];
+  burnchain_slot_holders: BurnChainSlotHolders[];
+  burnchain_total_rewards: BurnChainTotalRewards;
+}

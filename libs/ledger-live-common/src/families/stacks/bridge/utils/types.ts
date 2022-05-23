@@ -46,6 +46,33 @@ export type BroadcastTransactionRequest = Buffer;
 
 export type BroadcastTransactionResponse = string;
 
+export interface BurnChainRewards {
+  canonical: boolean;
+  burn_block_hash: string;
+  burn_block_height: number;
+  burn_amount: string;
+  reward_recipient: string;
+  reward_amount: string;
+  reward_index: number;
+}
+
+export type BurnChainRewardsResponse = BurnChainRewards[];
+
+export interface BurnChainSlotHolders {
+  canonical: boolean;
+  burn_block_hash: string;
+  burn_block_height: number;
+  address: string;
+  slot_index: number;
+}
+
+export interface BurnChainTotalRewards {
+  reward_recipient: string;
+  reward_amount: string;
+}
+
+export type BurnChainSlotHoldersResponse = BurnChainSlotHolders[];
+
 interface BlockIdentifier {
   block_height: number;
   block_hash: string;

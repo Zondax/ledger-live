@@ -10,6 +10,9 @@ import {
   fetchBalances,
   fetchBlockHeight,
   fetchTxs,
+  getBurnChainRewards,
+  getBurnChainSlotHolders,
+  getBurnChainTotalRewards,
 } from "../../bridge/utils/api";
 import { TransactionResponse } from "./types";
 import { getCryptoCurrencyById } from "../../../../currencies";
@@ -120,13 +123,22 @@ export const getAccountShape: GetAccountShape = async (info) => {
   const balance = await fetchBalances(address);
   const rawTxs = await fetchTxs(address);
 
-  const result = {
+  const slotHolders = await getBurnChainSlotHolders(address);
+  const rewards = await getBurnChainRewards(address);
+  const totalRewards = await getBurnChainTotalRewards(address);
+
+  const result: Partial<Account> = {
     id: accountId,
     xpub: rest["publicKey"], // This field come from hw-getAddress result...
     balance: new BigNumber(balance.balance),
     spendableBalance: new BigNumber(balance.balance),
     operations: flatMap(rawTxs, mapTxToOps(accountId, info)),
     blockHeight: blockHeight.chain_tip.block_height,
+    stacksResources: {
+      burnchain_rewards: rewards,
+      burnchain_total_rewards: totalRewards,
+      burnchain_slot_holders: slotHolders,
+    },
   };
 
   return result;

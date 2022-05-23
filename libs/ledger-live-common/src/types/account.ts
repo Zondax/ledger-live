@@ -20,6 +20,10 @@ import type {
   PolkadotResourcesRaw,
 } from "../families/polkadot/types";
 import type {
+  StacksResources,
+  StacksResourcesRaw,
+} from "../families/stacks/types";
+import type {
   TezosResources,
   TezosResourcesRaw,
 } from "../families/tezos/types";
