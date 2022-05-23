@@ -80,6 +80,11 @@ const envDefinitions = {
     def: "https://live.ledger.dev.zondax.net/blockchain/filecoin", // FIXME Filecoin - Set the correct value for ledger proxy
     desc: "Filecoin API url",
   },
+  API_STACKS_ENDPOINT: {
+    parser: stringParser,
+    def: "https://stacks-node-api.mainnet.stacks.co", // FIXME Stacks - Set the correct value for ledger proxy
+    desc: "Stacks API url",
+  },
   API_POLKADOT_INDEXER: {
     parser: stringParser,
     def: "https://polkadot.coin.ledger.com",
