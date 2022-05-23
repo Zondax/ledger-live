@@ -554,6 +554,7 @@ importers:
       react-native-gesture-handler: ^1.10.3
       react-native-keychain: ^7.0.0
       react-native-level-fs: ^3.0.0
+      react-native-linear-gradient: ^2.5.6
       react-native-localize: ^2.2.1
       react-native-modal: ^13.0.0
       react-native-navigation-bar-color: ^2.0.1
@@ -705,6 +706,7 @@ importers:
       react-native-gesture-handler: 1.10.3_@types+react@17.0.45
       react-native-keychain: 7.0.0
       react-native-level-fs: 3.0.1_asyncstorage-down@4.2.0
+      react-native-linear-gradient: 2.5.6_react-native@0.67.3
       react-native-localize: 2.2.1_jtrxi44z2zn3egoyupbz6wol6a
       react-native-modal: 13.0.1_jtrxi44z2zn3egoyupbz6wol6a
       react-native-navigation-bar-color: 2.0.1
@@ -19028,7 +19030,7 @@ packages:
   /axios/0.26.1:
     resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
     dependencies:
-      follow-redirects: 1.15.0_debug@4.3.4
+      follow-redirects: 1.15.0
     transitivePeerDependencies:
       - debug
 
@@ -19662,7 +19664,7 @@ packages:
       babel-plugin-syntax-jsx: 6.18.0
       lodash: 4.17.21
       picomatch: 2.3.1
-      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
+      styled-components: 5.3.5_ovpqj5wn7dv5iunpkty63trwiy
 
   /babel-plugin-syntax-jsx/6.18.0:
     resolution: {integrity: sha1-CvMqmm4Tyno/1QaeYtew9Y0NiUY=}
@@ -24723,7 +24725,7 @@ packages:
     dependencies:
       confusing-browser-globals: 1.0.11
       eslint: 7.32.0
-      eslint-plugin-import: 2.26.0_ffi3uiz42rv3jyhs6cr7p7qqry
+      eslint-plugin-import: 2.26.0_eslint@7.32.0
       object.assign: 4.1.2
       object.entries: 1.1.5
     dev: true
@@ -24740,7 +24742,7 @@ packages:
     dependencies:
       eslint: 7.32.0
       eslint-config-airbnb-base: 14.2.1_hpmu7kn6tcn2vnxpfzvv33bxmy
-      eslint-plugin-import: 2.26.0_ffi3uiz42rv3jyhs6cr7p7qqry
+      eslint-plugin-import: 2.26.0_eslint@7.32.0
       eslint-plugin-jsx-a11y: 6.5.1_eslint@7.32.0
       eslint-plugin-react: 7.29.4_eslint@7.32.0
       eslint-plugin-react-hooks: 4.5.0_eslint@7.32.0
@@ -32024,7 +32026,7 @@ packages:
       jest-resolve:
         optional: true
     dependencies:
-      jest-resolve: 27.5.1
+      jest-resolve: 27.5.1_metro@0.67.0
     dev: true
 
   /jest-pnp-resolver/1.2.2_jest-resolve@28.1.0:
@@ -35223,24 +35225,6 @@ packages:
       - supports-color
       - utf-8-validate
 
-  /metro-config/0.67.0_5rj3ktdhebdtkdjqejo5rbxriu:
-    resolution: {integrity: sha512-ThAwUmzZwTbKyyrIn2bKIcJDPDBS0LKAbqJZQioflvBGfcgA21h3fdL3IxRmvCEl6OnkEWI0Tn1Z9w2GLAjf2g==}
-    peerDependencies:
-      metro-transform-worker: '*'
-    peerDependenciesMeta:
-      metro-transform-worker:
-        optional: true
-    dependencies:
-      cosmiconfig: 5.2.1
-      jest-validate: 26.6.2
-      metro: 0.67.0
-      metro-cache: 0.67.0_metro@0.67.0
-      metro-core: 0.67.0_metro@0.67.0
-      metro-runtime: 0.67.0
-      metro-transform-worker: 0.67.0_metro-minify-uglify@0.67.0
-    transitivePeerDependencies:
-      - metro
-
   /metro-config/0.67.0_h77kaxayu5kga6qsud7rauzt6a:
     resolution: {integrity: sha512-ThAwUmzZwTbKyyrIn2bKIcJDPDBS0LKAbqJZQioflvBGfcgA21h3fdL3IxRmvCEl6OnkEWI0Tn1Z9w2GLAjf2g==}
     peerDependencies:
@@ -35514,7 +35498,7 @@ packages:
       '@babel/parser': 7.17.10
       '@babel/types': 7.17.10
       babel-preset-fbjs: 3.4.0_@babel+core@7.17.10
-      metro: 0.67.0_h77kaxayu5kga6qsud7rauzt6a
+      metro: 0.67.0
       metro-babel-transformer: 0.67.0
       metro-cache: 0.67.0_metro@0.67.0
       metro-cache-key: 0.67.0
@@ -35587,68 +35571,6 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
-      - supports-color
-      - utf-8-validate
-
-  /metro/0.67.0_h77kaxayu5kga6qsud7rauzt6a:
-    resolution: {integrity: sha512-DwuBGAFcAivoac/swz8Lp7Y5Bcge1tzT7T6K0nf1ubqJP8YzBUtyR4pkjEYVUzVu/NZf7O54kHSPVu1ibYzOBQ==}
-    hasBin: true
-    dependencies:
-      '@babel/code-frame': 7.16.7
-      '@babel/core': 7.17.10
-      '@babel/generator': 7.17.10
-      '@babel/parser': 7.17.10
-      '@babel/template': 7.16.7
-      '@babel/traverse': 7.17.10
-      '@babel/types': 7.17.10
-      absolute-path: 0.0.0
-      accepts: 1.3.8
-      async: 2.6.4
-      chalk: 4.1.2
-      ci-info: 2.0.0
-      connect: 3.7.0
-      debug: 2.6.9
-      denodeify: 1.2.1
-      error-stack-parser: 2.0.7
-      fs-extra: 1.0.0
-      graceful-fs: 4.2.10
-      hermes-parser: 0.5.0
-      image-size: 0.6.3
-      invariant: 2.2.4
-      jest-haste-map: 27.5.1_metro@0.67.0
-      jest-worker: 26.6.2_metro@0.67.0
-      lodash.throttle: 4.1.1
-      metro-babel-transformer: 0.67.0
-      metro-cache: 0.67.0_metro@0.67.0
-      metro-cache-key: 0.67.0
-      metro-config: 0.67.0_5rj3ktdhebdtkdjqejo5rbxriu
-      metro-core: 0.67.0_metro@0.67.0
-      metro-hermes-compiler: 0.67.0
-      metro-inspector-proxy: 0.67.0
-      metro-minify-uglify: 0.67.0
-      metro-react-native-babel-preset: 0.67.0
-      metro-resolver: 0.67.0
-      metro-runtime: 0.67.0
-      metro-source-map: 0.67.0
-      metro-symbolicate: 0.67.0
-      metro-transform-plugins: 0.67.0
-      metro-transform-worker: 0.67.0_metro-minify-uglify@0.67.0
-      mime-types: 2.1.35
-      mkdirp: 0.5.6
-      node-fetch: 2.6.7
-      nullthrows: 1.1.1
-      rimraf: 2.7.1
-      serialize-error: 2.1.0
-      source-map: 0.5.7
-      strip-ansi: 6.0.1
-      temp: 0.8.3
-      throat: 5.0.0
-      ws: 7.5.7
-      yargs: 15.4.1
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - metro-transform-worker
       - supports-color
       - utf-8-validate
 
@@ -36073,6 +35995,7 @@ packages:
 
   /moment/2.29.3:
     resolution: {integrity: sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==}
+    requiresBuild: true
 
   /morgan/1.10.0:
     resolution: {integrity: sha512-AbegBVI4sh6El+1gNwvD5YIck7nSA36weD7xvIxG4in80j/UoK8AEGaWnnz8v1GxonMCltmlNs5ZKbGvl9b1XQ==}
@@ -36189,6 +36112,7 @@ packages:
   /mv/2.1.1:
     resolution: {integrity: sha1-rmzg1vbV4KT32JN5jQPB6pVZtqI=}
     engines: {node: '>=0.8.0'}
+    requiresBuild: true
     dependencies:
       mkdirp: 0.5.6
       ncp: 2.0.0
@@ -40034,6 +39958,14 @@ packages:
       asyncstorage-down: 4.2.0
       level-filesystem: 1.2.0
       levelup: 0.18.6
+    dev: false
+
+  /react-native-linear-gradient/2.5.6_react-native@0.67.3:
+    resolution: {integrity: sha512-HDwEaXcQIuXXCV70O+bK1rizFong3wj+5Q/jSyifKFLg0VWF95xh8XQgfzXwtq0NggL9vNjPKXa016KuFu+VFg==}
+    peerDependencies:
+      react-native: '>=0.55'
+    dependencies:
+      react-native: 0.67.3_shn3lkepuadv4od4dudas6ijbq
     dev: false
 
   /react-native-localize/2.2.1_jtrxi44z2zn3egoyupbz6wol6a:

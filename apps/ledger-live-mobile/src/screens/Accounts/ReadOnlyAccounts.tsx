@@ -8,7 +8,7 @@ import {
   listTokens,
   useCurrenciesByMarketcap,
 } from "@ledgerhq/live-common/lib/currencies";
-import { Flex } from "@ledgerhq/native-ui";
+import { Flex, Box } from "@ledgerhq/native-ui";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRefreshAccountsOrdering } from "../../actions/general";
@@ -17,6 +17,8 @@ import TrackScreen from "../../analytics/TrackScreen";
 
 import { withDiscreetMode } from "../../context/DiscreetModeContext";
 import ReadOnlyAccountRow from "./ReadOnlyAccountRow";
+import { TAB_BAR_SAFE_HEIGHT } from "../../components/TabBar/TabBarSafeAreaView";
+import GradientBox from "../../components/GradientBox";
 
 type Props = {
   navigation: any;
@@ -49,14 +51,30 @@ function Accounts({ navigation, route }: Props) {
       })),
     [sortedCryptoCurrencies],
   );
-  console.log("accounts list", assets[1].currency.units);
 
-  const renderItem = useCallback(
-    ({ item }: { item: any }) => (
-      <ReadOnlyAccountRow navigation={navigation} currency={item.currency} />
-    ),
-    [navigation],
-  );
+  const data = [
+    ...assets.map(({ currency }) => (
+      <Box key={currency.id} mx={6}>
+        <ReadOnlyAccountRow navigation={navigation} currency={currency} />
+      </Box>
+    )),
+    <Box mx={6}>
+      <GradientBox
+        size="small"
+        title="+ more than 6000 others"
+        text={"Ledger supports more than 6000 coins and tokens"}
+      />
+    </Box>,
+  ];
+
+  // const renderItem = useCallback(
+  //   ({ item }: { item: any }) => (
+  //     <Box mx={6}>
+  //       <ReadOnlyAccountRow navigation={navigation} currency={item.currency} />
+  //     </Box>
+  //   ),
+  //   [navigation],
+  // );
 
   useEffect(() => {
     console.log("effect");
@@ -71,10 +89,13 @@ function Accounts({ navigation, route }: Props) {
       <TrackScreen category="Accounts" accountsLength={accounts.length} />
       <Flex flex={1} bg={"background.main"}>
         <FlatList
-          data={assets}
-          renderItem={renderItem}
+          data={data}
+          // renderItem={renderItem}
+          renderItem={({ item }: any) => item}
           keyExtractor={item => item.id}
-          contentContainerStyle={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingBottom: TAB_BAR_SAFE_HEIGHT,
+          }}
         />
       </Flex>
     </SafeAreaView>
