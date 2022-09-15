@@ -69,6 +69,7 @@ setSupportedCurrencies([
   "moonbeam",
   "songbird",
   "flare",
+  "stacks",
 ]);
 
 if (Config.VERBOSE) {
