@@ -165,9 +165,6 @@ const modes = Object.freeze({
     startsAt: 1,
     tag: "third-party",
   },
-  stacks: {
-    overridesDerivation: "44'/5757'/0'/0/<account>",
-  },
   solanaMain: {
     isNonIterable: true,
     overridesDerivation: "44'/501'",
@@ -200,7 +197,6 @@ const legacyDerivations: Record<CryptoCurrencyIds, DerivationMode[]> = {
   filecoin: ["gliflegacy", "glif"],
   cardano: ["cardano"],
   cardano_testnet: ["cardano"],
-  stacks: ["stacks"],
 };
 
 const legacyDerivationsPerFamily: Record<string, DerivationMode[]> = {
