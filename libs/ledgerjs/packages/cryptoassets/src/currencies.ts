@@ -3251,6 +3251,30 @@ export const cryptocurrenciesById: Record<string, CryptoCurrency> = {
       },
     ],
   },
+  casper: {
+    name: "Casper",
+    ticker: "CSPR",
+    coinType: 506,
+    color: "#ff0011",
+    family: "casper",
+    id: "casper",
+    managerAppName: "Casper",
+    scheme: "casper",
+    type: "CryptoCurrency",
+    explorerViews: [
+      {
+        tx: "https://casperstats.io/tx/$hash",
+        address: "https://casperstats.io/address/$address",
+      },
+    ],
+    units: [
+      {
+        name: "CSPR",
+        code: "CSPR",
+        magnitude: 18,
+      },
+    ],
+  },
   // Light Integrations are at the end of the list until we figure out a way to fix the ticker/managerApp collisions
   arbitrum: {
     type: "CryptoCurrency",
