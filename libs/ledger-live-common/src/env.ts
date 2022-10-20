@@ -102,6 +102,16 @@ const envDefinitions = {
     def: "https://filecoin.coin.ledger.com",
     desc: "Filecoin API url",
   },
+  API_CASPER_LIVE_ENDPOINT: {
+    parser: stringParser,
+    def: "https://api.cspr.live",
+    desc: "Casper API url",
+  },
+  API_CASPER_NODE_ENDPOINT: {
+    parser: stringParser,
+    def: "https://rpc.mainnet.casperlabs.io/rpc",
+    desc: "Casper API url",
+  },
   API_POLKADOT_INDEXER: {
     parser: stringParser,
     def: "https://polkadot.coin.ledger.com",
