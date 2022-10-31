@@ -1,6 +1,33 @@
 import blake2 from "blake2";
 import { SMALL_BYTES_COUNT } from "../../consts";
 
+import { Account, Address } from "@ledgerhq/types-live";
+import { CLPublicKeyTag } from "casper-js-sdk";
+
+export const getAddress = (a: Account): Address =>
+  a.freshAddresses.length > 0
+    ? a.freshAddresses[0]
+    : { address: a.freshAddress, derivationPath: a.freshAddressPath };
+
+export const getPublicKey = (a: Account): string => {
+  const address =
+    a.freshAddresses.length > 0
+      ? a.freshAddresses[0]
+      : { address: a.freshAddress, derivationPath: a.freshAddressPath };
+
+  return address.address.substring(2);
+};
+
+export const getPubKeySignature = (pubKey: string): CLPublicKeyTag => {
+  const signature = pubKey.substring(0, 2);
+
+  if (signature === "01") return CLPublicKeyTag.ED25519;
+
+  if (signature === "02") return CLPublicKeyTag.SECP256K1;
+
+  return 0;
+};
+
 function numberToBin(num: number) {
   return (num >>> 0).toString(2);
 }
@@ -52,7 +79,7 @@ function encode(inputBytes: Buffer) {
 
 // Decodes a mixed-case hexadecimal string
 // Checksum hex encoding for casper docs: https://docs.casperlabs.io/design/checksummed-hex/
-export function decode(inputString: string): string {
+function decode(inputString: string): string {
   if (Buffer.from(inputString, "hex").length > SMALL_BYTES_COUNT)
     return inputString;
 
@@ -67,4 +94,13 @@ export function decode(inputString: string): string {
   }
 
   return inputString;
+}
+
+export function validateAddress(address: string): { isValid: boolean } {
+  try {
+    decode(address);
+    return { isValid: true };
+  } catch (err) {
+    return { isValid: false };
+  }
 }
