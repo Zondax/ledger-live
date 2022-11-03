@@ -104,7 +104,7 @@ const envDefinitions = {
   },
   API_CASPER_NODE_ENDPOINT: {
     parser: stringParser,
-    def: "https://rpc.mainnet.casperlabs.io/rpc",
+    def: "https://rpc.testnet.casperlabs.io/rpc",
     desc: "Casper API url",
   },
   API_POLKADOT_INDEXER: {
