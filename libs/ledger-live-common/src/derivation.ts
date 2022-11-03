@@ -167,6 +167,11 @@ const modes = Object.freeze({
     startsAt: 1,
     tag: "third-party",
   },
+  casper_wallet: {
+    overridesDerivation: "44'/506'/0'/0/<account>",
+    startsAt: 1,
+    tag: "third-party",
+  },
   solanaMain: {
     isNonIterable: true,
     overridesDerivation: "44'/501'",
@@ -197,6 +202,7 @@ const legacyDerivations: Record<CryptoCurrencyIds, DerivationMode[]> = {
   polkadot: ["polkadotbip44"],
   hedera: ["hederaBip44"],
   filecoin: ["gliflegacy", "glif"],
+  casper: ["casper_wallet"],
   cardano: ["cardano"],
   cardano_testnet: ["cardano"],
 };
@@ -369,6 +375,7 @@ const seedIdentifierPath = {
   hedera: ({ purpose, coinType }) => `${purpose}/${coinType}`,
   cardano: ({ purpose, coinType }) => `${purpose}'/${coinType}'/0'/0/0`,
   cardano_testnet: ({ purpose, coinType }) => `${purpose}'/${coinType}'/0'/0/0`,
+  casper: ({ purpose, coinType }) => `${purpose}'/${coinType}'/0'/0/0`,
   _: ({ purpose, coinType }) => `${purpose}'/${coinType}'/0'`,
 };
 export const getSeedIdentifierDerivation = (
