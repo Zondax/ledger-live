@@ -1,8 +1,8 @@
-import blake2 from "blake2";
 import { SMALL_BYTES_COUNT } from "../../consts";
 
 import { Account, Address } from "@ledgerhq/types-live";
 import { CLPublicKeyTag } from "casper-js-sdk";
+import { blake2bFinal, blake2bInit, blake2bUpdate } from "blakejs";
 
 export const getAddress = (a: Account): Address =>
   a.freshAddresses.length > 0
@@ -48,17 +48,15 @@ function bytesToBitsString(buf: Buffer) {
  * similar to [EIP-55](https://eips.ethereum.org/EIPS/eip-55).
  */
 function encode(inputBytes: Buffer) {
-  const blakeHash = blake2
-    .createHash("blake2b", { digestLength: inputBytes.length })
-    .update(inputBytes)
-    .digest("hex");
+  const context = blake2bInit(inputBytes.length);
+  blake2bUpdate(context, inputBytes);
+  const hashBuf = Buffer.from(blake2bFinal(context));
 
   const nibbles = inputBytes
     .toString("hex")
     .split("")
     .map((v) => parseInt(v, 16));
 
-  const hashBuf = Buffer.from(blakeHash, "hex");
   const bitsArray = bytesToBitsString(hashBuf);
 
   const res: Array<number | string> = [];
