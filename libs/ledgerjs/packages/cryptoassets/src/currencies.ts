@@ -3273,6 +3273,11 @@ export const cryptocurrenciesById: Record<string, CryptoCurrency> = {
         code: "CSPR",
         magnitude: 9,
       },
+      {
+        name: "motes",
+        code: "motes",
+        magnitude: 0,
+      },
     ],
   },
   // Light Integrations are at the end of the list until we figure out a way to fix the ticker/managerApp collisions
