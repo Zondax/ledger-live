@@ -11,6 +11,7 @@ import {
 import { log } from "@ledgerhq/logs";
 import BigNumber from "bignumber.js";
 import { LTxnHistoryData, NAccountBalance } from "./bridge/utils/types";
+import { CASPER_FEES } from "./consts";
 
 const validHexRegExp = new RegExp(/[0-9A-Fa-f]{6}/g);
 const validBase64RegExp = new RegExp(
@@ -86,7 +87,7 @@ export const getAccountShape: GetAccountShape = async (info) => {
   const result = {
     id: accountId,
     balance: csprBalance,
-    spendableBalance: csprBalance,
+    spendableBalance: csprBalance.minus(CASPER_FEES),
     operations: flatMap(txs, mapTxToOps(accountId, info)),
     blockHeight: blockHeight.last_added_block_info.height,
   };

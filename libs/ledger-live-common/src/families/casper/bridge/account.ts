@@ -5,6 +5,7 @@ import type {
   SignOperationEvent,
   BroadcastFnSignature,
   SignOperationFnSignature,
+  AccountLike,
 } from "@ledgerhq/types-live";
 import type { Transaction, TransactionStatus } from "../types";
 import { makeAccountBridgeReceive, makeSync } from "../../../bridge/jsHelpers";
@@ -12,7 +13,7 @@ import { makeAccountBridgeReceive, makeSync } from "../../../bridge/jsHelpers";
 import { getAccountShape, getPath, isError } from "../utils";
 import { CLPublicKey, DeployUtil } from "casper-js-sdk";
 import BigNumber from "bignumber.js";
-import { CASPER_FEES, CASPER_NETWORK } from "../consts";
+import { CASPER_FEES, CASPER_NETWORK, MINIMUM_VALID_AMOUNT } from "../consts";
 import {
   getAddress,
   getPubKeySignature,
@@ -30,7 +31,12 @@ import {
   NotEnoughBalance,
   RecipientRequired,
 } from "@ledgerhq/errors";
-import { broadcastTx } from "./utils/network";
+import {
+  broadcastTx,
+  fetchBalances,
+  getAccountStateInfo,
+} from "./utils/network";
+import { getMainAccount } from "../../../account/helpers";
 
 const receive = makeAccountBridgeReceive();
 
@@ -56,7 +62,7 @@ const createNewDeploy = (
       undefined
     );
 
-  const payment = DeployUtil.standardPayment(CASPER_FEES);
+  const payment = DeployUtil.standardPayment(CASPER_FEES.toString());
   return DeployUtil.makeDeploy(deployParams, session, payment);
 };
 
@@ -123,6 +129,10 @@ const getTransactionStatus = async (
   const estimatedFees = new BigNumber(CASPER_FEES);
 
   let totalSpent;
+  if (amount.lte(MINIMUM_VALID_AMOUNT))
+    errors.amount = new NotEnoughBalance(
+      `Minimum CSPR to transfer is ${MINIMUM_VALID_AMOUNT} CSPR`
+    );
   if (useAllAmount) {
     totalSpent = a.spendableBalance;
     amount = totalSpent.minus(estimatedFees);
@@ -149,8 +159,44 @@ const getTransactionStatus = async (
   };
 };
 
-const estimateMaxSpendable = () => {
-  throw new Error("estimateMaxSpendable not implemented");
+const estimateMaxSpendable = async ({
+  account,
+  parentAccount,
+  transaction,
+}: {
+  account: AccountLike;
+  parentAccount?: Account | null | undefined;
+  transaction?: Transaction | null | undefined;
+}): Promise<BigNumber> => {
+  const a = getMainAccount(account, parentAccount);
+  const { address } = getAddress(a);
+
+  const recipient = transaction?.recipient;
+
+  if (!validateAddress(address).isValid) throw new InvalidAddress();
+  if (recipient && !validateAddress(recipient).isValid)
+    throw new InvalidAddress();
+
+  const { purseUref } = await getAccountStateInfo(address);
+  if (!purseUref) throw new InvalidAddress();
+
+  const balances = await fetchBalances(purseUref);
+  let balance = new BigNumber(balances.balance_value);
+
+  if (balance.eq(0)) return balance;
+
+  const amount = transaction?.amount;
+
+  const estimatedFees = CASPER_FEES;
+
+  if (balance.lte(estimatedFees)) return new BigNumber(0);
+
+  balance = balance.minus(estimatedFees);
+  if (amount) balance = balance.minus(amount);
+
+  // log("debug", "[estimateMaxSpendable] finish fn");
+
+  return balance;
 };
 
 const signOperation: SignOperationFnSignature<Transaction> = ({
