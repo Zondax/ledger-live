@@ -10,6 +10,7 @@ import {
 } from "./bridge/utils/network";
 import { log } from "@ledgerhq/logs";
 import BigNumber from "bignumber.js";
+import { LTxnHistoryData, NAccountBalance } from "./bridge/utils/types";
 
 const validHexRegExp = new RegExp(/[0-9A-Fa-f]{6}/g);
 const validBase64RegExp = new RegExp(
@@ -72,16 +73,16 @@ export const getAccountShape: GetAccountShape = async (info) => {
 
   const blockHeight = await fetchBlockHeight();
 
-  let balance, txs;
+  let balance: NAccountBalance, txs: LTxnHistoryData[];
   if (purseUref && accountHash) {
-    balance = await fetchBalances(address, purseUref);
+    balance = await fetchBalances(purseUref);
     txs = await fetchTxs(accountHash);
   } else {
-    balance = 0;
+    balance = { balance_value: "0", api_version: "", merkle_proof: "" };
     txs = [];
   }
 
-  const csprBalance = motesToCSPR(balance.balance_value);
+  const csprBalance = new BigNumber(balance.balance_value);
   const result = {
     id: accountId,
     balance: csprBalance,

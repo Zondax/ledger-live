@@ -12,7 +12,7 @@ import { makeAccountBridgeReceive, makeSync } from "../../../bridge/jsHelpers";
 import { getAccountShape, getPath, isError } from "../utils";
 import { CLPublicKey, DeployUtil } from "casper-js-sdk";
 import BigNumber from "bignumber.js";
-import { CASPER_FEES } from "../consts";
+import { CASPER_FEES, CASPER_NETWORK } from "../consts";
 import {
   getAddress,
   getPubKeySignature,
@@ -37,21 +37,24 @@ const receive = makeAccountBridgeReceive();
 const createNewDeploy = (
   sender: string,
   recipient?: string,
-  network = "main-network"
+  amount?: BigNumber,
+  network = CASPER_NETWORK
 ) => {
+  log("debug", `Creating new Deploy: ${sender}, ${recipient}, ${network}`);
   const deployParams = new DeployUtil.DeployParams(
-    new CLPublicKey(Buffer.from(sender, "hex"), 2),
+    new CLPublicKey(Buffer.from(sender.substring(2), "hex"), 2),
     network
   );
   const recipientBuff = recipient
-    ? Buffer.from(recipient, "hex")
-    : Buffer.alloc(32);
-  const session = DeployUtil.ExecutableDeployItem.newTransfer(
-    0,
-    new CLPublicKey(recipientBuff, getPubKeySignature(recipient ?? "")),
-    undefined,
-    1
-  );
+    ? Buffer.from(recipient.substring(2), "hex")
+    : Buffer.from(sender.substring(2), "hex");
+
+  const session =
+    DeployUtil.ExecutableDeployItem.newTransferWithOptionalTransferId(
+      amount?.toNumber() ?? 0,
+      new CLPublicKey(recipientBuff, getPubKeySignature(recipient ?? sender)),
+      undefined
+    );
 
   const payment = DeployUtil.standardPayment(CASPER_FEES);
   return DeployUtil.makeDeploy(deployParams, session, payment);
@@ -89,7 +92,7 @@ const prepareTransaction = async (
     ) {
       t.recipient = recipient;
 
-      t.deploy = createNewDeploy(address, recipient);
+      t.deploy = createNewDeploy(address, recipient, t.amount);
     }
   }
 
@@ -130,8 +133,9 @@ const getTransactionStatus = async (
     totalSpent = amount.plus(estimatedFees);
     if (amount.eq(0)) {
       errors.amount = new AmountRequired();
-    } else if (totalSpent.gt(a.spendableBalance))
+    } else if (totalSpent.gt(a.spendableBalance)) {
       errors.amount = new NotEnoughBalance();
+    }
   }
 
   // log("debug", "[getTransactionStatus] finish fn");
@@ -208,7 +212,10 @@ const signOperation: SignOperationFnSignature<Transaction> = ({
             const signedDeploy = DeployUtil.setSignature(
               transaction.deploy,
               signature,
-              new CLPublicKey(pk, getPubKeySignature(pk.toString("hex")))
+              new CLPublicKey(
+                pk,
+                getPubKeySignature(ledgerPublicKey.Address.toString())
+              )
             );
             transaction.deploy = signedDeploy;
 

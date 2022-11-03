@@ -135,7 +135,6 @@ export const getAccountStateInfo = async (
 };
 
 export const fetchBalances = async (
-  publicKey: string,
   purseUref: CLURef
 ): Promise<NAccountBalance> => {
   const stateRootInfo = await node<NStateRootHashResponse>({
@@ -194,7 +193,7 @@ export const broadcastTx = async (
     id: 1,
     jsonrpc: "2.0",
     method: "account_put_deploy",
-    params: deploy,
+    params: DeployUtil.deployToJson(deploy),
   });
 
   return response; // TODO Validate if the response fits this interface
