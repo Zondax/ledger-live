@@ -13,7 +13,7 @@ import { makeAccountBridgeReceive, makeSync } from "../../../bridge/jsHelpers";
 import { getAccountShape, getPath, isError, motesToCSPR } from "../utils";
 import { CLPublicKey, DeployUtil } from "casper-js-sdk";
 import BigNumber from "bignumber.js";
-import { CASPER_FEES, CASPER_NETWORK, MINIMUM_VALID_AMOUNT } from "../consts";
+import { CASPER_FEES, MINIMUM_VALID_AMOUNT } from "../consts";
 import {
   getAddress,
   getPubKeySignature,
@@ -38,34 +38,9 @@ import {
   getAccountStateInfo,
 } from "./utils/network";
 import { getMainAccount } from "../../../account/helpers";
+import { createNewDeploy } from "./utils/txn";
 
 const receive = makeAccountBridgeReceive();
-
-const createNewDeploy = (
-  sender: string,
-  recipient?: string,
-  amount?: BigNumber,
-  network = CASPER_NETWORK
-) => {
-  log("debug", `Creating new Deploy: ${sender}, ${recipient}, ${network}`);
-  const deployParams = new DeployUtil.DeployParams(
-    new CLPublicKey(Buffer.from(sender.substring(2), "hex"), 2),
-    network
-  );
-  const recipientBuff = recipient
-    ? Buffer.from(recipient.substring(2), "hex")
-    : Buffer.from(sender.substring(2), "hex");
-
-  const session =
-    DeployUtil.ExecutableDeployItem.newTransferWithOptionalTransferId(
-      amount?.toNumber() ?? 0,
-      new CLPublicKey(recipientBuff, getPubKeySignature(recipient ?? sender)),
-      undefined
-    );
-
-  const payment = DeployUtil.standardPayment(CASPER_FEES.toString());
-  return DeployUtil.makeDeploy(deployParams, session, payment);
-};
 
 const createTransaction = (a: Account): Transaction => {
   // log("debug", "[createTransaction] creating base tx");
