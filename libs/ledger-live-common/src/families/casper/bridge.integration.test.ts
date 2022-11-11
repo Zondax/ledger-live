@@ -3,9 +3,7 @@ import { testBridge } from "../../__tests__/test-helpers/bridge";
 import type { CurrenciesData, DatasetTest } from "@ledgerhq/types-live";
 import type { Transaction } from "./types";
 import { fromTransactionRaw } from "./transaction";
-import { createNewDeploy } from "./bridge/utils/txn";
 import BigNumber from "bignumber.js";
-import { DeployUtil } from "casper-js-sdk";
 import {
   AmountRequired,
   InvalidAddress,
@@ -14,8 +12,6 @@ import {
 } from "@ledgerhq/errors";
 
 const SEED_IDENTIFIER =
-  "020378080845446B50D7bFe2C450B5b24b8C586EfaF1aA051Feff4d12aD8f1eBF9E6";
-const ACCOUNT_1 =
   "020378080845446B50D7bFe2C450B5b24b8C586EfaF1aA051Feff4d12aD8f1eBF9E6";
 const ACCOUNT_2 =
   "0203A17118eC0e64c4e4FdbDbEe0eA14D118C9aAf08C6c81bbB776Cae607cEB84EcB";
@@ -35,14 +31,15 @@ const casper: CurrenciesData<Transaction> = {
       <= 03046705498ee223a1bf41ed23d9889fb5f2f711df2e14ef73a431594e75a4636130323033303436373035343938654532323361316266343165643233643938383946423566324637313164463245313445463733413433313539344537356134363336319000
       => 11010000142c000080fa010080020000800000000000000000
       <= 029644cc1ec96ea3faf36d483b7bde8c85393b9b34e602f184d8b559b526e474ed30323032393634344363314563393665413346414633364434383362374264653863383533393342396233344536303246313834643862353539623532364534373445649000
+      => 11010000142c000080fa010080030000800000000000000000
+      <= 02488e51a828423e59a45261c63c473d59419a8d7d2dc29fbadd9e8fee16d3988330323032343838453531613832383432334535394134353236314336336334373364353934313941386437443244633239666241644439453866456531366433393838339000
       `,
     },
   ],
   accounts: [
     {
-      FIXME_tests: ["balance is sum of ops"],
       raw: {
-        id: `js:2:casper:${SEED_IDENTIFIER}:live`,
+        id: `js:2:casper:${SEED_IDENTIFIER}:casper_wallet`,
         seedIdentifier: SEED_IDENTIFIER,
         name: "Casper 1",
         derivationMode: "casper_wallet" as const,
@@ -64,14 +61,8 @@ const casper: CurrenciesData<Transaction> = {
           transaction: fromTransactionRaw({
             family: "casper",
             recipient: "novalidaddress",
-            amount: "100000000",
-            deploy: DeployUtil.deployToJson(
-              createNewDeploy(
-                ACCOUNT_1,
-                "novalidaddress",
-                new BigNumber(100000000)
-              )
-            ),
+            amount: "1000",
+            deploy: null,
           }),
           expectedStatus: {
             errors: {
@@ -85,14 +76,8 @@ const casper: CurrenciesData<Transaction> = {
           transaction: fromTransactionRaw({
             family: "casper",
             recipient: ACCOUNT_2,
-            amount: "100000000000000000000",
-            deploy: DeployUtil.deployToJson(
-              createNewDeploy(
-                ACCOUNT_1,
-                ACCOUNT_2,
-                new BigNumber(100000000000000000000)
-              )
-            ),
+            amount: (300 * 1e9).toString(),
+            deploy: null,
           }),
           expectedStatus: {
             errors: {
@@ -107,9 +92,7 @@ const casper: CurrenciesData<Transaction> = {
             family: "casper",
             recipient: ACCOUNT_2,
             amount: "0",
-            deploy: DeployUtil.deployToJson(
-              createNewDeploy(ACCOUNT_1, ACCOUNT_2, new BigNumber(0))
-            ),
+            deploy: null,
           }),
           expectedStatus: {
             errors: {
@@ -124,13 +107,12 @@ const casper: CurrenciesData<Transaction> = {
             family: "casper",
             recipient: ACCOUNT_2,
             amount: "1",
-            deploy: DeployUtil.deployToJson(
-              createNewDeploy(ACCOUNT_1, ACCOUNT_2, new BigNumber(1))
-            ),
+            deploy: null,
           }),
+
           expectedStatus: {
             errors: {
-              amount: new InvalidAmountTransfer(),
+              amount: new AmountRequired(),
             },
             warnings: {},
           },
@@ -140,13 +122,11 @@ const casper: CurrenciesData<Transaction> = {
           transaction: fromTransactionRaw({
             family: "casper",
             recipient: ACCOUNT_2,
-            amount: "2.5",
-            deploy: DeployUtil.deployToJson(
-              createNewDeploy(ACCOUNT_1, ACCOUNT_2, new BigNumber(2.5))
-            ),
+            amount: "3",
+            deploy: null,
           }),
           expectedStatus: {
-            amount: new BigNumber("2.5"),
+            amount: new BigNumber("3"),
             errors: {},
             warnings: {},
           },
