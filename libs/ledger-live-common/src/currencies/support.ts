@@ -75,6 +75,7 @@ export function listSupportedFiats(): FiatCurrency[] {
   return userSupportedFiats;
 }
 export function setSupportedCurrencies(ids: CryptoCurrencyIds[]) {
+  // eslint-disable-next-line no-console
   userSupportedCurrencies = Array.from(new Set(ids)) // Make sure to remove duplicates
     .map((id) => getCryptoCurrencyById(id));
 }
