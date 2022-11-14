@@ -9,6 +9,8 @@ import {
   InvalidAddress,
   NotEnoughBalance,
 } from "@ledgerhq/errors";
+import { MINIMUM_VALID_AMOUNT } from "./consts";
+import { motesToCSPR } from "./utils";
 
 const SEED_IDENTIFIER =
   "020378080845446B50D7bFe2C450B5b24b8C586EfaF1aA051Feff4d12aD8f1eBF9E6";
@@ -111,7 +113,11 @@ const casper: CurrenciesData<Transaction> = {
 
           expectedStatus: {
             errors: {
-              amount: new AmountRequired(),
+              amount: new AmountRequired(
+                `Minimum CSPR to transfer is ${motesToCSPR(
+                  MINIMUM_VALID_AMOUNT
+                ).toNumber()} CSPR`
+              ),
             },
             warnings: {},
           },
