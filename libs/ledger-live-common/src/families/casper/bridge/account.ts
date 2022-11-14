@@ -10,7 +10,7 @@ import type {
 import type { Transaction, TransactionStatus } from "../types";
 import { makeAccountBridgeReceive, makeSync } from "../../../bridge/jsHelpers";
 
-import { getAccountShape, getPath, isError, motesToCSPR } from "../utils";
+import { getAccountShape, getPath, isError } from "../utils";
 import { CLPublicKey, DeployUtil } from "casper-js-sdk";
 import BigNumber from "bignumber.js";
 import { CASPER_FEES, MINIMUM_VALID_AMOUNT } from "../consts";
@@ -38,6 +38,7 @@ import {
 } from "./utils/network";
 import { getMainAccount } from "../../../account/helpers";
 import { createNewDeploy } from "./utils/txn";
+import { invalidMinimumAmountError } from "./utils/errors";
 
 const receive = makeAccountBridgeReceive();
 
@@ -108,11 +109,7 @@ const getTransactionStatus = async (
 
   let totalSpent;
   if (amount.lt(MINIMUM_VALID_AMOUNT))
-    errors.amount = new AmountRequired(
-      `Minimum CSPR to transfer is ${motesToCSPR(
-        MINIMUM_VALID_AMOUNT
-      ).toNumber()} CSPR`
-    );
+    errors.amount = invalidMinimumAmountError();
 
   if (useAllAmount) {
     totalSpent = a.spendableBalance;
