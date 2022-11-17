@@ -2051,6 +2051,7 @@
       "rewardFrom" : "Récompense de",
       "rewardAmount" : "Montant touché",
       "memo" : "Mémo",
+      "transferId": "ID de transfert",
       "assetId" : "Identifiant de l’actif",
       "rewards" : "Récompenses gagnées",
       "bondedAmount" : "Montant lié",
@@ -3273,6 +3274,8 @@
       "maxEstimatedFee" : "Frais maximaux estimés",
       "validateFees" : "Valider les frais",
       "customizeFees" : "Modifier les frais",
+      "transferId": "ID de transfert",
+      "validateTransferId": "Valider l'identifiant",
       "memo" : {
         "title" : "Mémo",
         "type" : "Type de mémo",

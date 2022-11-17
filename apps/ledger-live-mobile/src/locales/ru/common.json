@@ -2031,6 +2031,7 @@
     },
     "details" : "{{ currency }} – сведения",
     "extra" : {
+      "transferId": "Идентификатор передачи",
       "resource" : "Ресурс",
       "frozenAmount" : "Замороженная сумма",
       "unfreezeAmount" : "Разморозить сумму",
@@ -3273,6 +3274,8 @@
       "maxEstimatedFee" : "Макс. ориентировочная комиссия",
       "validateFees" : "Подтвердить комиссию",
       "customizeFees" : "Указать комиссию",
+      "transferId": "Идентификатор передачи",
+      "validateTransferId": "Идентификатор валидара",
       "memo" : {
         "title" : "Memo",
         "type" : "Тип Memo",
