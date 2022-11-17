@@ -1993,6 +1993,7 @@
     "details" : "{{ currency }} Details",
     "extra" : {
       "resource" : "Ressource",
+      "transferId": "Transfer ID",
       "frozenAmount" : "Eingefrorener Betrag",
       "unfreezeAmount" : "Betrag entsperren",
       "address" : "Adresse",
@@ -3217,6 +3218,8 @@
       "fees" : "Gebühren",
       "validateFees" : "Gebühren validieren",
       "customizeFees" : "Gebühren anpassen",
+      "transferId": "Transfer ID",
+      "validateTransferId": "ID validieren",
       "memo" : {
         "title" : "Memo",
         "type" : "Memo-Typ",

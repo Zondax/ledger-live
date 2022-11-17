@@ -2013,6 +2013,7 @@
     },
     "details": "{{ currency }} details",
     "extra": {
+      "transferId": "Transfer ID",
       "resource": "Resource",
       "frozenAmount": "Frozen amount",
       "unfreezeAmount": "Unfreeze amount",
@@ -3244,8 +3245,8 @@
       "infoTotalDesc": "Includes transaction amount and the selected network fees",
       "gasLimit": "Gas limit",
       "gasPrice": "Gas price",
-      "maxFee" : "Max fee",
-      "maxPriorityFee" : "Max priority fee",
+      "maxFee": "Max fee",
+      "maxPriorityFee": "Max priority fee",
       "nextBlock": "Next block: {{nextBaseFee}}",
       "suggestedPriorityFee": "Suggested: {{lowPriorityFee}} - {{highPriorityFee}}",
       "maxFees": "Max fees",
@@ -3254,6 +3255,8 @@
       "maxEstimatedFee": "Max estimated fee",
       "validateFees": "Validate Fees",
       "customizeFees": "Customize Fees",
+      "transferId": "Transfer ID",
+      "validateTransferId": "Validate ID",
       "memo": {
         "title": "Memo",
         "type": "Memo type",
