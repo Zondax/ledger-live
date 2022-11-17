@@ -15,6 +15,7 @@ export enum ScreenName {
   Asset = "Asset",
   BenchmarkQRStream = "BenchmarkQRStream",
   BitcoinEditCustomFees = "BitcoinEditCustomFees",
+  CasperEditTransferId = "CasperEditTransferId",
   ClaimRewardsConnectDevice = "ClaimRewardsConnectDevice",
   ClaimRewardsSelectDevice = "ClaimRewardsSelectDevice",
   ClaimRewardsValidationError = "ClaimRewardsValidationError",

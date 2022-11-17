@@ -3,6 +3,7 @@ import {
   TransactionStatus,
 } from "@ledgerhq/live-common/generated/types";
 import type { Transaction as EthereumTransaction } from "@ledgerhq/live-common/families/ethereum/types";
+import type { Transaction as CasperTransaction } from "@ledgerhq/live-common/families/casper/types";
 import type {
   CardanoAccount,
   Transaction as CardanoTransaction,
@@ -172,6 +173,28 @@ export type LendingWithdrawFlowNavigatorParamList = {
     accountId: string;
     parentId?: string;
     transaction: EthereumTransaction;
+    currentNavigation:
+      | ScreenName.LendingWithdrawSummary
+      | ScreenName.LendingSupplySummary
+      | ScreenName.SignTransactionSummary
+      | ScreenName.LendingEnableSummary
+      | ScreenName.SignTransactionSummary
+      | ScreenName.SendSummary
+      | ScreenName.SwapForm;
+    nextNavigation:
+      | ScreenName.LendingWithdrawSelectDevice
+      | ScreenName.LendingSupplySelectDevice
+      | ScreenName.SignTransactionSelectDevice
+      | ScreenName.LendingEnableSelectDevice
+      | ScreenName.SignTransactionSelectDevice
+      | ScreenName.SendSelectDevice
+      | ScreenName.SwapForm;
+  };
+  [ScreenName.CasperEditTransferId]: {
+    accountId: string;
+    account: Account;
+    parentId?: string;
+    transaction: CasperTransaction;
     currentNavigation:
       | ScreenName.LendingWithdrawSummary
       | ScreenName.LendingSupplySummary
