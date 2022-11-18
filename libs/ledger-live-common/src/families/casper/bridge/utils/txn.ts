@@ -7,7 +7,11 @@ import BigNumber from "bignumber.js";
 import { CLPublicKey, DeployUtil } from "casper-js-sdk";
 import { encodeOperationId } from "../../../../operation";
 import { CASPER_FEES, CASPER_NETWORK } from "../../consts";
-import { getPubKeySignature, validateAddress } from "./addresses";
+import {
+  getPubKeySignature,
+  getPublicKeyFromCasperAddress,
+  validateAddress,
+} from "./addresses";
 import { LTxnHistoryData } from "./types";
 
 export const getUnit = (): Unit => getCryptoCurrencyById("filecoin").units[0];
@@ -75,8 +79,8 @@ export function mapTxToOps(accountId: string, addressHash: string) {
 
 export const createNewDeploy = (
   sender: string,
-  recipient?: string,
-  amount?: BigNumber,
+  recipient: string,
+  amount: BigNumber,
   transferId?: string,
   network = CASPER_NETWORK
 ): DeployUtil.Deploy => {
@@ -87,12 +91,16 @@ export const createNewDeploy = (
   }
 
   const deployParams = new DeployUtil.DeployParams(
-    new CLPublicKey(Buffer.from(sender.substring(2), "hex"), 2),
+    new CLPublicKey(
+      Buffer.from(getPublicKeyFromCasperAddress(sender), "hex"),
+      2
+    ),
     network
   );
-  const recipientBuff = recipient
-    ? Buffer.from(recipient.substring(2), "hex")
-    : Buffer.from(sender.substring(2), "hex");
+  const recipientBuff = Buffer.from(
+    getPublicKeyFromCasperAddress(recipient),
+    "hex"
+  );
 
   const session =
     DeployUtil.ExecutableDeployItem.newTransferWithOptionalTransferId(

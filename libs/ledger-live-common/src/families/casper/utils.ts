@@ -13,6 +13,7 @@ import BigNumber from "bignumber.js";
 import { LTxnHistoryData, NAccountBalance } from "./bridge/utils/types";
 import { CLPublicKey } from "casper-js-sdk";
 import { encode, getPubKeySignature } from "./bridge/utils/addresses";
+import { Account } from "@ledgerhq/types-live";
 
 const validHexRegExp = new RegExp(/[0-9A-Fa-f]{6}/g);
 const validBase64RegExp = new RegExp(
@@ -85,7 +86,7 @@ export const getAccountShape: GetAccountShape = async (info) => {
   }
 
   const csprBalance = new BigNumber(balance.balance_value);
-  const result = {
+  const result: Partial<Account> = {
     id: accountId,
     balance: csprBalance,
     spendableBalance: csprBalance,

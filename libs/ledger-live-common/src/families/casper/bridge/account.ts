@@ -23,6 +23,7 @@ import { CASPER_FEES, MINIMUM_VALID_AMOUNT } from "../consts";
 import {
   getAddress,
   getPubKeySignature,
+  getPublicKeyFromCasperAddress,
   validateAddress,
 } from "./utils/addresses";
 import { log } from "@ledgerhq/logs";
@@ -57,6 +58,7 @@ const createTransaction = (): Transaction => {
     deploy: null,
     amount: new BigNumber(0),
     recipient: "",
+    useAllAmount: false,
   };
 };
 
@@ -242,7 +244,10 @@ const signOperation: SignOperationFnSignature<Transaction> = ({
             );
             const signature = result.signatureRS;
 
-            const pkBuffer = Buffer.from(address.substring(2), "hex");
+            const pkBuffer = Buffer.from(
+              getPublicKeyFromCasperAddress(address),
+              "hex"
+            );
             // sign deploy object
             const signedDeploy = DeployUtil.setSignature(
               transaction.deploy,
