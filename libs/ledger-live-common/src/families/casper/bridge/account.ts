@@ -11,6 +11,7 @@ import type { Transaction, TransactionStatus } from "../types";
 import { makeAccountBridgeReceive, makeSync } from "../../../bridge/jsHelpers";
 
 import {
+  deployHashToString,
   getAccountShape,
   getPath,
   isError,
@@ -235,7 +236,10 @@ const signOperation: SignOperationFnSignature<Transaction> = ({
             });
 
             // signature verification
-            const deployHash = transaction.deploy.hash;
+            const deployHash = deployHashToString(
+              transaction.deploy.hash,
+              true
+            );
             const signature = result.signatureRS;
 
             const pkBuffer = Buffer.from(address.substring(2), "hex");
@@ -248,8 +252,8 @@ const signOperation: SignOperationFnSignature<Transaction> = ({
             transaction.deploy = signedDeploy;
 
             const operation: Operation = {
-              id: encodeOperationId(accountId, deployHash.toString(), "OUT"),
-              hash: deployHash.toString(),
+              id: encodeOperationId(accountId, deployHash, "OUT"),
+              hash: deployHash,
               type: "OUT",
               senders: [address],
               recipients: [recipient],

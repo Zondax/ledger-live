@@ -1,33 +1,60 @@
 import type { DeviceAction } from "../../bot/types";
 import type { Transaction } from "./types";
-import { deviceActionFlow, formatDeviceAmount } from "../../bot/specs";
+import { deviceActionFlow } from "../../bot/specs";
+import { casperPubKeyToAccountHash, deployHashToString } from "./utils";
+import { CASPER_FEES } from "./consts";
 
 export const acceptTransaction: DeviceAction<Transaction, any> =
   deviceActionFlow({
     steps: [
       {
-        title: "To",
+        title: "Review",
         button: "Rr",
-        expectedValue: ({ transaction }) => transaction.recipient,
       },
       {
-        title: "From",
+        title: "Txn hash",
+        button: "Rr",
+        expectedValue: ({ transaction }) => {
+          if (transaction.deploy)
+            return deployHashToString(transaction.deploy.hash);
+          return "";
+        },
+      },
+      {
+        title: "Type",
+        button: "Rr",
+        expectedValue: () => "Token transfer",
+      },
+      {
+        title: "Chain ID",
+        button: "Rr",
+        expectedValue: () => "casper",
+      },
+      {
+        title: "Account",
         button: "Rr",
         expectedValue: ({ account }) => account.freshAddress,
       },
       {
-        title: "Value",
+        title: "Fee",
         button: "Rr",
-        expectedValue: ({ account, status }) =>
-          formatDeviceAmount(account.currency, status.amount, {
-            hideCode: true,
-            showAllDigits: true,
-          }),
+        expectedValue: () =>
+          `${CASPER_FEES.toLocaleString("en-US").replaceAll(",", " ")} motes`,
       },
       {
-        title: "Method",
+        title: "Target",
         button: "Rr",
-        expectedValue: () => "Transfer",
+        expectedValue: ({ transaction }) =>
+          casperPubKeyToAccountHash(transaction.recipient),
+      },
+      {
+        title: "Amount",
+        button: "Rr",
+        expectedValue: ({ status }) =>
+          `${status.amount
+            .toNumber()
+            .toLocaleString("en-US")
+            .replaceAll(",", " ")} motes`,
       },
       {
         title: "APPROVE",
