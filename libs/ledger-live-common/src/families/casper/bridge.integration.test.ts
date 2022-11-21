@@ -11,6 +11,7 @@ import {
   NotEnoughBalance,
   CasperInvalidTransferId,
 } from "@ledgerhq/errors";
+import { getEstimatedFees } from "./utils";
 
 const SEED_IDENTIFIER =
   "0202ba6dc98cbe677711a45bf028a03646f9e588996eb223fad2485e8bc391b01581";
@@ -58,6 +59,7 @@ const casper: CurrenciesData<Transaction> = {
           transaction: fromTransactionRaw({
             family: "casper",
             recipient: "novalidaddress",
+            fees: getEstimatedFees().toString(),
             amount: "1000",
             deploy: null,
           }),
@@ -73,6 +75,7 @@ const casper: CurrenciesData<Transaction> = {
           transaction: fromTransactionRaw({
             family: "casper",
             recipient: ACCOUNT_2,
+            fees: getEstimatedFees().toString(),
             amount: (300 * 1e9).toString(),
             deploy: null,
           }),
@@ -89,6 +92,7 @@ const casper: CurrenciesData<Transaction> = {
             family: "casper",
             recipient: ACCOUNT_2,
             amount: "0",
+            fees: getEstimatedFees().toString(),
             deploy: null,
           }),
           expectedStatus: {
@@ -102,6 +106,7 @@ const casper: CurrenciesData<Transaction> = {
           name: "Minimum Amount Required",
           transaction: fromTransactionRaw({
             family: "casper",
+            fees: getEstimatedFees().toString(),
             recipient: ACCOUNT_2,
             amount: "1",
             deploy: null,
@@ -121,6 +126,7 @@ const casper: CurrenciesData<Transaction> = {
             recipient: ACCOUNT_2,
             amount: "3",
             deploy: null,
+            fees: getEstimatedFees().toString(),
           }),
           expectedStatus: {
             amount: new BigNumber("3"),
@@ -133,6 +139,7 @@ const casper: CurrenciesData<Transaction> = {
           transaction: fromTransactionRaw({
             family: "casper",
             recipient: ACCOUNT_2,
+            fees: getEstimatedFees().toString(),
             amount: "3",
             transferId: "afdsaf1",
             deploy: null,

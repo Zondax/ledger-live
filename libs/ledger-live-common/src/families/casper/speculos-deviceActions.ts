@@ -2,7 +2,6 @@ import type { DeviceAction } from "../../bot/types";
 import type { Transaction } from "./types";
 import { deviceActionFlow } from "../../bot/specs";
 import { casperPubKeyToAccountHash, deployHashToString } from "./utils";
-import { CASPER_FEES } from "./consts";
 
 export const acceptTransaction: DeviceAction<Transaction, any> =
   deviceActionFlow({
@@ -38,8 +37,11 @@ export const acceptTransaction: DeviceAction<Transaction, any> =
       {
         title: "Fee",
         button: "Rr",
-        expectedValue: () =>
-          `${CASPER_FEES.toLocaleString("en-US").replaceAll(",", " ")} motes`,
+        expectedValue: ({ transaction }) =>
+          `${transaction.fees
+            .toNumber()
+            .toLocaleString("en-US")
+            .replaceAll(",", " ")} motes`,
       },
       {
         title: "Target",

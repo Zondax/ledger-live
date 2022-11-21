@@ -14,6 +14,7 @@ import { LTxnHistoryData, NAccountBalance } from "./bridge/utils/types";
 import { CLPublicKey } from "casper-js-sdk";
 import { encode, getPubKeySignature } from "./bridge/utils/addresses";
 import { Account } from "@ledgerhq/types-live";
+import { CASPER_FEES } from "./consts";
 
 const validHexRegExp = new RegExp(/[0-9A-Fa-f]{6}/g);
 const validBase64RegExp = new RegExp(
@@ -132,4 +133,8 @@ export function validateTransferId(id?: string): { isValid: boolean } {
   if (/^\d+$/.test(id)) return { isValid: true };
 
   return { isValid: false };
+}
+
+export function getEstimatedFees(): BigNumber {
+  return new BigNumber(CASPER_FEES);
 }

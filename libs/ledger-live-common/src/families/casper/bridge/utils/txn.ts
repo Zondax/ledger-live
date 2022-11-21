@@ -6,7 +6,8 @@ import { Operation } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
 import { CLPublicKey, DeployUtil } from "casper-js-sdk";
 import { encodeOperationId } from "../../../../operation";
-import { CASPER_FEES, CASPER_NETWORK } from "../../consts";
+import { CASPER_NETWORK } from "../../consts";
+import { getEstimatedFees } from "../../utils";
 import {
   getPubKeySignature,
   getPublicKeyFromCasperAddress,
@@ -16,7 +17,11 @@ import { LTxnHistoryData } from "./types";
 
 export const getUnit = (): Unit => getCryptoCurrencyById("filecoin").units[0];
 
-export function mapTxToOps(accountId: string, addressHash: string) {
+export function mapTxToOps(
+  accountId: string,
+  addressHash: string,
+  fees = getEstimatedFees()
+) {
   return (tx: LTxnHistoryData): Operation[] => {
     const ops: Operation[] = [];
     const {
@@ -30,7 +35,7 @@ export function mapTxToOps(accountId: string, addressHash: string) {
 
     const date = new Date(timestamp);
     const value = new BigNumber(amount);
-    const feeToUse = new BigNumber(CASPER_FEES);
+    const feeToUse = fees;
 
     const isSending = addressHash === fromAccount;
     const isReceiving = addressHash === toAccount;
@@ -81,6 +86,7 @@ export const createNewDeploy = (
   sender: string,
   recipient: string,
   amount: BigNumber,
+  fees: BigNumber,
   transferId?: string,
   network = CASPER_NETWORK
 ): DeployUtil.Deploy => {
@@ -110,7 +116,7 @@ export const createNewDeploy = (
       transferId
     );
 
-  const payment = DeployUtil.standardPayment(CASPER_FEES.toString());
+  const payment = DeployUtil.standardPayment(fees.toString());
   const deploy = DeployUtil.makeDeploy(deployParams, session, payment);
   const txnRaw = DeployUtil.deployToJson(deploy);
   const txnFromRaw = DeployUtil.deployFromJson(txnRaw).unwrap();
