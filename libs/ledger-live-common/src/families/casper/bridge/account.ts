@@ -282,6 +282,7 @@ const signOperation: SignOperationFnSignature<Transaction> = ({
               date: new Date(),
               extra: {
                 deploy: DeployUtil.deployToJson(transaction.deploy),
+                transferId: transaction.transferId,
               },
             };
 
