@@ -131,8 +131,6 @@ const getTransactionStatus = async (
   const estimatedFees = t.fees;
 
   let totalSpent;
-  if (amount.lt(MINIMUM_VALID_AMOUNT))
-    errors.amount = new InvalidMinimumAmount();
 
   if (useAllAmount) {
     totalSpent = a.spendableBalance;
@@ -148,6 +146,9 @@ const getTransactionStatus = async (
       errors.amount = new NotEnoughBalance();
     }
   }
+
+  if (amount.lt(MINIMUM_VALID_AMOUNT))
+    errors.amount = new InvalidMinimumAmount();
 
   // log("debug", "[getTransactionStatus] finish fn");
 
