@@ -280,6 +280,12 @@
       "title": "Device disconnected",
       "description": "Ledger Live could not connect to your device. Please try it again."
     },
+    "CasperInvalidTransferId": {
+      "title": "Transfer ID should be a positive number smaller than 18446744073709551615"
+    },
+    "InvalidMinimumAmount": {
+      "title": "Minimum amount to transfer is 2.5 CSPR"
+    },
     "ETHAddressNonEIP": {
       "title": "Auto-verification not available: carefully verify the address.",
       "description": null
@@ -2013,6 +2019,7 @@
     },
     "details": "{{ currency }} details",
     "extra": {
+      "transferId": "Transfer ID",
       "resource": "Resource",
       "frozenAmount": "Frozen amount",
       "unfreezeAmount": "Unfreeze amount",
@@ -3244,8 +3251,8 @@
       "infoTotalDesc": "Includes transaction amount and the selected network fees",
       "gasLimit": "Gas limit",
       "gasPrice": "Gas price",
-      "maxFee" : "Max fee",
-      "maxPriorityFee" : "Max priority fee",
+      "maxFee": "Max fee",
+      "maxPriorityFee": "Max priority fee",
       "nextBlock": "Next block: {{nextBaseFee}}",
       "suggestedPriorityFee": "Suggested: {{lowPriorityFee}} - {{highPriorityFee}}",
       "maxFees": "Max fees",
@@ -3254,6 +3261,8 @@
       "maxEstimatedFee": "Max estimated fee",
       "validateFees": "Validate Fees",
       "customizeFees": "Customize Fees",
+      "transferId": "Transfer ID",
+      "validateTransferId": "Validate ID",
       "memo": {
         "title": "Memo",
         "type": "Memo type",

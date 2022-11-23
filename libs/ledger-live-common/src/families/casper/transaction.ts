@@ -35,7 +35,9 @@ export const fromTransactionRaw = (tr: TransactionRaw): Transaction => {
     ...common,
     deploy: tr.deploy ? DeployUtil.deployFromJson(tr.deploy).unwrap() : null,
     family: tr.family,
+    fees: new BigNumber(tr.fees),
     amount: new BigNumber(tr.amount),
+    transferId: tr.transferId,
   };
 };
 
@@ -46,7 +48,9 @@ const toTransactionRaw = (t: Transaction): TransactionRaw => {
     ...common,
     family: t.family,
     amount: t.amount.toFixed(),
+    fees: t.fees.toString(),
     deploy: t.deploy ? DeployUtil.deployToJson(t.deploy) : null,
+    transferId: t.transferId,
   };
 };
 

@@ -280,6 +280,12 @@
       "title" : "Устройство отключено",
       "description" : "Ledger Live не удалось подключиться к устройству. Пожалуйста, попробуйте ещё раз."
     },
+    "CasperInvalidTransferId": {
+      "title": "Идентификатор перевода должен быть положительным числом меньше 18446744073709551615."
+    },
+    "InvalidMinimumAmount": {
+      "title": "Минимальная сумма для перевода 2,5 CSPR."
+    },
     "ETHAddressNonEIP" : {
       "title" : "Автопроверка недоступна: внимательно проверьте адрес.",
       "description" : null
@@ -1992,6 +1998,7 @@
     },
     "details" : "{{ currency }} – сведения",
     "extra" : {
+      "transferId": "Идентификатор передачи",
       "resource" : "Ресурс",
       "frozenAmount" : "Замороженная сумма",
       "unfreezeAmount" : "Разморозить сумму",
@@ -3217,6 +3224,8 @@
       "fees" : "Комиссия",
       "validateFees" : "Подтвердить комиссию",
       "customizeFees" : "Указать комиссию",
+      "transferId": "Идентификатор передачи",
+      "validateTransferId": "Идентификатор валидара",
       "memo" : {
         "title" : "Memo",
         "type" : "Тип Memo",

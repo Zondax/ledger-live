@@ -269,6 +269,12 @@
       "title" : "Dispositivo desconectado",
       "description" : "O Ledger Live não conseguiu se conectar ao seu dispositivo. Tente novamente."
     },
+    "CasperInvalidTransferId": {
+      "title": "O ID da transferência deve ser um número positivo menor que 18446744073709551615"
+    },
+    "InvalidMinimumAmount": {
+      "title": "O valor mínimo para transferência é de 2,5 CSPR"
+    },
     "ETHAddressNonEIP" : {
       "title" : "Verificação automática indisponível: verificar o endereço com cuidado.",
       "description" : null
@@ -1763,6 +1769,7 @@
     },
     "details" : "detalhes de {{ currency }}",
     "extra" : {
+      "transferId": "ID de transferência",
       "resource" : "Recurso",
       "frozenAmount" : "Quantia Congelado",
       "unfreezeAmount" : "Descongelar Quantia",
@@ -2876,6 +2883,8 @@
       "fees" : "Taxas",
       "validateFees" : "Validar Taxas",
       "customizeFees" : "Personalizar Taxas",
+      "transferId": "ID de transferência",
+      "validateTransferId": "Validar ID",
       "memo" : {
         "title" : "Memo",
         "type" : "Tipo de memo",

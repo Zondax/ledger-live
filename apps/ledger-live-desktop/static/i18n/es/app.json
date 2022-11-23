@@ -4356,6 +4356,11 @@
     "cta" : "Continuar"
   },
   "families" : {
+    "casper": {
+      "transferIdPlaceholder": "Opcional",
+      "transferId": "Transfer ID",
+      "transferIdWarningText": "El ID de la transferencia debe ser un número positivo menor que 18446744073709551615"
+    },
     "cardano" : {
       "memoPlaceholder" : "Opcional",
       "memo" : "Memo"
@@ -4794,6 +4799,12 @@
     "CantOpenDevice" : {
       "title" : "La conexión ha fallado",
       "description" : "Dispositivo detectado pero conexión fallida. Inténtalo de nuevo o contacta al Soporte de Ledger si persiste el problema."
+    },
+    "CasperInvalidTransferId": {
+      "title": "El ID de la transferencia debe ser un número positivo menor que 18446744073709551615"
+    },
+    "InvalidMinimumAmount": {
+      "title": "El monto mínimo para transferir es 2.5 CSPR"
     },
     "ETHAddressNonEIP" : {
       "title" : "Verificación automática no disponible: verifica cuidadosamente la dirección.",

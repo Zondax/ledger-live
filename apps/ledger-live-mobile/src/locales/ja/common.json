@@ -280,6 +280,12 @@
       "title" : "デバイスが切断されました",
       "description" : "Ledger Liveはデバイスに接続できませんでした。もう一度お試しください。"
     },
+    "CasperInvalidTransferId": {
+      "title": "転送 ID は 18446744073709551615 より小さい正の数である必要があります"
+    },
+    "InvalidMinimumAmount": {
+      "title": "最低送金額は 2.5 CSPR です"
+    },
     "ETHAddressNonEIP" : {
       "title" : "自動認証が利用できません：アドレスを慎重に確認してください。",
       "description" : null
@@ -1992,6 +1998,7 @@
     },
     "details" : "{{ currency }} 詳細",
     "extra" : {
+      "transferId": "引き継ぎID",
       "resource" : "リソース",
       "frozenAmount" : "凍結額",
       "unfreezeAmount" : "凍結解除額",
@@ -3217,6 +3224,8 @@
       "fees" : "手数料",
       "validateFees" : "手数料の確認",
       "customizeFees" : "手数料のカスタマイズ",
+      "transferId": "引き継ぎID",
+      "validateTransferId": "ID の検証",
       "memo" : {
         "title" : "メモ",
         "type" : "メモの種類",

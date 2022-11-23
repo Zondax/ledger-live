@@ -280,6 +280,12 @@
       "title" : "Cihaz bağlantısı kesildi",
       "description" : "Ledger Live, cihazınıza bağlanamadı. Lütfen tekrar deneyin."
     },
+    "CasperInvalidTransferId": {
+      "title": "Aktarım Kimliği, 18446744073709551615'ten küçük pozitif bir sayı olmalıdır"
+    },
+    "InvalidMinimumAmount": {
+      "title": "Aktarılacak minimum tutar 2,5 CSPR'dir"
+    },
     "ETHAddressNonEIP" : {
       "title" : "Otomatik doğrulama mevcut değil; adresi dikkatle doğrulayın.",
       "description" : null
@@ -1992,6 +1998,7 @@
     },
     "details" : "{{ currency }} ayrıntıları",
     "extra" : {
+      "transferId": "geçiş kimliği",
       "resource" : "Kaynak",
       "frozenAmount" : "Dondurulan tutar",
       "unfreezeAmount" : "Çözülen tutar",
@@ -3217,6 +3224,8 @@
       "fees" : "Ücretler",
       "validateFees" : "Ücretleri Onayla",
       "customizeFees" : "Ücretleri Özelleştir",
+      "transferId": "geçiş kimliği",
+      "validateTransferId": "Kimliği doğrula",
       "memo" : {
         "title" : "Memo",
         "type" : "Memo türü",
