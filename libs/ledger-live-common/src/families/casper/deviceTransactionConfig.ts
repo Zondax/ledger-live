@@ -22,12 +22,12 @@ function getDeviceTransactionConfig({
   fields.push({
     type: "casper.extendedAmount",
     label: "Amount",
-    value: transaction.amount.toString(),
+    value: transaction.amount.toFixed(),
   });
   fields.push({
     type: "casper.extendedAmount",
     label: "Fees",
-    value: transaction.fees.toString(),
+    value: transaction.fees.toFixed(),
   });
   fields.push({
     type: "text",
