@@ -78,9 +78,9 @@ export const getAccountShape: GetAccountShape = async (info) => {
   const blockHeight = await fetchBlockHeight();
 
   let balance: NAccountBalance, txs: LTxnHistoryData[];
-  if (purseUref) {
+  if (purseUref && accountHash) {
     balance = await fetchBalances(purseUref);
-    txs = await fetchTxs(address);
+    txs = await fetchTxs(accountHash);
   } else {
     balance = { balance_value: "0", api_version: "", merkle_proof: "" };
     txs = [];

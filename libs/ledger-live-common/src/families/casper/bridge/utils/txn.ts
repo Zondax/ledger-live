@@ -7,7 +7,7 @@ import BigNumber from "bignumber.js";
 import { CLPublicKey, DeployUtil } from "casper-js-sdk";
 import { encodeOperationId } from "../../../../operation";
 import { CASPER_NETWORK } from "../../consts";
-import { casperPubKeyToAccountHash, getEstimatedFees } from "../../utils";
+import { getEstimatedFees } from "../../utils";
 import {
   getPubKeySignature,
   getPublicKeyFromCasperAddress,
@@ -27,57 +27,53 @@ export function mapTxToOps(
     const {
       timestamp,
       amount,
-      caller_public_key,
-      args: txArgs,
-      deploy_hash,
-      error_message,
+      toAccount,
+      fromAccount,
+      deployHash: hash,
+      transferId,
     } = tx;
-    const fromAccount = casperPubKeyToAccountHash(caller_public_key);
-    const toAccount = txArgs.target.parsed;
 
     const date = new Date(timestamp);
     const value = new BigNumber(amount);
     const feeToUse = fees;
 
-    const isSending = addressHash.toLowerCase() === fromAccount.toLowerCase();
-    const isReceiving = addressHash.toLowerCase() === toAccount.toLowerCase();
+    const isSending = addressHash === fromAccount;
+    const isReceiving = addressHash === toAccount;
 
     if (isSending) {
       ops.push({
-        id: encodeOperationId(accountId, deploy_hash, "OUT"),
-        hash: deploy_hash,
+        id: encodeOperationId(accountId, hash, "OUT"),
+        hash,
         type: "OUT",
         value: value.plus(feeToUse),
         fee: feeToUse,
         blockHeight: 1,
-        hasFailed: error_message ? true : false,
         blockHash: null,
         accountId,
         senders: [fromAccount],
         recipients: [toAccount],
         date,
         extra: {
-          transferId: txArgs.id.parsed,
+          transferId,
         },
       });
     }
 
     if (isReceiving) {
       ops.push({
-        id: encodeOperationId(accountId, deploy_hash, "IN"),
-        hash: deploy_hash,
+        id: encodeOperationId(accountId, hash, "IN"),
+        hash,
         type: "IN",
         value,
         fee: feeToUse,
         blockHeight: 1,
         blockHash: null,
-        hasFailed: error_message ? true : false,
         accountId,
         senders: [fromAccount],
         recipients: [toAccount],
         date,
         extra: {
-          transferId: txArgs.id.parsed,
+          transferId,
         },
       });
     }

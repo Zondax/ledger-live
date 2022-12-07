@@ -18,36 +18,15 @@ export interface LiveResponseRoot<T> {
 }
 
 export interface LTxnHistoryData {
-  deploy_hash: string;
-  block_hash: string;
-  caller_public_key: string;
-  execution_type_id: number;
-  contract_hash?: any;
-  contract_package_hash?: any;
-  cost: string;
-  payment_amount: string;
-  error_message?: string;
-  timestamp: string;
-  status: string;
-  args: {
-    id: {
-      parsed?: number;
-      cl_type: {
-        Option: string;
-      };
-    };
-    amount: {
-      parsed: string;
-      cl_type: string;
-    };
-    target: {
-      parsed: string;
-      cl_type: {
-        ByteArray: number;
-      };
-    };
-  };
+  transferId?: any;
+  deployHash: string;
+  blockHash: string;
+  sourcePurse: string;
+  targetPurse: string;
   amount: string;
+  fromAccount: string;
+  toAccount: string;
+  timestamp: string;
 }
 
 export interface NodeResponseRoot<T> {
