@@ -12,7 +12,6 @@ export * from "./solana";
 export * from "./crypto_org";
 export * from "./cardano";
 export * from "./hedera";
-export * from "./osmosis";
 export * from "./celo";
 export * from "./near";
 export * from "./stacks";

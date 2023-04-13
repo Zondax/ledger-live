@@ -31,10 +31,6 @@ type Navigation = BaseComposite<
       LendingSupplyFlowNavigatorParamList,
       ScreenName.LendingSupplySummary
     >
-  | StackNavigatorProps<
-      LendingWithdrawFlowNavigatorParamList,
-      ScreenName.LendingWithdrawSummary
-    >
   | StackNavigatorProps<SwapNavigatorParamList, ScreenName.SwapSelectFees>
 >;
 

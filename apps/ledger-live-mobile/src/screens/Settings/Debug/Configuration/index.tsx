@@ -13,6 +13,8 @@ import MockModeRow from "../../General/MockModeRow";
 import HasOrderedNanoRow from "./HasOrderedNanoRow";
 import { StackNavigatorNavigation } from "../../../../components/RootNavigator/types/helpers";
 import { SettingsNavigatorStackParamList } from "../../../../components/RootNavigator/types/SettingsNavigator";
+import ResetOnboardingStateRow from "./ResetOnboardingStateRow";
+import NftMetadataServiceRow from "./NftMetadataServiceRow";
 
 export default function Configuration() {
   const navigation =
@@ -33,10 +35,12 @@ export default function Configuration() {
         onPress={() => navigation.navigate(ScreenName.DebugEnv)}
       />
       <Alert type={"info"} title={"Quick toggles for common settings."} />
+      <ResetOnboardingStateRow />
       <ReadOnlyModeRow />
       <HasOrderedNanoRow />
       <MockModeRow />
       <AnalyticsConsoleRow />
+      <NftMetadataServiceRow />
       <ThemeToggleRow />
       <SkipLock />
     </SettingsNavigationScrollView>
