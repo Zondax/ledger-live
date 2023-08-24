@@ -461,8 +461,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.3
       semver:
-        specifier: ^7.1.3
-        version: 7.3.7
+        specifier: ^7.5.2
+        version: 7.5.2
       styled-components:
         specifier: ^5.3.3
         version: 5.3.5(react-dom@17.0.2)(react-is@17.0.2)(react@17.0.2)
@@ -1089,8 +1089,8 @@ importers:
         specifier: npm:rxjs@7.8.1
         version: /rxjs@7.8.1
       semver:
-        specifier: ^7.3.7
-        version: 7.3.7
+        specifier: ^7.5.2
+        version: 7.5.2
       storyly-react-native:
         specifier: 2.0.1
         version: 2.0.1(prop-types@15.8.1)(react-native@0.71.6)(react@18.0.0)
@@ -1526,7 +1526,7 @@ importers:
     dependencies:
       '@ledgerhq/compressjs':
         specifier: github:LedgerHQ/compressjs#d9e8e4d994923e0ea76a32b97289bcccfe71b82e
-        version: github.com/LedgerHQ/compressjs/d9e8e4d994923e0ea76a32b97289bcccfe71b82e
+        version: git@github.com+LedgerHQ/compressjs/d9e8e4d994923e0ea76a32b97289bcccfe71b82e
       '@ledgerhq/cryptoassets':
         specifier: workspace:^
         version: link:../ledgerjs/packages/cryptoassets
@@ -1900,7 +1900,7 @@ importers:
         version: link:../coin-polkadot
       '@ledgerhq/compressjs':
         specifier: github:LedgerHQ/compressjs#d9e8e4d994923e0ea76a32b97289bcccfe71b82e
-        version: github.com/LedgerHQ/compressjs/d9e8e4d994923e0ea76a32b97289bcccfe71b82e
+        version: git@github.com+LedgerHQ/compressjs/d9e8e4d994923e0ea76a32b97289bcccfe71b82e
       '@ledgerhq/cryptoassets':
         specifier: workspace:^
         version: link:../ledgerjs/packages/cryptoassets
@@ -2217,8 +2217,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
       semver:
-        specifier: ^7.3.5
-        version: 7.3.7
+        specifier: ^7.5.2
+        version: 7.5.2
       sha.js:
         specifier: ^2.4.11
         version: 2.4.11
@@ -2475,8 +2475,8 @@ importers:
         specifier: '6'
         version: 6.6.7
       semver:
-        specifier: ^7.3.5
-        version: 7.3.7
+        specifier: ^7.5.2
+        version: 7.5.2
     devDependencies:
       '@types/jest':
         specifier: ^29.5.0
@@ -2609,8 +2609,8 @@ importers:
         specifier: '2'
         version: 2.0.2
       semver:
-        specifier: ^7.3.5
-        version: 7.3.7
+        specifier: ^7.5.2
+        version: 7.5.2
       sha.js:
         specifier: '2'
         version: 2.4.11
@@ -4936,8 +4936,8 @@ importers:
         specifier: ^5.1.1
         version: 5.1.1
       semver:
-        specifier: ^7.3.7
-        version: 7.3.7
+        specifier: ^7.5.2
+        version: 7.5.2
       tsup:
         specifier: ^7.0.0
         version: 7.0.0(typescript@5.1.3)
@@ -4954,8 +4954,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       semver:
-        specifier: ^7.3.5
-        version: 7.3.7
+        specifier: ^7.5.2
+        version: 7.5.2
       tsup:
         specifier: ^7.0.0
         version: 7.0.0(typescript@5.1.3)
@@ -5200,8 +5200,8 @@ importers:
         specifier: '*'
         version: 7.5.7
       semver:
-        specifier: ^7.3.7
-        version: 7.3.7
+        specifier: ^7.5.2
+        version: 7.5.2
       styled-components:
         specifier: ^4.4.0
         version: 4.4.1(react-dom@17.0.2)(react@17.0.2)
@@ -10790,7 +10790,7 @@ packages:
       debug: 4.3.4
       fp-ts: 2.1.1
       io-ts: 2.0.1(fp-ts@2.1.1)
-      semver: 7.3.8
+      semver: 7.5.4
       web3: 1.3.6
       web3-utils: 1.3.6
     transitivePeerDependencies:
@@ -11511,7 +11511,7 @@ packages:
       '@cosmjs/math': 0.26.6
       '@cosmjs/utils': 0.26.6
       ledger-cosmos-js: 2.1.8
-      semver: 7.3.8
+      semver: 7.5.4
     dev: false
 
   /@cosmjs/math@0.23.1:
@@ -18715,7 +18715,7 @@ packages:
       pretty-format: 26.6.2
       prompts: 2.4.2
       react-native: 0.71.6(@babel/core@7.22.8)(metro-resolver@0.76.0)(metro-transform-worker@0.76.0)(react@18.0.0)
-      semver: 6.3.0
+      semver: 6.3.1
       serve-static: 1.15.0
       strip-ansi: 5.2.0
       sudo-prompt: 9.2.1
@@ -32755,7 +32755,7 @@ packages:
       proper-lockfile: 3.2.0
       resolve-from: 5.0.0
       sanitize-filename: 1.6.3
-      semver: 7.5.3
+      semver: 7.5.4
       serialize-error: 8.1.0
       shell-quote: 1.7.3
       signal-exit: 3.0.7
@@ -33276,7 +33276,7 @@ packages:
     resolution: {integrity: sha512-t3UczsYugm4OAbqvdImMCImIMVdFzJAHgbwHpkl5jmfu1izVgUcP/mnrPqJIpEeCK1uZGpt+yHgWEN+9EwoYhQ==}
     dependencies:
       rimraf: 3.0.2
-      semver: 7.3.7
+      semver: 7.5.4
       tslib: 2.4.0
       unzip-crx-3: 0.2.0
     dev: true
@@ -33343,7 +33343,7 @@ packages:
       lazy-val: 1.0.5
       lodash.escaperegexp: 4.1.2
       lodash.isequal: 4.5.0
-      semver: 7.3.8
+      semver: 7.5.4
       typed-emitter: 2.1.0
     transitivePeerDependencies:
       - supports-color
@@ -34304,7 +34304,7 @@ packages:
       minimatch: 3.1.2
       object.values: 1.1.6
       resolve: 1.22.1
-      semver: 6.3.0
+      semver: 6.3.1
       tsconfig-paths: 3.14.1
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
@@ -34337,7 +34337,7 @@ packages:
       minimatch: 3.1.2
       object.values: 1.1.6
       resolve: 1.22.1
-      semver: 6.3.0
+      semver: 6.3.1
       tsconfig-paths: 3.14.1
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
@@ -34370,7 +34370,7 @@ packages:
       minimatch: 3.1.2
       object.values: 1.1.6
       resolve: 1.22.1
-      semver: 6.3.0
+      semver: 6.3.1
       tsconfig-paths: 3.14.1
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
@@ -34491,7 +34491,7 @@ packages:
       minimatch: 3.1.2
       object.entries: 1.1.6
       object.fromentries: 2.0.6
-      semver: 6.3.0
+      semver: 6.3.1
 
   /eslint-plugin-prettier@4.2.1(eslint-config-prettier@8.8.0)(eslint@8.41.0)(prettier@2.8.3):
     resolution: {integrity: sha512-f/0rXLXUt0oFYs8ra4w49wYZBG5GKZpAYsJSm6rnYL5uVDjd+zowwMwVZHnAjf4edNrKpCDYfXDgmRE/Ak7QyQ==}
@@ -34566,7 +34566,7 @@ packages:
       object.values: 1.1.6
       prop-types: 15.8.1
       resolve: 2.0.0-next.4
-      semver: 6.3.0
+      semver: 6.3.1
       string.prototype.matchall: 4.0.8
 
   /eslint-plugin-testing-library@5.6.0(eslint@8.41.0)(typescript@5.1.3):
@@ -51704,7 +51704,7 @@ packages:
       pino-http: 5.8.0
       pkg-conf: 3.1.0
       resolve: 1.22.0
-      semver: 7.3.7
+      semver: 7.5.4
       update-dotenv: 1.1.1(dotenv@8.6.0)
       update-notifier: 5.1.0
       uuid: 8.3.2
@@ -55632,27 +55632,20 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  /semver@7.3.7:
-    resolution: {integrity: sha512-QlYTucUYOews+WeEujDoEGziz4K6c47V/Bd+LjSSYcA94p+DmINdf7ncaUinThfvZyu13lN9OY1XDxt8C0Tw0g==}
-    engines: {node: '>=10'}
-    hasBin: true
-    dependencies:
-      lru-cache: 6.0.0
-
   /semver@7.3.8:
     resolution: {integrity: sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==}
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
+    dev: true
 
-  /semver@7.5.3:
-    resolution: {integrity: sha512-QBlUtyVk/5EeHbi7X0fw6liDZc7BBmEaSYn01fMU1OUYbf6GPsbTtd8WmnqbI20SeycoHSeiybkE/q1Q+qlThQ==}
+  /semver@7.5.2:
+    resolution: {integrity: sha512-SoftuTROv/cRjCze/scjGyiDtcUyxw1rgYQSZY7XTmtR5hX+dm76iDbTH8TkLPHCQmlbQVSSbNZCPM2hb0knnQ==}
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
-    dev: true
 
   /semver@7.5.4:
     resolution: {integrity: sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==}
@@ -58622,7 +58615,7 @@ packages:
       json5: 2.2.1
       lodash.memoize: 4.1.2
       make-error: 1.3.6
-      semver: 7.3.7
+      semver: 7.5.4
       typescript: 5.1.3
       yargs-parser: 21.1.1
     dev: true
@@ -58655,7 +58648,7 @@ packages:
       json5: 2.2.1
       lodash.memoize: 4.1.2
       make-error: 1.3.6
-      semver: 7.3.7
+      semver: 7.5.4
       typescript: 5.1.3
       yargs-parser: 21.1.1
     dev: true
@@ -58690,7 +58683,7 @@ packages:
       json5: 2.2.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6
-      semver: 7.5.3
+      semver: 7.5.4
       typescript: 5.1.3
       yargs-parser: 21.1.1
     dev: true
@@ -58723,7 +58716,7 @@ packages:
       json5: 2.2.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6
-      semver: 7.5.3
+      semver: 7.5.4
       typescript: 5.1.3
       yargs-parser: 21.1.1
     dev: true
@@ -58756,7 +58749,7 @@ packages:
       json5: 2.2.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6
-      semver: 7.5.3
+      semver: 7.5.4
       typescript: 5.1.3
       yargs-parser: 21.1.1
     dev: true
@@ -63334,8 +63327,8 @@ packages:
       styled-system: 5.1.5
     dev: false
 
-  github.com/LedgerHQ/compressjs/d9e8e4d994923e0ea76a32b97289bcccfe71b82e:
-    resolution: {tarball: https://codeload.github.com/LedgerHQ/compressjs/tar.gz/d9e8e4d994923e0ea76a32b97289bcccfe71b82e}
+  git@github.com+LedgerHQ/compressjs/d9e8e4d994923e0ea76a32b97289bcccfe71b82e:
+    resolution: {commit: d9e8e4d994923e0ea76a32b97289bcccfe71b82e, repo: git@github.com:LedgerHQ/compressjs.git, type: git}
     name: '@ledgerhq/compressjs'
     version: 1.3.1
     hasBin: true

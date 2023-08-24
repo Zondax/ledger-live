@@ -68,7 +68,7 @@
     "bs58check": "^2.1.2",
     "invariant": "^2.2.4",
     "ripemd160": "2",
-    "semver": "^7.3.5",
+    "semver": "^7.5.2",
     "sha.js": "2",
     "tiny-secp256k1": "1.1.6",
     "varuint-bitcoin": "1.1.2"
