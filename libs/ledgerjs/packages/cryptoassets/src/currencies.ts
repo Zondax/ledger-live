@@ -3158,13 +3158,8 @@ export const cryptocurrenciesById: Record<CryptoCurrencyId, CryptoCurrency> = {
     ticker: "ZEC",
     scheme: "zcash",
     color: "#3790ca",
-    family: "bitcoin",
+    family: "zcash",
     blockAvgTime: 150,
-    bitcoinLikeInfo: {
-      P2PKH: 0x1cb8,
-      P2SH: 0x1cbd,
-      XPUBVersion: 0x0488b21e,
-    },
     units: [
       {
         name: "zcash",
@@ -3172,8 +3167,8 @@ export const cryptocurrenciesById: Record<CryptoCurrencyId, CryptoCurrency> = {
         magnitude: 8,
       },
       {
-        name: "satoshi",
-        code: "sat",
+        name: "zatoshi",
+        code: "zat",
         magnitude: 0,
       },
     ],

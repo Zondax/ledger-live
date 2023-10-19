@@ -74,6 +74,10 @@ import { Transaction as tronTransaction } from "../families/tron/types";
 import { TransactionRaw as tronTransactionRaw } from "../families/tron/types";
 import { TransactionStatus as tronTransactionStatus } from "../families/tron/types";
 import { TransactionStatusRaw as tronTransactionStatusRaw } from "../families/tron/types";
+import { Transaction as zcashTransaction } from "../families/zcash/types";
+import { TransactionRaw as zcashTransactionRaw } from "../families/zcash/types";
+import { TransactionStatus as zcashTransactionStatus } from "../families/zcash/types";
+import { TransactionStatusRaw as zcashTransactionStatusRaw } from "../families/zcash/types";
 
 export type Transaction =
   | algorandTransaction
@@ -94,7 +98,8 @@ export type Transaction =
   | stacksTransaction
   | stellarTransaction
   | tezosTransaction
-  | tronTransaction;
+  | tronTransaction
+  | zcashTransaction;
 
 export type TransactionRaw =
   | algorandTransactionRaw
@@ -115,7 +120,8 @@ export type TransactionRaw =
   | stacksTransactionRaw
   | stellarTransactionRaw
   | tezosTransactionRaw
-  | tronTransactionRaw;
+  | tronTransactionRaw
+  | zcashTransactionRaw;
 
 export type TransactionStatus =
   | algorandTransactionStatus
@@ -136,7 +142,8 @@ export type TransactionStatus =
   | stacksTransactionStatus
   | stellarTransactionStatus
   | tezosTransactionStatus
-  | tronTransactionStatus;
+  | tronTransactionStatus
+  | zcashTransactionStatus;
 
 export type TransactionStatusRaw =
   | algorandTransactionStatusRaw
@@ -157,4 +164,5 @@ export type TransactionStatusRaw =
   | stacksTransactionStatusRaw
   | stellarTransactionStatusRaw
   | tezosTransactionStatusRaw
-  | tronTransactionStatusRaw;
+  | tronTransactionStatusRaw
+  | zcashTransactionStatusRaw;
