@@ -92,7 +92,7 @@ const makeGetAccountShape =
 
     const paramXpub = initialAccount ? decodeAccountId(initialAccount.id).xpubOrAddress : undefined;
 
-    let generatedXpub;
+    let generatedXpub: string | undefined;
     if (!paramXpub) {
       // Xpub not provided, generate it using the hwapp
 
@@ -112,7 +112,7 @@ const makeGetAccountShape =
         }),
       );
     }
-    const xpub = paramXpub || generatedXpub;
+    const xpub = (paramXpub || generatedXpub)!!;
 
     const accountId = encodeAccountId({
       type: "js",

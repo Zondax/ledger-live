@@ -190,6 +190,7 @@
     "@zondax/ledger-icp": "^0.7.0",
     "@zondax/ledger-stacks": "^1.0.2",
     "@zondax/ledger-zcash": "^0.0.0",
+    "@zondax/zcashtools": "^0.0.0",
     "async": "^3.2.3",
     "axios": "0.26.1",
     "axios-retry": "^3.2.4",
