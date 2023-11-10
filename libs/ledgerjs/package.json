@@ -7,7 +7,7 @@
     "import-cal-tokens": "ts-node script/crypto-assets-importer/index.ts"
   },
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "^1.6.0",
     "bs58check": "^2.1.2",
     "buffer": "^6.0.3",
     "invariant": "^2.2.4",
