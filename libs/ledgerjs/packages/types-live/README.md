@@ -1826,6 +1826,7 @@ Type: {currencyAvalancheCChain: [DefaultFeature](#defaultfeature), currencyStack
 *   `currencyLukso` **[DefaultFeature](#defaultfeature)**&#x20;
 *   `currencyLinea` **[DefaultFeature](#defaultfeature)**&#x20;
 *   `currencyLineaTesnet` **[DefaultFeature](#defaultfeature)**&#x20;
+*   `currencyTon` **[DefaultFeature](#defaultfeature)**&#x20;
 
 ### Features
 
