@@ -8,6 +8,7 @@ import hedera from "../../families/hedera/bridge/js";
 import internet_computer from "../../families/internet_computer/bridge/js";
 import stacks from "../../families/stacks/bridge/js";
 import stellar from "../../families/stellar/bridge/js";
+import ton from "../../families/ton/bridge/js";
 import tron from "../../families/tron/bridge/js";
 import vechain from "../../families/vechain/bridge/js";
 import { bridge as algorand } from "../../families/algorand/setup";
@@ -31,6 +32,7 @@ export default {
   internet_computer,
   stacks,
   stellar,
+  ton,
   tron,
   vechain,
   algorand,
