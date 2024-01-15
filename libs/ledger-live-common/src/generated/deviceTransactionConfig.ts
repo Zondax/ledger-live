@@ -8,6 +8,7 @@ import hedera from "../families/hedera/deviceTransactionConfig";
 import internet_computer from "../families/internet_computer/deviceTransactionConfig";
 import stacks from "../families/stacks/deviceTransactionConfig";
 import stellar from "../families/stellar/deviceTransactionConfig";
+import ton from "../families/ton/deviceTransactionConfig";
 import tron from "../families/tron/deviceTransactionConfig";
 import algorand from "@ledgerhq/coin-algorand/deviceTransactionConfig";
 import bitcoin from "@ledgerhq/coin-bitcoin/deviceTransactionConfig";
@@ -30,6 +31,7 @@ export default {
   internet_computer,
   stacks,
   stellar,
+  ton,
   tron,
   algorand,
   bitcoin,
