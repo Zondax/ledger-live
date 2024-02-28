@@ -11,6 +11,7 @@ import casperTokens, { CasperToken } from "./data/casper";
 import trc10tokens, { TRC10Token } from "./data/trc10";
 import trc20tokens, { TRC20Token } from "./data/trc20";
 import vechainTokens, { vip180Token } from "./data/vip180";
+import jettonTokens, { JettonToken } from "./data/jetton";
 
 const emptyArray = [];
 const tokensArray: TokenCurrency[] = [];
@@ -34,6 +35,7 @@ addTokens(cardanoNativeTokens.map(convertCardanoNativeTokens));
 addTokens(stellarTokens.map(convertStellarTokens));
 addTokens(casperTokens.map(convertCasperTokens));
 addTokens(vechainTokens.map(convertVechainToken));
+addTokens(jettonTokens.map(convertJettonToken));
 
 type TokensListOptions = {
   withDelisted: boolean;
@@ -260,6 +262,34 @@ export function convertERC20([
     ticker,
     delisted,
     disableCountervalue: !!parentCurrency.isTestnetFor || !!disableCountervalue,
+    units: [
+      {
+        name,
+        code: ticker,
+        magnitude,
+      },
+    ],
+  };
+}
+
+export function convertJettonToken([address, name, ticker, magnitude, delisted]: JettonToken):
+  | TokenCurrency
+  | undefined {
+  const parentCurrency = findCryptoCurrencyById("ton");
+
+  if (!parentCurrency) {
+    return;
+  }
+
+  return {
+    type: "TokenCurrency",
+    id: "ton/jetton/" + address,
+    contractAddress: address,
+    parentCurrency,
+    tokenType: "jetton",
+    name,
+    ticker,
+    delisted,
     units: [
       {
         name,
