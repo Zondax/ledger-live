@@ -163,7 +163,8 @@ export type CryptoCurrencyId =
   | "neon_evm"
   | "lukso"
   | "linea"
-  | "linea_goerli";
+  | "linea_goerli"
+  | "kadena";
 
 export type LedgerExplorerId =
   | "btc"

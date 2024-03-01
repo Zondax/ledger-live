@@ -108,6 +108,7 @@ const abandonSeedAddresses: Partial<Record<CryptoCurrency["id"], string>> = {
   lukso: EVM_DEAD_ADDRESS,
   linea: EVM_DEAD_ADDRESS,
   linea_goerli: EVM_DEAD_ADDRESS,
+  kadena: "k:9f68e4252ac1739f722d52a7dc6215bd177947494e6d3e83bbbe1fc2efe6ce47",
 };
 
 /**

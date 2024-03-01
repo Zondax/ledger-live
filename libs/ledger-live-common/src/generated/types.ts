@@ -46,6 +46,10 @@ import { Transaction as internet_computerTransaction } from "../families/interne
 import { TransactionRaw as internet_computerTransactionRaw } from "../families/internet_computer/types";
 import { TransactionStatus as internet_computerTransactionStatus } from "../families/internet_computer/types";
 import { TransactionStatusRaw as internet_computerTransactionStatusRaw } from "../families/internet_computer/types";
+import { Transaction as kadenaTransaction } from "../families/kadena/types";
+import { TransactionRaw as kadenaTransactionRaw } from "../families/kadena/types";
+import { TransactionStatus as kadenaTransactionStatus } from "../families/kadena/types";
+import { TransactionStatusRaw as kadenaTransactionStatusRaw } from "../families/kadena/types";
 import { Transaction as nearTransaction } from "@ledgerhq/coin-near/types";
 import { TransactionRaw as nearTransactionRaw } from "@ledgerhq/coin-near/types";
 import { TransactionStatus as nearTransactionStatus } from "@ledgerhq/coin-near/types";
@@ -96,6 +100,7 @@ export type Transaction =
   | filecoinTransaction
   | hederaTransaction
   | internet_computerTransaction
+  | kadenaTransaction
   | nearTransaction
   | polkadotTransaction
   | rippleTransaction
@@ -119,6 +124,7 @@ export type TransactionRaw =
   | filecoinTransactionRaw
   | hederaTransactionRaw
   | internet_computerTransactionRaw
+  | kadenaTransactionRaw
   | nearTransactionRaw
   | polkadotTransactionRaw
   | rippleTransactionRaw
@@ -142,6 +148,7 @@ export type TransactionStatus =
   | filecoinTransactionStatus
   | hederaTransactionStatus
   | internet_computerTransactionStatus
+  | kadenaTransactionStatus
   | nearTransactionStatus
   | polkadotTransactionStatus
   | rippleTransactionStatus
@@ -165,6 +172,7 @@ export type TransactionStatusRaw =
   | filecoinTransactionStatusRaw
   | hederaTransactionStatusRaw
   | internet_computerTransactionStatusRaw
+  | kadenaTransactionStatusRaw
   | nearTransactionStatusRaw
   | polkadotTransactionStatusRaw
   | rippleTransactionStatusRaw
