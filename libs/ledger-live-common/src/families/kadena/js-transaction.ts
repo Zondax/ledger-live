@@ -10,7 +10,8 @@ export const createTransaction = (): Transaction => {
     fees: new BigNumber(0),
     recipient: "",
     useAllAmount: false,
-    chainId: "",
+    receiverChainId: 0,
+    senderChainId: 0,
   };
 };
 

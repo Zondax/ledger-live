@@ -102,6 +102,16 @@ const envDefinitions = {
     def: "https://filecoin.coin.ledger.com",
     desc: "Filecoin API url",
   },
+  API_KADENA_NODE_ENDPOINT: {
+    parser: stringParser,
+    def: "https://api.testnet.chainweb.com/chainweb/0.0/testnet04",
+    desc: "Kadena Node API url",
+  },
+  API_KADENA_INDEXER_ENDPOINT: {
+    parser: stringParser,
+    def: "https://estats.testnet.chainweb.com",
+    desc: "Kadena Indexer API url",
+  },
   API_NEAR_ARCHIVE_NODE: {
     def: "https://near.coin.ledger.com/node/",
     parser: stringParser,

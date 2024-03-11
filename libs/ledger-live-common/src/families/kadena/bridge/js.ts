@@ -8,12 +8,6 @@ import getTransactionStatus from "../js-getTransactionStatus";
 import estimateMaxSpendable from "../js-estimateMaxSpendable";
 import signOperation from "../js-signOperation";
 import broadcast from "../js-broadcast";
-import {
-  assignFromAccountRaw,
-  assignToAccountRaw,
-  fromOperationExtraRaw,
-  toOperationExtraRaw,
-} from "../serialization";
 
 import { makeScanAccounts } from "../../../bridge/jsHelpers";
 
@@ -38,10 +32,6 @@ const accountBridge: AccountBridge<Transaction> = {
   signOperation,
   receive,
   broadcast,
-  assignFromAccountRaw,
-  assignToAccountRaw,
-  fromOperationExtraRaw,
-  toOperationExtraRaw,
 };
 export default {
   currencyBridge,
