@@ -15,18 +15,21 @@ export type KadenaAccount = Account;
 export type Transaction = TransactionCommon & {
   family: FamilyType;
   fees: BigNumber;
-  chainId: string;
+  senderChainId: number;
+  receiverChainId: number;
 };
 
-export type CasperOperation = Operation<CasperOperationExtra>;
+export type KadenaOperation = Operation<KadenaOperationExtra>;
 
-interface CasperOperationExtra {
-  chainId: string;
+interface KadenaOperationExtra {
+  senderChainId: number;
+  receiverChainId: number;
 }
 
 export type TransactionRaw = TransactionCommonRaw & {
   family: FamilyType;
-  chainId: string;
+  senderChainId: number;
+  receiverChainId: number;
   fees: string;
 };
 
