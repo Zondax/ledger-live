@@ -22,16 +22,16 @@ export interface KadenaRosettaAccountBalance {
 }
 
 export interface GetTxnsResponse {
-  amount: string
-  blockHash: string
-  blockTime: string
-  chain: number
-  crossChainAccount?: string
-  crossChainId?: number
-  fromAccount: string
-  height: number
-  idx: number
-  requestKey: string
-  toAccount: string
-  token: string
+  amount: string;
+  blockHash: string;
+  blockTime: string;
+  chain: number;
+  crossChainAccount?: string;
+  crossChainId?: number;
+  fromAccount: string;
+  height: number;
+  idx: number;
+  requestKey: string;
+  toAccount: string;
+  token: string;
 }
