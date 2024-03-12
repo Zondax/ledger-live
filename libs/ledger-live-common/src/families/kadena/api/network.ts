@@ -75,7 +75,7 @@ export const fetchBalances = async (address: string) => {
       KadenaApiWrapper<KadenaRosettaAccountBalance>(
         getRosettaPath("account/balance"),
         {
-          ...getRosettaNetworkIdentifier(),
+          ...getRosettaNetworkIdentifier(i.toString() as ChainId),
           account_identifier: {
             address,
           },
@@ -94,7 +94,7 @@ export const fetchTransactions = async (address: string) => {
   const result: GetTxnsResponse[] = [];
   let next = "";
 
-  while (true) {
+  for (;;) {
     let query = "";
     if (next === "") {
       query = `${url}/${address}?limit=100&token=coin`;
@@ -102,8 +102,9 @@ export const fetchTransactions = async (address: string) => {
       query = `${url}/${address}?next=${next}&limit=100&token=coin`;
     }
 
-    const res = await KadenaApiWrapper<GetTxnsResponse>(query, {}, "GET");
-    result.push(res.data);
+    const res = await KadenaApiWrapper<GetTxnsResponse[]>(query, {}, "GET");
+
+    result.push(...res.data);
 
     const headers = res.headers;
     next = headers["Chainweb-Next"] ?? "";

@@ -4,11 +4,13 @@ import { GetAccountShape } from "@ledgerhq/coin-framework/bridge/jsHelpers";
 import { Account } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
 import invariant from "invariant";
-import { flatMap } from "lodash";
+import flatMap from "lodash/flatMap";
 import { fetchBlockHeight, fetchBalances, fetchTransactions } from "./api/network";
 import { GetTxnsResponse } from "./api/types";
 import { KadenaOperation } from "./types";
 import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
+import { log } from "@ledgerhq/logs";
+import { KDA_DECIMALS } from "./consts";
 
 const getAddressFromPublicKey = (pubkey: string): string => {
   return `k:${pubkey}`;
@@ -42,7 +44,7 @@ export const getAccountShape: GetAccountShape = async info => {
   }
 
   const balance = totalBalance;
-  let spendableBalance = balance;
+  const spendableBalance = balance;
   // for (const tx of mempoolTxs) {
   //   spendableBalance = spendableBalance
   //     .minus(new BigNumber(tx.fee_rate))
@@ -76,62 +78,66 @@ function reconciliatePublicKey(
 
 const mapTxToOps = (accountId: string, address: string) => {
   return (txInfo: GetTxnsResponse): KadenaOperation[] => {
-    const ops: KadenaOperation[] = [];
+    try {
+      const ops: KadenaOperation[] = [];
+      const { requestKey, blockTime, height, amount, fromAccount, toAccount, blockHash } = txInfo;
 
-    const { requestKey, blockTime, height, amount, fromAccount, toAccount, blockHash } = txInfo;
+      if (txInfo.token !== "coin") return ops;
 
-    if (txInfo.token !== "coin") return [];
+      const hash = requestKey;
 
-    const hash = requestKey;
+      const blockHeight = height;
 
-    const blockHeight = height;
+      const date = new Date(blockTime);
+      const value = new BigNumber(amount);
 
-    const date = new Date(blockTime);
-    const value = new BigNumber(amount);
+      const isSending = fromAccount === address;
+      const isReceiving = toAccount === address;
 
-    const isSending = fromAccount === address;
-    const isReceiving = toAccount === address;
+      if (isSending) {
+        ops.push({
+          id: encodeOperationId(accountId, hash, "OUT"),
+          hash,
+          type: "OUT",
+          value: value.multipliedBy(10 ** KDA_DECIMALS),
+          fee: new BigNumber(0),
+          blockHeight,
+          blockHash,
+          accountId,
+          senders: [fromAccount],
+          recipients: [toAccount],
+          date,
+          extra: {
+            senderChainId: txInfo.chain,
+            receiverChainId: txInfo.crossChainId ?? txInfo.chain,
+          },
+        });
+      }
 
-    if (isSending) {
-      ops.push({
-        id: encodeOperationId(accountId, hash, "OUT"),
-        hash,
-        type: "OUT",
-        value,
-        fee: new BigNumber(0),
-        blockHeight,
-        blockHash,
-        accountId,
-        senders: [fromAccount],
-        recipients: [toAccount],
-        date,
-        extra: {
-          senderChainId: txInfo.chain,
-          receiverChainId: txInfo.crossChainId ?? txInfo.chain,
-        },
-      });
+      if (isReceiving) {
+        ops.push({
+          id: encodeOperationId(accountId, hash, "IN"),
+          hash,
+          type: "IN",
+          value: value.multipliedBy(10 ** KDA_DECIMALS),
+          fee: new BigNumber(0),
+          blockHeight,
+          blockHash,
+          accountId,
+          senders: [fromAccount],
+          recipients: [toAccount],
+          date,
+          extra: {
+            senderChainId: txInfo.chain,
+            receiverChainId: txInfo.crossChainId ?? txInfo.chain,
+          },
+        });
+      }
+
+      return ops;
+    } catch (err) {
+      log("warn", "mapTxToOps failed kadena", err);
+      return [];
     }
-
-    if (isReceiving) {
-      ops.push({
-        id: encodeOperationId(accountId, hash, "IN"),
-        hash,
-        type: "IN",
-        value,
-        fee: new BigNumber(0),
-        blockHeight,
-        blockHash,
-        accountId,
-        senders: [fromAccount],
-        recipients: [toAccount],
-        date,
-        extra: {
-          senderChainId: txInfo.chain,
-          receiverChainId: txInfo.crossChainId ?? txInfo.chain,
-        },
-      });
-    }
-
-    return ops;
   };
 };
