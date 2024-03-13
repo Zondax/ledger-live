@@ -67,7 +67,7 @@ export const fetchBlockHeight = async () => {
   return res.data;
 };
 
-export const fetchBalances = async (address: string) => {
+export const fetchBalances = async (address: string): Promise<{ [K in keyof ChainId]: string }> => {
   const resPromises: Promise<{ data: KadenaRosettaAccountBalance }>[] = [];
 
   for (let i = 0; i < 20; i++) {
@@ -86,7 +86,11 @@ export const fetchBalances = async (address: string) => {
   }
 
   const res = await Promise.all(resPromises);
-  return res.map(r => r.data);
+  const balances = res.reduce((prev, curr, idx) => {
+    return { ...prev, [idx.toString()]: curr.data.balances[0].value };
+  }, {});
+
+  return balances;
 };
 
 export const fetchTransactions = async (address: string) => {
