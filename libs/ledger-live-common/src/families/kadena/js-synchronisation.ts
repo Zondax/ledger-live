@@ -39,8 +39,8 @@ export const getAccountShape: GetAccountShape = async info => {
   // const mempoolTxs = await fetchFullMempoolTxs(address);
 
   let totalBalance = new BigNumber(0);
-  for (const balance of balanceResp) {
-    totalBalance = totalBalance.plus(balance.balances[0].value);
+  for (const balance of Object.values(balanceResp)) {
+    totalBalance = totalBalance.plus(balance);
   }
 
   const balance = totalBalance;
