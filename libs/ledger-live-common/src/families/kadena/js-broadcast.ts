@@ -1,9 +1,20 @@
 import { BroadcastFnSignature } from "@ledgerhq/types-live";
+import { broadcastTransaction } from "./api/network";
+import invariant from "invariant";
+import { PactCommandObject } from "hw-app-kda";
+import { KadenaOperation } from "./types";
 
-export const broadcast: BroadcastFnSignature = async ({ signedOperation: { operation } }) => {
+export const broadcast: BroadcastFnSignature = async ({
+  signedOperation: { operation, rawData },
+}) => {
   // log("debug", "[broadcast] start fn");
 
-  //   await broadcastTxn(signature);
+  invariant(rawData, "rawData is required");
+
+  const pactCmd = rawData["pact_command"] as PactCommandObject;
+  invariant(pactCmd, "pactCmd is required");
+
+  await broadcastTransaction(pactCmd, operation as KadenaOperation);
 
   const result = { ...operation };
 

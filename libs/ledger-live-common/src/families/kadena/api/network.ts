@@ -2,22 +2,21 @@ import { getEnv } from "@ledgerhq/live-env";
 import network from "@ledgerhq/live-network/network";
 import { log } from "@ledgerhq/logs";
 import { AxiosRequestConfig, AxiosResponse, Method } from "axios";
-import { KADENA_BLK_NAME_ROSETTA, KADENA_NET_ID_ROSETTA } from "../consts";
-import { ChainId } from "@kadena/client";
-import { GetTxnsResponse, KadenaRosettaAccountBalance, KadenaRosettaNetworkStatus } from "./types";
+import { ChainId, ICommandResult, Pact, createClient } from "@kadena/client";
+import { GetInfoResponse, GetTxnsResponse } from "./types";
+import { PactCommandObject } from "hw-app-kda";
+import { KadenaOperation } from "../types";
+import { KDA_CHAINWEB_VER, KDA_NETWORK } from "../consts";
 
-const getKadenaNodeURL = (subpath?: string): string => {
-  const baseUrl = getEnv("API_KADENA_NODE_ENDPOINT");
-  if (!baseUrl) throw new Error("API node base URL not available");
+const getKadenaURL = (subpath?: string): string => {
+  const baseUrl = getEnv("API_KADENA_ENDPOINT");
+  if (!baseUrl) throw new Error("API indexer base URL not available");
 
   return `${baseUrl}${subpath ?? ""}`;
 };
 
-const getKadenaIndexerURL = (subpath?: string): string => {
-  const baseUrl = getEnv("API_KADENA_INDEXER_ENDPOINT");
-  if (!baseUrl) throw new Error("API indexer base URL not available");
-
-  return `${baseUrl}${subpath ?? ""}`;
+export const getKadenaPactURL = (chainId: string): string => {
+  return `${getKadenaURL()}/chainweb/${KDA_CHAINWEB_VER}/${KDA_NETWORK}/chain/${chainId}/pact`;
 };
 
 const KadenaApiWrapper = async <T>(path: string, body: any, method: Method) => {
@@ -39,62 +38,47 @@ const KadenaApiWrapper = async <T>(path: string, body: any, method: Method) => {
   return { data, headers };
 };
 
-const getRosettaNetworkIdentifier = (subNetId: ChainId = "0") => {
-  return {
-    network_identifier: {
-      blockchain: KADENA_BLK_NAME_ROSETTA,
-      network: KADENA_NET_ID_ROSETTA,
-      sub_network_identifier: {
-        network: subNetId,
-      },
-    },
-  };
-};
-
-const getRosettaPath = (subPath: string): string => {
-  return getKadenaNodeURL(`/rosetta/${subPath}`);
-};
-
-export const fetchBlockHeight = async () => {
-  const res = await KadenaApiWrapper<KadenaRosettaNetworkStatus>(
-    getRosettaPath("network/status"),
-    {
-      ...getRosettaNetworkIdentifier(),
-    },
-    "POST",
-  );
+export const fetchNetworkInfo = async () => {
+  const res = await KadenaApiWrapper<GetInfoResponse>(getKadenaURL("/info"), undefined, "GET");
 
   return res.data;
 };
 
-export const fetchBalances = async (address: string): Promise<{ [K in keyof ChainId]: string }> => {
-  const resPromises: Promise<{ data: KadenaRosettaAccountBalance }>[] = [];
+export const fetchCoinDetailsForAccount = async (
+  address: string,
+  chains: ChainId[],
+): Promise<{ [K in keyof ChainId]: string }> => {
+  const txn = Pact.builder
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .execution((Pact.modules as any).coin.details(address))
+    .setNonce("local")
+    .setMeta({
+      chainId: "",
+    })
+    .createTransaction();
 
-  for (let i = 0; i < 20; i++) {
-    resPromises.push(
-      KadenaApiWrapper<KadenaRosettaAccountBalance>(
-        getRosettaPath("account/balance"),
-        {
-          ...getRosettaNetworkIdentifier(i.toString() as ChainId),
-          account_identifier: {
-            address,
-          },
-        },
-        "POST",
-      ),
-    );
+  const promises: Promise<ICommandResult>[] = [];
+  for (const id of chains.sort()) {
+    const c = createClient(getKadenaPactURL(id));
+    promises.push(c.dirtyRead(txn));
   }
 
-  const res = await Promise.all(resPromises);
-  const balances = res.reduce((prev, curr, idx) => {
-    return { ...prev, [idx.toString()]: curr.data.balances[0].value };
+  const results = await Promise.all(promises);
+
+  const balances = results.reduce((lastVal, val, idx) => {
+    const r = val.result;
+    if (r.status === "failure") {
+      return lastVal;
+    }
+
+    return { ...lastVal, [idx]: r.data.balance };
   }, {});
 
   return balances;
 };
 
 export const fetchTransactions = async (address: string) => {
-  const url = getKadenaIndexerURL("/txs/account");
+  const url = getKadenaURL("/txs/account");
   const result: GetTxnsResponse[] = [];
   let next = "";
 
@@ -118,4 +102,24 @@ export const fetchTransactions = async (address: string) => {
   }
 
   return result;
+};
+
+export const broadcastTransaction = async (cmd: PactCommandObject, op: KadenaOperation) => {
+  const id = op.extra.senderChainId;
+
+  const client = createClient(getKadenaPactURL(id.toString()));
+
+  try {
+    const res = await client.local(cmd);
+    if (res.result.status === "failure") {
+      throw new Error((res.result.error as Error).message ?? "dry run for the transaction failed");
+    }
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      throw err?.message;
+    }
+    throw err;
+  }
+
+  await client.submit(cmd);
 };

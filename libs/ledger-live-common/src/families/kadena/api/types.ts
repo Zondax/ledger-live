@@ -1,26 +1,3 @@
-export interface KadenaRosettaNetworkStatus {
-  current_block_identifier: {
-    hash: string;
-    index: number;
-  };
-}
-
-export interface KadenaRosettaAccountBalance {
-  balances: [
-    {
-      currency: {
-        decimals: 12;
-        symbol: "KDA";
-      };
-      value: string;
-    },
-  ];
-  block_identifier: {
-    hash: string;
-    index: number;
-  };
-}
-
 export interface GetTxnsResponse {
   amount: string;
   blockHash: string;
@@ -34,4 +11,13 @@ export interface GetTxnsResponse {
   requestKey: string;
   toAccount: string;
   token: string;
+}
+
+export interface GetInfoResponse {
+  nodeApiVersion: string;
+  nodeChains: string[];
+  nodeGraphHistory: [number, [number, number[]][]][];
+  nodeLatestBehaviorHeight: number;
+  nodeNumberOfChains: number;
+  nodeVersion: string;
 }

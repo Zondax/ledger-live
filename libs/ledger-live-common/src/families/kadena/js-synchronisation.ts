@@ -5,12 +5,12 @@ import { Account } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
 import invariant from "invariant";
 import flatMap from "lodash/flatMap";
-import { fetchBlockHeight, fetchBalances, fetchTransactions } from "./api/network";
+import { fetchNetworkInfo, fetchCoinDetailsForAccount, fetchTransactions } from "./api/network";
 import { GetTxnsResponse } from "./api/types";
 import { KadenaOperation } from "./types";
 import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
 import { log } from "@ledgerhq/logs";
-import { KDA_DECIMALS } from "./consts";
+import { baseUnitToKda } from "./utils";
 
 const getAddressFromPublicKey = (pubkey: string): string => {
   return `k:${pubkey}`;
@@ -33,8 +33,8 @@ export const getAccountShape: GetAccountShape = async info => {
 
   const address = getAddressFromPublicKey(pubKey);
 
-  const blockHeight = await fetchBlockHeight();
-  const balanceResp = await fetchBalances(address);
+  const networkInfo = await fetchNetworkInfo();
+  const balanceResp = await fetchCoinDetailsForAccount(address, networkInfo.nodeChains);
   const rawTxs = await fetchTransactions(address);
   // const mempoolTxs = await fetchFullMempoolTxs(address);
 
@@ -43,8 +43,7 @@ export const getAccountShape: GetAccountShape = async info => {
     totalBalance = totalBalance.plus(balance);
   }
 
-  const balance = totalBalance;
-  const spendableBalance = balance;
+  const balance = baseUnitToKda(totalBalance);
   // for (const tx of mempoolTxs) {
   //   spendableBalance = spendableBalance
   //     .minus(new BigNumber(tx.fee_rate))
@@ -56,9 +55,9 @@ export const getAccountShape: GetAccountShape = async info => {
     xpub: pubKey,
     freshAddress: address,
     balance,
-    spendableBalance,
+    spendableBalance: balance,
     operations: flatMap(rawTxs, mapTxToOps(accountId, info.address)),
-    blockHeight: blockHeight.current_block_identifier.index,
+    blockHeight: networkInfo.nodeLatestBehaviorHeight,
   };
 
   return result;
@@ -99,7 +98,7 @@ const mapTxToOps = (accountId: string, address: string) => {
           id: encodeOperationId(accountId, hash, "OUT"),
           hash,
           type: "OUT",
-          value: value.multipliedBy(10 ** KDA_DECIMALS),
+          value: baseUnitToKda(value),
           fee: new BigNumber(0),
           blockHeight,
           blockHash,
@@ -119,7 +118,7 @@ const mapTxToOps = (accountId: string, address: string) => {
           id: encodeOperationId(accountId, hash, "IN"),
           hash,
           type: "IN",
-          value: value.multipliedBy(10 ** KDA_DECIMALS),
+          value: baseUnitToKda(value),
           fee: new BigNumber(0),
           blockHeight,
           blockHash,
