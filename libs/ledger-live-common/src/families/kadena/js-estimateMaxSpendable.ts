@@ -1,7 +1,7 @@
 import { Account, AccountLike } from "@ledgerhq/types-live";
 import { Transaction } from "./types";
 import BigNumber from "bignumber.js";
-import { fetchBalances } from "./api/network";
+import { fetchCoinDetailsForAccount } from "./api/network";
 import { KDA_FEES } from "./consts";
 import { getAddress } from "./utils";
 
@@ -21,11 +21,18 @@ export const estimateMaxSpendable = async ({
     return new BigNumber(0);
   }
 
-  const balances = await fetchBalances(getAddress(account).address);
+  const balance = await fetchCoinDetailsForAccount(getAddress(account).address, [
+    transaction.senderChainId.toString(),
+  ]);
+  if (balance[transaction.senderChainId] === undefined) {
+    return new BigNumber(0);
+  }
 
-  const fees = new BigNumber(KDA_FEES);
+  const fees = KDA_FEES;
 
-  return BigNumber(balances[transaction.senderChainId]).minus(fees);
+  const estimate = BigNumber(balance[transaction.senderChainId]).minus(fees);
+
+  return estimate.lt(0) ? new BigNumber(0) : estimate;
 };
 
 export default estimateMaxSpendable;

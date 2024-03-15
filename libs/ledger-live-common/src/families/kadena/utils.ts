@@ -1,4 +1,6 @@
 import { Account, Address } from "@ledgerhq/types-live";
+import BigNumber from "bignumber.js";
+import { KDA_DECIMALS } from "./consts";
 
 export const isNoErrorReturnCode = (code: number): boolean => code === 0x9000;
 
@@ -18,3 +20,11 @@ export const validateAddress = (address: string): boolean => {
 
   return true;
 };
+
+export function kdaToBaseUnit(amount: string | BigNumber | number): BigNumber {
+  return new BigNumber(amount).dividedBy(Math.pow(10, KDA_DECIMALS));
+}
+
+export function baseUnitToKda(amount: string | BigNumber | number): BigNumber {
+  return new BigNumber(amount).multipliedBy(Math.pow(10, KDA_DECIMALS));
+}

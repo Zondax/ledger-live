@@ -9,7 +9,7 @@ export const createTransaction = (): Transaction => {
   return {
     family: "kadena",
     amount: new BigNumber(0),
-    fees: new BigNumber(KDA_FEES),
+    fees: KDA_FEES,
     recipient: "",
     useAllAmount: false,
     receiverChainId: 0,
