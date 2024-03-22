@@ -7,7 +7,7 @@ import { getPath } from "./utils";
 const resolver: Resolver = async (transport, { path, verify }) => {
   log("debug", "start getAddress process");
 
-  const kadena = new Kadena(transport);
+  const kadena = new Kadena(transport as any);
 
   try {
     const r = verify

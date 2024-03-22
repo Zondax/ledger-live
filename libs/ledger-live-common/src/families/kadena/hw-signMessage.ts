@@ -8,7 +8,7 @@ import { getPath } from "./utils";
 const signMessage: SignMessage = async (transport, account, { message }): Promise<Result> => {
   log("debug", "start signMessage process");
 
-  const kadena = new Kadena(transport);
+  const kadena = new Kadena(transport as any);
 
   if (!message) throw new Error("Message cannot be empty");
   if (typeof message !== "string") throw new Error("Message must be a string");
