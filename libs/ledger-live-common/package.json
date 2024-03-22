@@ -216,7 +216,7 @@
     "eip55": "^2.1.1",
     "expect": "^27.4.6",
     "fuse.js": "^6.6.2",
-    "hw-app-kda": "link:/home/law/Work/zondax/hw-app-kda",
+    "hw-app-kda": "link:/Users/prateek/work/zondax/hw-app-kda",
     "invariant": "^2.2.2",
     "iso-filecoin": "^4.0.3",
     "isomorphic-ws": "^4.0.1",

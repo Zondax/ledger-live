@@ -37,7 +37,7 @@ export const signOperation: SignOperationFnSignature<Transaction> = ({
             type: "device-signature-requested",
           });
 
-          const kadena = new Kadena(transport);
+          const kadena = new Kadena(transport as any);
 
           let buildTxnRes: BuildTransactionResult;
 
