@@ -136,6 +136,7 @@
     "src/families/tezos/types.ts",
     "src/families/tron/react.ts",
     "src/families/tron/types.ts",
+    "src/families/kadena/types.ts",
     "src/featureFlags/FeatureFlagsContext.ts",
     "src/featureFlags/groupedFeatures.ts",
     "src/featureFlags/index.ts",

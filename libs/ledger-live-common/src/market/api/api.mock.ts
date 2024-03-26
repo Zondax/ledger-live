@@ -1,5 +1,5 @@
-import { CurrencyData, MarketCoin, MarketListRequestParams, SupportedCoins } from "../types";
 import { listCryptoCurrencies, listTokens } from "../../currencies";
+import { CurrencyData, MarketCoin, MarketListRequestParams, SupportedCoins } from "../types";
 
 const cryptoCurrenciesList = [...listCryptoCurrencies(), ...listTokens()];
 
@@ -355,6 +355,7 @@ async function supportedCounterCurrencies(): Promise<string[]> {
     "xau",
     "bits",
     "sats",
+    "kda",
   ]);
 }
 

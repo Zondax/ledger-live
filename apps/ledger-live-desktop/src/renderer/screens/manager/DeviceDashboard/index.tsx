@@ -1,35 +1,35 @@
-import React, { memo, useRef, useState, useCallback, useMemo, useEffect } from "react";
-import styled from "styled-components";
-import { useTranslation } from "react-i18next";
-import { App, DeviceInfo, FirmwareUpdateContext } from "@ledgerhq/types-live";
-import { Exec, InstalledItem, ListAppsResult } from "@ledgerhq/live-common/apps/types";
 import {
+  distribute,
+  isIncompleteState,
   predictOptimisticState,
   reducer,
-  isIncompleteState,
-  distribute,
 } from "@ledgerhq/live-common/apps/index";
 import { useAppsRunner } from "@ledgerhq/live-common/apps/react";
-import NavigationGuard from "~/renderer/components/NavigationGuard";
-import Quit from "~/renderer/icons/Quit";
+import { Exec, InstalledItem, ListAppsResult } from "@ledgerhq/live-common/apps/types";
 import { Device } from "@ledgerhq/live-common/hw/actions/types";
-import AppList from "./AppsList";
-import DeviceInformationSummary from "./DeviceInformationSummary";
-import ProviderWarning from "./ProviderWarning";
-import AppDepsInstallModal from "./AppDepsInstallModal";
-import AppDepsUnInstallModal from "./AppDepsUnInstallModal";
-import ErrorModal from "~/renderer/modals/ErrorModal/index";
+import { App, DeviceInfo, FirmwareUpdateContext } from "@ledgerhq/types-live";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import styled from "styled-components";
 import {
   addNewDeviceModel,
   clearLastSeenCustomImage,
   setHasInstalledApps,
   setLastSeenDeviceInfo,
 } from "~/renderer/actions/settings";
-import { useDispatch, useSelector } from "react-redux";
+import NavigationGuard from "~/renderer/components/NavigationGuard";
+import Quit from "~/renderer/icons/Quit";
+import ErrorModal from "~/renderer/modals/ErrorModal/index";
 import {
   hasInstalledAppsSelector,
   lastSeenCustomImageSelector,
 } from "~/renderer/reducers/settings";
+import AppDepsInstallModal from "./AppDepsInstallModal";
+import AppDepsUnInstallModal from "./AppDepsUnInstallModal";
+import AppList from "./AppsList";
+import DeviceInformationSummary from "./DeviceInformationSummary";
+import ProviderWarning from "./ProviderWarning";
 
 const Container = styled.div`
   display: flex;

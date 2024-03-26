@@ -1,27 +1,27 @@
-import React, { useCallback, memo } from "react";
+import { useFetchCurrencyFrom } from "@ledgerhq/live-common/exchange/swap/hooks/index";
+import { useFeature } from "@ledgerhq/live-common/featureFlags/index";
 import { useMarketData } from "@ledgerhq/live-common/market/MarketDataProvider";
-import styled, { DefaultTheme, StyledComponent } from "styled-components";
-import { Flex, Text, Icon } from "@ledgerhq/react-ui";
+import { CurrencyData, MarketListRequestParams } from "@ledgerhq/live-common/market/types";
+import { useRampCatalog } from "@ledgerhq/live-common/platform/providers/RampCatalogProvider/useRampCatalog";
+import { Flex, Icon, Text } from "@ledgerhq/react-ui";
 import { TFunction } from "i18next";
+import React, { memo, useCallback } from "react";
 import { Trans, useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
-import AutoSizer from "react-virtualized-auto-sizer";
-import MarketRowItem from "./MarketRowItem";
-import LoadingPlaceholder from "../../components/LoadingPlaceholder";
-import { Button } from ".";
-import { useSelector, useDispatch } from "react-redux";
-import { localeSelector } from "~/renderer/reducers/settings";
+import styled, { DefaultTheme, StyledComponent } from "styled-components";
+import { FlexProps } from "styled-system";
 import { addStarredMarketCoins, removeStarredMarketCoins } from "~/renderer/actions/settings";
 import Track from "~/renderer/analytics/Track";
-import { useRampCatalog } from "@ledgerhq/live-common/platform/providers/RampCatalogProvider/useRampCatalog";
+import TrackPage from "~/renderer/analytics/TrackPage";
 import Image from "~/renderer/components/Image";
 import NoResultsFound from "~/renderer/images/no-results-found.png";
-import { useFeature } from "@ledgerhq/live-common/featureFlags/index";
-import { FlexProps } from "styled-system";
-import { CurrencyData, MarketListRequestParams } from "@ledgerhq/live-common/market/types";
-import TrackPage from "~/renderer/analytics/TrackPage";
-import { useFetchCurrencyFrom } from "@ledgerhq/live-common/exchange/swap/hooks/index";
+import { localeSelector } from "~/renderer/reducers/settings";
+import { Button } from ".";
+import LoadingPlaceholder from "../../components/LoadingPlaceholder";
+import MarketRowItem from "./MarketRowItem";
 
 export const TableCellBase: StyledComponent<"div", DefaultTheme, FlexProps> = styled(Flex).attrs({
   alignItems: "center",

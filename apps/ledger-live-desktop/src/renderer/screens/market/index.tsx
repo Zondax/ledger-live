@@ -1,16 +1,16 @@
-import React, { useMemo, useCallback } from "react";
-import { Flex, Button as BaseButton, Text, SearchInput, Dropdown } from "@ledgerhq/react-ui";
-import { useSelector } from "react-redux";
-import { starredMarketCoinsSelector } from "~/renderer/reducers/settings";
-import { useTranslation } from "react-i18next";
 import { useMarketData } from "@ledgerhq/live-common/market/MarketDataProvider";
+import { rangeDataTable } from "@ledgerhq/live-common/market/utils/rangeDataTable";
+import { Button as BaseButton, Dropdown, Flex, SearchInput, Text } from "@ledgerhq/react-ui";
+import React, { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
+import TrackPage from "~/renderer/analytics/TrackPage";
+import { useInitSupportedCounterValues } from "~/renderer/hooks/useInitSupportedCounterValues";
+import { starredMarketCoinsSelector } from "~/renderer/reducers/settings";
 import CounterValueSelect from "./CountervalueSelect";
 import MarketList from "./MarketList";
 import SideDrawerFilter from "./SideDrawerFilter";
-import { rangeDataTable } from "@ledgerhq/live-common/market/utils/rangeDataTable";
-import TrackPage from "~/renderer/analytics/TrackPage";
-import { useInitSupportedCounterValues } from "~/renderer/hooks/useInitSupportedCounterValues";
 
 const Container = styled(Flex).attrs({
   flex: "1",

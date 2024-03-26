@@ -1,10 +1,10 @@
-import fs from "fs";
-import "./live-common-set-supported-currencies";
 import {
-  listCryptoCurrencies,
   isCurrencySupported,
+  listCryptoCurrencies,
   listTokens,
 } from "@ledgerhq/live-common/currencies/index";
+import fs from "fs";
+import "./live-common-set-supported-currencies";
 
 export const outputFile = "cryptoassets.md";
 

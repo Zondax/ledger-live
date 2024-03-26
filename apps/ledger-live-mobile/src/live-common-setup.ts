@@ -1,31 +1,31 @@
-import Config from "react-native-config";
-import { Observable, timer } from "rxjs";
-import { map, debounce } from "rxjs/operators";
-import { TraceContext, listen } from "@ledgerhq/logs";
-import HIDTransport from "@ledgerhq/react-native-hid";
+import { getDeviceModel } from "@ledgerhq/devices";
+import { DescriptorEvent } from "@ledgerhq/hw-transport";
 import withStaticURLs from "@ledgerhq/hw-transport-http";
-import { retry } from "@ledgerhq/live-common/promise";
-import { setEnv } from "@ledgerhq/live-env";
+import { setGlobalOnBridgeError } from "@ledgerhq/live-common/bridge/useBridgeTransaction";
 import {
   getCryptoCurrencyById,
   setSupportedCurrencies,
 } from "@ledgerhq/live-common/currencies/index";
-import { setWalletAPIVersion } from "@ledgerhq/live-common/wallet-api/version";
-import { WALLET_API_VERSION } from "@ledgerhq/live-common/wallet-api/constants";
-import { registerTransportModule } from "@ledgerhq/live-common/hw/index";
-import type { TransportModule } from "@ledgerhq/live-common/hw/index";
+import { setSecp256k1Instance } from "@ledgerhq/live-common/families/bitcoin/logic";
 import { setDeviceMode } from "@ledgerhq/live-common/hw/actions/app";
-import { getDeviceModel } from "@ledgerhq/devices";
-import { DescriptorEvent } from "@ledgerhq/hw-transport";
-import VersionNumber from "react-native-version-number";
+import type { TransportModule } from "@ledgerhq/live-common/hw/index";
+import { registerTransportModule } from "@ledgerhq/live-common/hw/index";
+import { retry } from "@ledgerhq/live-common/promise";
+import { WALLET_API_VERSION } from "@ledgerhq/live-common/wallet-api/constants";
+import { setWalletAPIVersion } from "@ledgerhq/live-common/wallet-api/version";
+import { setEnv } from "@ledgerhq/live-env";
+import { TraceContext, listen } from "@ledgerhq/logs";
+import HIDTransport from "@ledgerhq/react-native-hid";
 import type { DeviceModelId } from "@ledgerhq/types-devices";
 import { Platform } from "react-native";
-import { setSecp256k1Instance } from "@ledgerhq/live-common/families/bitcoin/logic";
-import { setGlobalOnBridgeError } from "@ledgerhq/live-common/bridge/useBridgeTransaction";
+import Config from "react-native-config";
+import VersionNumber from "react-native-version-number";
+import { Observable, timer } from "rxjs";
+import { debounce, map } from "rxjs/operators";
 import { prepareCurrency } from "./bridge/cache";
-import BluetoothTransport from "./react-native-hw-transport-ble";
 import "./experimental";
 import logger, { ConsoleLogger } from "./logger";
+import BluetoothTransport from "./react-native-hw-transport-ble";
 
 const consoleLogger = ConsoleLogger.getLogger();
 listen(log => {
@@ -124,6 +124,7 @@ setSupportedCurrencies([
   "lukso",
   "linea",
   "linea_goerli",
+  "kadena"
 ]);
 
 if (Config.BLE_LOG_LEVEL) BluetoothTransport.setLogLevel(Config.BLE_LOG_LEVEL);

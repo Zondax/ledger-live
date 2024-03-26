@@ -1,26 +1,26 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 // @flow
 import React, {
+  ReactElement,
   createContext,
   useCallback,
   useContext,
-  ReactElement,
-  useReducer,
   useEffect,
+  useReducer,
 } from "react";
 
+import type { Currency } from "@ledgerhq/types-cryptoassets";
 import { useDebounce } from "../hooks/useDebounce";
+import defaultFetchApi from "./api/api";
 import {
-  State,
+  CurrencyData,
+  MarketCurrencyChartDataRequestParams,
   MarketDataApi,
   MarketListRequestParams,
-  MarketCurrencyChartDataRequestParams,
-  CurrencyData,
   SingleCoinState,
+  State,
   SupportedCoins,
 } from "./types";
-import defaultFetchApi from "./api/api";
-import type { Currency } from "@ledgerhq/types-cryptoassets";
 type Props = {
   children: React.ReactNode;
   fetchApi?: MarketDataApi;
@@ -229,8 +229,10 @@ export const MarketDataProvider = ({
     if (countervalue) {
       const ticker = countervalue.ticker.toLowerCase();
       api.supportedCounterCurrencies().then(
-        supportedCounterCurrencies =>
+        supportedCounterCurrencies =>{
+        console.log(' supportedCounterCurrencies ', supportedCounterCurrencies)
           api.setSupportedCoinsList().then((coins: SupportedCoins) => {
+            console.log(' 111111 coins ', coins)
             dispatch({
               type: ACTIONS.IS_READY,
               payload: {
@@ -242,7 +244,7 @@ export const MarketDataProvider = ({
               type: ACTIONS.UPDATE_COUNTERVALUE,
               payload: supportedCounterCurrencies.includes(ticker) ? ticker : "usd",
             });
-          }, handleError),
+          }, handleError)},
         handleError,
       );
     }

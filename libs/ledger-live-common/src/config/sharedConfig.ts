@@ -11,6 +11,7 @@ import { evmConfig } from "../families/evm/config";
 import { fileCoinConfig } from "../families/filecoin/config";
 import { hederaConfig } from "../families/hedera/config";
 import { internetComputerConfig } from "../families/internet_computer/config";
+import { kadenaConfig } from "../families/kadena/config";
 import { nearConfig } from "../families/near/config";
 import { polkadotConfig } from "../families/polkadot/config";
 import { rippleConfig } from "../families/ripple/config";
@@ -46,4 +47,5 @@ export const liveConfig: ConfigSchema = {
   ...tezosConfig,
   ...tronConfig,
   ...vechainConfig,
+  ...kadenaConfig,
 };

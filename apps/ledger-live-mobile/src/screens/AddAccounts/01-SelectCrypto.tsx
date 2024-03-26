@@ -1,30 +1,30 @@
-import React, { useMemo } from "react";
-import { Trans } from "react-i18next";
-import { StyleSheet, View, FlatList, SafeAreaView } from "react-native";
+import { useCurrenciesByMarketcap } from "@ledgerhq/live-common/currencies/hooks";
+import {
+  isCurrencySupported,
+  listSupportedCurrencies,
+  listTokens,
+} from "@ledgerhq/live-common/currencies/index";
+import useFeature from "@ledgerhq/live-common/featureFlags/useFeature";
+import useEnv from "@ledgerhq/live-common/hooks/useEnv";
+import { getEnv } from "@ledgerhq/live-env";
 import type {
   CryptoCurrency,
   CryptoCurrencyId,
   CryptoOrTokenCurrency,
   TokenCurrency,
 } from "@ledgerhq/types-cryptoassets";
-import {
-  isCurrencySupported,
-  listTokens,
-  listSupportedCurrencies,
-} from "@ledgerhq/live-common/currencies/index";
-import { useCurrenciesByMarketcap } from "@ledgerhq/live-common/currencies/hooks";
+import { Feature } from "@ledgerhq/types-live";
 import { useTheme } from "@react-navigation/native";
-import useFeature from "@ledgerhq/live-common/featureFlags/useFeature";
-import useEnv from "@ledgerhq/live-common/hooks/useEnv";
-import { ScreenName } from "~/const";
+import React, { useMemo } from "react";
+import { Trans } from "react-i18next";
+import { FlatList, SafeAreaView, StyleSheet, View } from "react-native";
 import { TrackScreen } from "~/analytics";
-import FilteredSearchBar from "~/components/FilteredSearchBar";
 import CurrencyRow from "~/components/CurrencyRow";
+import FilteredSearchBar from "~/components/FilteredSearchBar";
 import LText from "~/components/LText";
 import { AddAccountsNavigatorParamList } from "~/components/RootNavigator/types/AddAccountsNavigator";
 import { StackNavigatorProps } from "~/components/RootNavigator/types/helpers";
-import { getEnv } from "@ledgerhq/live-env";
-import { Feature } from "@ledgerhq/types-live";
+import { ScreenName } from "~/const";
 
 const SEARCH_KEYS = getEnv("CRYPTO_ASSET_SEARCH_KEYS");
 
@@ -97,6 +97,7 @@ export default function AddAccountsSelectCrypto({ navigation, route }: Props) {
   const lukso = useFeature("currencyLukso");
   const linea = useFeature("currencyLinea");
   const lineaGoerli = useFeature("currencyLineaGoerli");
+  const kadena = useFeature("currencyKadena");
 
   const featureFlaggedCurrencies = useMemo(
     (): Partial<Record<CryptoCurrencyId, Feature<unknown> | null>> => ({
@@ -140,6 +141,7 @@ export default function AddAccountsSelectCrypto({ navigation, route }: Props) {
       lukso,
       linea,
       linea_goerli: lineaGoerli,
+      kadena
     }),
     [
       axelar,
@@ -182,6 +184,7 @@ export default function AddAccountsSelectCrypto({ navigation, route }: Props) {
       lukso,
       linea,
       lineaGoerli,
+      kadena
     ],
   );
 

@@ -2,7 +2,7 @@ import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import {
   Transaction,
   TransactionStatus,
-} from "@ledgerhq/live-common/families/internet_computer/types";
+} from "@ledgerhq/live-common/families/kadena/types";
 import { Account } from "@ledgerhq/types-live";
 import invariant from "invariant";
 import React, { useCallback } from "react";
@@ -20,7 +20,7 @@ const MemoField = ({
   transaction: Transaction;
   status: TransactionStatus;
 }) => {
-  invariant(transaction.family === "internet_computer", "Memo: Internet Computer family expected");
+  invariant(transaction.family === "kadena", "Memo: Kadena family expected");
 
   const { t } = useTranslation();
 
@@ -40,8 +40,8 @@ const MemoField = ({
     <Input
       warning={status.warnings.transaction}
       error={status.errors.transaction}
-      value={transaction.memo ?? ""}
-      placeholder={t("families.internet_computer.memoPlaceholder")}
+      // value={transaction.memo ?? ""}
+      placeholder={t("families.kadena.memoPlaceholder")}
       onChange={onMemoFieldChange}
       spellCheck="false"
     />

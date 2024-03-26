@@ -1,33 +1,33 @@
-import React, { useMemo, useCallback } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { findTokenAccountByCurrency } from "@ledgerhq/live-common/account/index";
 import {
+  isCurrencySupported,
   listSupportedCurrencies,
   listTokens,
-  isCurrencySupported,
 } from "@ledgerhq/live-common/currencies/index";
-import { findTokenAccountByCurrency } from "@ledgerhq/live-common/account/index";
-import { supportLinkByTokenType } from "~/config/urls";
-import TrackPage from "~/renderer/analytics/TrackPage";
-import SelectCurrency from "~/renderer/components/SelectCurrency";
-import Button from "~/renderer/components/Button";
-import Box from "~/renderer/components/Box";
-import CurrencyBadge from "~/renderer/components/CurrencyBadge";
-import Alert from "~/renderer/components/Alert";
-import CurrencyDownStatusAlert from "~/renderer/components/CurrencyDownStatusAlert";
-import { StepProps } from "..";
-import { useDispatch } from "react-redux";
-import { openModal } from "~/renderer/actions/modals";
-import FullNodeStatus from "~/renderer/modals/AddAccounts/FullNodeStatus";
-import useSatStackStatus from "~/renderer/hooks/useSatStackStatus";
 import useEnv from "@ledgerhq/live-common/hooks/useEnv";
+import React, { useCallback, useMemo } from "react";
+import { Trans, useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
+import { supportLinkByTokenType } from "~/config/urls";
+import { openModal } from "~/renderer/actions/modals";
+import TrackPage from "~/renderer/analytics/TrackPage";
+import Alert from "~/renderer/components/Alert";
+import Box from "~/renderer/components/Box";
+import Button from "~/renderer/components/Button";
+import CurrencyBadge from "~/renderer/components/CurrencyBadge";
+import CurrencyDownStatusAlert from "~/renderer/components/CurrencyDownStatusAlert";
+import SelectCurrency from "~/renderer/components/SelectCurrency";
+import useSatStackStatus from "~/renderer/hooks/useSatStackStatus";
+import FullNodeStatus from "~/renderer/modals/AddAccounts/FullNodeStatus";
+import { StepProps } from "..";
 // TODO move to bitcoin family
 // eslint-disable-next-line no-restricted-imports
+import { NetworkDown } from "@ledgerhq/errors";
 import { SatStackStatus } from "@ledgerhq/live-common/families/bitcoin/satstack";
 import useFeature from "@ledgerhq/live-common/featureFlags/useFeature";
-import { NetworkDown } from "@ledgerhq/errors";
-import ErrorBanner from "~/renderer/components/ErrorBanner";
 import { CryptoCurrencyId, CryptoOrTokenCurrency } from "@ledgerhq/types-cryptoassets";
 import { Feature } from "@ledgerhq/types-live";
+import ErrorBanner from "~/renderer/components/ErrorBanner";
 
 const listSupportedTokens = () =>
   listTokens().filter(token => isCurrencySupported(token.parentCurrency));
@@ -61,7 +61,7 @@ const StepChooseCurrency = ({ currency, setCurrency }: StepProps) => {
   const velasEvm = useFeature("currencyVelasEvm");
   const syscoin = useFeature("currencySyscoin");
   const internetComputer = useFeature("currencyInternetComputer");
-  const telosEvm = useFeature("currencyTelosEvm");
+  const telosEvm = useFeature("currencyTelosEvm"); 
   const coreum = useFeature("currencyCoreum");
   const polygonZkEvm = useFeature("currencyPolygonZkEvm");
   const polygonZkEvmTestnet = useFeature("currencyPolygonZkEvmTestnet");
@@ -75,6 +75,7 @@ const StepChooseCurrency = ({ currency, setCurrency }: StepProps) => {
   const lukso = useFeature("currencyLukso");
   const linea = useFeature("currencyLinea");
   const lineaGoerli = useFeature("currencyLineaGoerli");
+  const kadena = useFeature("currencyKadena");
 
   const featureFlaggedCurrencies = useMemo(
     (): Partial<Record<CryptoCurrencyId, Feature<unknown> | null>> => ({
@@ -118,6 +119,7 @@ const StepChooseCurrency = ({ currency, setCurrency }: StepProps) => {
       lukso,
       linea,
       linea_goerli: lineaGoerli,
+      kadena
     }),
     [
       axelar,
@@ -160,6 +162,7 @@ const StepChooseCurrency = ({ currency, setCurrency }: StepProps) => {
       lukso,
       linea,
       lineaGoerli,
+      kadena,
     ],
   );
 

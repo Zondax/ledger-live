@@ -7,6 +7,7 @@ import elrond from "../families/elrond/deviceTransactionConfig";
 import filecoin from "../families/filecoin/deviceTransactionConfig";
 import hedera from "../families/hedera/deviceTransactionConfig";
 import internet_computer from "../families/internet_computer/deviceTransactionConfig";
+import kadena from "../families/kadena/deviceTransactionConfig";
 import ripple from "../families/ripple/deviceTransactionConfig";
 import solana from "../families/solana/deviceTransactionConfig";
 import stacks from "../families/stacks/deviceTransactionConfig";
@@ -29,6 +30,7 @@ export default {
   filecoin,
   hedera,
   internet_computer,
+  kadena,
   ripple,
   solana,
   stacks,
