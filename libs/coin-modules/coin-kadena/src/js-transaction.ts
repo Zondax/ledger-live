@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { Transaction } from "./types";
 import { Account } from "@ledgerhq/types-live";
 import { getAddress, validateAddress } from "./utils";
-import { KDA_FEES } from "./consts";
+import { KDA_FEES } from "./constants";
 
 export const createTransaction = (): Transaction => {
   // log("debug", "[createTransaction] creating base tx");

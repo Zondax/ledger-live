@@ -1,5 +1,3 @@
-import { encodeAccountId } from "../../account";
-import { decodeAccountId } from "../../account";
 import { GetAccountShape } from "@ledgerhq/coin-framework/bridge/jsHelpers";
 import { Account } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
@@ -11,6 +9,8 @@ import { KadenaOperation } from "./types";
 import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
 import { log } from "@ledgerhq/logs";
 import { baseUnitToKda } from "./utils";
+import { encodeAccountId } from "@ledgerhq/coin-framework/account/index";
+import { decodeAccountId } from "@ledgerhq/coin-framework/account/index";
 
 const getAddressFromPublicKey = (pubkey: string): string => {
   return `k:${pubkey}`;

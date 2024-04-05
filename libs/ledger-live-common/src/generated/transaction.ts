@@ -7,7 +7,6 @@ import elrond from "../families/elrond/transaction";
 import filecoin from "../families/filecoin/transaction";
 import hedera from "../families/hedera/transaction";
 import internet_computer from "../families/internet_computer/transaction";
-import kadena from "../families/kadena/transaction";
 import ripple from "../families/ripple/transaction";
 import solana from "../families/solana/transaction";
 import stacks from "../families/stacks/transaction";
@@ -20,6 +19,7 @@ import bitcoin from "@ledgerhq/coin-bitcoin/transaction";
 import evm from "@ledgerhq/coin-evm/transaction";
 import near from "@ledgerhq/coin-near/transaction";
 import polkadot from "@ledgerhq/coin-polkadot/transaction";
+import kadena from "@ledgerhq/coin-kadena/transaction";
 
 export default {
   cardano,
@@ -31,7 +31,6 @@ export default {
   filecoin,
   hedera,
   internet_computer,
-  kadena,
   ripple,
   solana,
   stacks,
@@ -44,4 +43,5 @@ export default {
   evm,
   near,
   polkadot,
+  kadena,
 };

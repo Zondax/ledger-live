@@ -7,7 +7,6 @@ import elrond from "../../families/elrond/bridge/js";
 import filecoin from "../../families/filecoin/bridge/js";
 import hedera from "../../families/hedera/bridge/js";
 import internet_computer from "../../families/internet_computer/bridge/js";
-import kadena from "../../families/kadena/bridge/js";
 import ripple from "../../families/ripple/bridge/js";
 import solana from "../../families/solana/bridge/js";
 import stacks from "../../families/stacks/bridge/js";
@@ -20,6 +19,7 @@ import { bridge as bitcoin } from "../../families/bitcoin/setup";
 import { bridge as evm } from "../../families/evm/setup";
 import { bridge as near } from "../../families/near/setup";
 import { bridge as polkadot } from "../../families/polkadot/setup";
+import { bridge as kadena } from "../../families/kadena/setup";
 
 export default {
   cardano,
@@ -31,7 +31,6 @@ export default {
   filecoin,
   hedera,
   internet_computer,
-  kadena,
   ripple,
   solana,
   stacks,
@@ -44,4 +43,5 @@ export default {
   evm,
   near,
   polkadot,
+  kadena,
 };

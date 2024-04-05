@@ -1,12 +1,12 @@
 import { getEnv } from "@ledgerhq/live-env";
 import network from "@ledgerhq/live-network/network";
 import { log } from "@ledgerhq/logs";
-import { AxiosRequestConfig, AxiosResponse, Method } from "axios";
+import { AxiosResponse, Method } from "axios";
 import { ChainId, ICommandResult, Pact, createClient } from "@kadena/client";
 import { GetInfoResponse, GetTxnsResponse } from "./types";
 import { PactCommandObject } from "hw-app-kda";
 import { KadenaOperation } from "../types";
-import { KDA_CHAINWEB_VER, KDA_NETWORK } from "../consts";
+import { KDA_CHAINWEB_VER, KDA_NETWORK } from "../constants";
 
 const getKadenaURL = (subpath?: string): string => {
   const baseUrl = getEnv("API_KADENA_ENDPOINT");
@@ -21,12 +21,7 @@ export const getKadenaPactURL = (chainId: string): string => {
 
 const KadenaApiWrapper = async <T>(path: string, body: any, method: Method) => {
   // We force data to this way as network func is not using the correct param type. Changing that func will generate errors in other implementations
-  const opts: AxiosRequestConfig = {
-    method,
-    data: body,
-    url: path,
-  };
-  const rawResponse = await network(opts);
+  const rawResponse = await network({ url: path, method, data: body });
   if (rawResponse && rawResponse.data && rawResponse.data.details?.error_message) {
     log("error", rawResponse.data.details?.error_message);
   }

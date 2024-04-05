@@ -2,7 +2,7 @@ import { Account, AccountLike } from "@ledgerhq/types-live";
 import { Transaction } from "./types";
 import BigNumber from "bignumber.js";
 import { fetchCoinDetailsForAccount } from "./api/network";
-import { KDA_FEES } from "./consts";
+import { KDA_FEES } from "./constants";
 import { getAddress } from "./utils";
 
 export const estimateMaxSpendable = async ({

@@ -63,6 +63,7 @@
     "coin:evm": "pnpm --filter coin-evm",
     "coin:framework": "pnpm --filter coin-framework",
     "coin:near": "pnpm --filter coin-near",
+    "coin:kadena": "pnpm --filter coin-kadena",
     "coin:polkadot": "pnpm --filter coin-polkadot",
     "evm-tools": "pnpm --filter evm-tools",
     "domain": "pnpm --filter domain-service",

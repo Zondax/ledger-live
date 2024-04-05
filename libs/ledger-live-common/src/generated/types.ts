@@ -46,10 +46,10 @@ import { Transaction as internet_computerTransaction } from "../families/interne
 import { TransactionRaw as internet_computerTransactionRaw } from "../families/internet_computer/types";
 import { TransactionStatus as internet_computerTransactionStatus } from "../families/internet_computer/types";
 import { TransactionStatusRaw as internet_computerTransactionStatusRaw } from "../families/internet_computer/types";
-import { Transaction as kadenaTransaction } from "../families/kadena/types";
-import { TransactionRaw as kadenaTransactionRaw } from "../families/kadena/types";
-import { TransactionStatus as kadenaTransactionStatus } from "../families/kadena/types";
-import { TransactionStatusRaw as kadenaTransactionStatusRaw } from "../families/kadena/types";
+import { Transaction as kadenaTransaction } from "@ledgerhq/coin-kadena/types";
+import { TransactionRaw as kadenaTransactionRaw } from "@ledgerhq/coin-kadena/types";
+import { TransactionStatus as kadenaTransactionStatus } from "@ledgerhq/coin-kadena/types";
+import { TransactionStatusRaw as kadenaTransactionStatusRaw } from "@ledgerhq/coin-kadena/types";
 import { Transaction as nearTransaction } from "@ledgerhq/coin-near/types";
 import { TransactionRaw as nearTransactionRaw } from "@ledgerhq/coin-near/types";
 import { TransactionStatus as nearTransactionStatus } from "@ledgerhq/coin-near/types";

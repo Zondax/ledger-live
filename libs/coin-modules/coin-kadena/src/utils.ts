@@ -1,6 +1,6 @@
 import { Account, Address } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
-import { KDA_DECIMALS } from "./consts";
+import { KDA_DECIMALS } from "./constants";
 
 export const isNoErrorReturnCode = (code: number): boolean => code === 0x9000;
 
