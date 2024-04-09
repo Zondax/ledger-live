@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
-import "zx/globals";
 import rimraf from "rimraf";
+import "zx/globals";
 
 const targets = [
   "hw-getAddress.ts",
@@ -21,7 +21,7 @@ const targets = [
 ];
 
 // Coins using coin-framework
-const familiesWPackage = ["algorand", "bitcoin", "evm", "near", "polkadot"];
+const familiesWPackage = ["algorand", "bitcoin", "evm", "near", "polkadot", "ton"];
 
 cd(path.join(__dirname, "..", "src"));
 await rimraf("generated");
