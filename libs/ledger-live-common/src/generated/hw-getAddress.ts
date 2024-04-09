@@ -12,7 +12,6 @@ import solana from "../families/solana/hw-getAddress";
 import stacks from "../families/stacks/hw-getAddress";
 import stellar from "../families/stellar/hw-getAddress";
 import tezos from "../families/tezos/hw-getAddress";
-import ton from "../families/ton/hw-getAddress";
 import tron from "../families/tron/hw-getAddress";
 import vechain from "../families/vechain/hw-getAddress";
 import { resolver as algorand } from "../families/algorand/setup";
@@ -20,6 +19,7 @@ import { resolver as bitcoin } from "../families/bitcoin/setup";
 import { resolver as evm } from "../families/evm/setup";
 import { resolver as near } from "../families/near/setup";
 import { resolver as polkadot } from "../families/polkadot/setup";
+import { resolver as ton } from "../families/ton/setup";
 
 export default {
   cardano,
@@ -36,7 +36,6 @@ export default {
   stacks,
   stellar,
   tezos,
-  ton,
   tron,
   vechain,
   algorand,
@@ -44,4 +43,5 @@ export default {
   evm,
   near,
   polkadot,
+  ton,
 };

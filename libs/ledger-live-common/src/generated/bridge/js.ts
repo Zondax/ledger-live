@@ -12,7 +12,6 @@ import solana from "../../families/solana/bridge/js";
 import stacks from "../../families/stacks/bridge/js";
 import stellar from "../../families/stellar/bridge/js";
 import tezos from "../../families/tezos/bridge/js";
-import ton from "../../families/ton/bridge/js";
 import tron from "../../families/tron/bridge/js";
 import vechain from "../../families/vechain/bridge/js";
 import { bridge as algorand } from "../../families/algorand/setup";
@@ -20,6 +19,7 @@ import { bridge as bitcoin } from "../../families/bitcoin/setup";
 import { bridge as evm } from "../../families/evm/setup";
 import { bridge as near } from "../../families/near/setup";
 import { bridge as polkadot } from "../../families/polkadot/setup";
+import { bridge as ton } from "../../families/ton/setup";
 
 export default {
   cardano,
@@ -36,7 +36,6 @@ export default {
   stacks,
   stellar,
   tezos,
-  ton,
   tron,
   vechain,
   algorand,
@@ -44,4 +43,5 @@ export default {
   evm,
   near,
   polkadot,
+  ton,
 };
