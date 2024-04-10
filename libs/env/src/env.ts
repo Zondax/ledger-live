@@ -775,8 +775,9 @@ const envDefinitions = {
     parser: intParser,
     desc: "Configure the low battery percentage threshold",
   },
+  // TODO: TON switch to mainnet
   API_TON_ENDPOINT: {
-    def: "https://toncenter.com/api/v3",
+    def: "https://testnet.toncenter.com/api/v3",
     parser: stringParser,
     desc: "Toncenter API for TON",
   },

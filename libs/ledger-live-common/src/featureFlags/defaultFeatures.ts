@@ -1,9 +1,9 @@
 import {
+  ABTestingVariants,
   DefaultFeature,
   Feature,
-  Features,
   FeatureMap,
-  ABTestingVariants,
+  Features,
 } from "@ledgerhq/types-live";
 import reduce from "lodash/reduce";
 import { formatToFirebaseFeatureId } from "./firebaseFeatureFlags";
@@ -71,8 +71,8 @@ export const CURRENCY_DEFAULT_FEATURES = {
   currencyCasper: DEFAULT_FEATURE,
   currencyNeonEvm: DEFAULT_FEATURE,
   currencyLinea: DEFAULT_FEATURE,
-  currencyLineaTesnet: DEFAULT_FEATURE,
-  currencyTon: DEFAULT_FEATURE,
+  currencyLineaGoerli: DEFAULT_FEATURE,
+  currencyTon: { enabled: true },
 };
 
 /**

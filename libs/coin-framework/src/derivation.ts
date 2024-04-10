@@ -1,12 +1,12 @@
-import invariant from "invariant";
-import { Observable, defer, of, range, empty } from "rxjs";
-import { catchError, switchMap, concatMap, takeWhile, map } from "rxjs/operators";
-import { log } from "@ledgerhq/logs";
 import { TransportStatusError, UserRefusedAddress } from "@ledgerhq/errors";
-import type { CryptoCurrency } from "@ledgerhq/types-cryptoassets";
-import { getCryptoCurrencyById } from "./currencies";
 import { getEnv } from "@ledgerhq/live-env";
+import { log } from "@ledgerhq/logs";
+import type { CryptoCurrency } from "@ledgerhq/types-cryptoassets";
 import { DerivationMode } from "@ledgerhq/types-live";
+import invariant from "invariant";
+import { Observable, defer, empty, of, range } from "rxjs";
+import { catchError, concatMap, map, switchMap, takeWhile } from "rxjs/operators";
+import { getCryptoCurrencyById } from "./currencies";
 
 export type ModeSpec = {
   mandatoryEmptyAccountSkip?: number;
@@ -187,7 +187,7 @@ const modes: Readonly<Partial<Record<DerivationMode, unknown>>> = Object.freeze(
     tag: "third-party",
   },
   ton: {
-    overridesDerivation: "44'/607'/0'/0'/<account>'/0'",
+    overridesDerivation: "44'/607'/1'/0'/<account>'/0'", // TODO: TON switch to mainnet
   },
 });
 modes as Record<DerivationMode, ModeSpec>; // eslint-disable-line
