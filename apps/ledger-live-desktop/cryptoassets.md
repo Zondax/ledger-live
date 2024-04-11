@@ -15057,6 +15057,8 @@
 | Polygon | YPRED | 0xdFaF2680239d678d9551669727b93b62Ad0D18Cc | yPredict |  | polygon/erc20/ypredict |
 | Polygon | WATCH | 0x09211Dc67f9fe98Fb7bBB91Be0ef05f4a12FA2b2 | yieldwatch |  | polygon/erc20/yieldwatch |
 | Stellar | usdc | GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN | USDC |  | stellar/asset/USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN |
+| TON | ZDX | EQCstL4MHs8XnWvsiuL4yXJcI_ckHD-4yhUsjEQkTvKqjOU6 | Zondax Test |  | ton/jetton/eqcstl4mhs8xnwvsiul4yxjci_ckhd-4yhusjeqktvkqjou6 |
+| TON | ZDXT | EQCV4wQkl5dOEhxlicXRY9usvx8c2punEdPROfTpKa45IQnB | Zondax Test Ton |  | ton/jetton/eqcv4wqkl5doehxlicxry9usvx8c2punedproftpka45iqnb |
 | Tron | GOLD | TKjLCYg1aQmtnC8HGLCgbrq89Ru7xifPP5 | !!!!GOLDCOIN | delisted | tron/trc10/1002341 |
 | Tron | GOLD | TP429SKrsp4BoTiEFXHj4TNSJwqDFsygnr | !!!!GoldSpot!!!! | delisted | tron/trc10/1002467 |
 | Tron | 666 | TMqNJwD3qVmuRxzzP3Q4A24fuByVBKQ39E | !!!666 | delisted | tron/trc10/1002438 |
