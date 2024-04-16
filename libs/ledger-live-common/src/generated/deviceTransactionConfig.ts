@@ -12,13 +12,13 @@ import solana from "../families/solana/deviceTransactionConfig";
 import stacks from "../families/stacks/deviceTransactionConfig";
 import stellar from "../families/stellar/deviceTransactionConfig";
 import tezos from "../families/tezos/deviceTransactionConfig";
-import ton from "../families/ton/deviceTransactionConfig";
 import tron from "../families/tron/deviceTransactionConfig";
 import algorand from "@ledgerhq/coin-algorand/deviceTransactionConfig";
 import bitcoin from "@ledgerhq/coin-bitcoin/deviceTransactionConfig";
 import evm from "@ledgerhq/coin-evm/deviceTransactionConfig";
 import near from "@ledgerhq/coin-near/deviceTransactionConfig";
 import polkadot from "@ledgerhq/coin-polkadot/deviceTransactionConfig";
+import ton from "@ledgerhq/coin-ton/deviceTransactionConfig";
 
 export default {
   cardano,
@@ -35,13 +35,13 @@ export default {
   stacks,
   stellar,
   tezos,
-  ton,
   tron,
   algorand,
   bitcoin,
   evm,
   near,
   polkadot,
+  ton,
 };
 import { ExtraDeviceTransactionField as ExtraDeviceTransactionField_casper } from "../families/casper/deviceTransactionConfig";
 import { ExtraDeviceTransactionField as ExtraDeviceTransactionField_cosmos } from "../families/cosmos/deviceTransactionConfig";
