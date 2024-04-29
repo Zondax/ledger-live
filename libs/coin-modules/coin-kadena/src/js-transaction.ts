@@ -38,3 +38,4 @@ export const prepareTransaction = async (a: Account, t: Transaction): Promise<Tr
   // log("debug", "[prepareTransaction] finish fn");
   return t;
 };
+
