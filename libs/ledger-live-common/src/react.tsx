@@ -32,7 +32,6 @@ function polyfillIconComponent(IconComponent: Icon | null | undefined): Icon | n
  * @deprecated prefer using @ledgerhq/crypto-icons-ui directly + mapping provided by @ledgerhq/live-common/currencies/cryptoIcons
  */
 export function getCryptoCurrencyIcon(currency: CryptoCurrency): Icon | null | undefined {
-  console.log(icons)
   return polyfillIconComponent(inferCryptoCurrencyIcon(icons, currency));
 }
 
