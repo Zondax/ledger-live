@@ -71,7 +71,7 @@ export const CURRENCY_DEFAULT_FEATURES = {
   currencyCasper: DEFAULT_FEATURE,
   currencyNeonEvm: DEFAULT_FEATURE,
   currencyLinea: DEFAULT_FEATURE,
-  currencyLineaGoerli: DEFAULT_FEATURE,
+  currencyLineaTesnet: DEFAULT_FEATURE,
   currencyTon: { enabled: true },
 };
 
