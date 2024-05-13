@@ -2,6 +2,9 @@ import { Account, Address } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
 import { KDA_DECIMALS } from "./constants";
 
+// This regex will not work with Starknet since addresses are 65 caracters long after the 0x
+const kdaAddressRegEx = /[0-9A-Fa-f]{64}/;
+
 export const isNoErrorReturnCode = (code: number): boolean => code === 0x9000;
 
 export const getPath = (path: string): string =>
@@ -13,8 +16,9 @@ export const getAddress = (a: Account): Address =>
     : { address: a.freshAddress, derivationPath: a.freshAddressPath };
 
 export const validateAddress = (address: string): boolean => {
+
   address = address.startsWith("k:") ? address.substring(2) : address;
-  if (!address.match(/[0-9A-Fa-f]{64}/g)) {
+  if (!address.match(kdaAddressRegEx)) {
     return false;
   }
 
