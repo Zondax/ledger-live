@@ -18595,8 +18595,10 @@ var package_default = {
     "coin:bitcoin": "pnpm --filter coin-bitcoin",
     "coin:evm": "pnpm --filter coin-evm",
     "coin:framework": "pnpm --filter coin-framework",
+    "coin:tester": "pnpm --filter coin-tester",
     "coin:near": "pnpm --filter coin-near",
     "coin:polkadot": "pnpm --filter coin-polkadot",
+    "coin:ton": "pnpm --filter coin-ton",
     "evm-tools": "pnpm --filter evm-tools",
     domain: "pnpm --filter domain-service",
     doc: "pnpm --filter docs",
@@ -18710,7 +18712,8 @@ var package_default = {
       "react-native-webview@11.26.1": "patches/react-native-webview@11.26.1.patch",
       "asyncstorage-down@4.2.0": "patches/asyncstorage-down@4.2.0.patch",
       "detox@20.18.4": "patches/detox@20.18.4.patch",
-      "usb@2.9.0": "patches/usb@2.9.0.patch"
+      "usb@2.9.0": "patches/usb@2.9.0.patch",
+      "buffer@6.0.3": "patches/buffer@6.0.3.patch"
     },
     packageExtensions: {
       "eslint-config-next@*": {

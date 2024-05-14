@@ -145,7 +145,7 @@
 | lisk | LSK | NO | lisk |
 | æternity | AE | NO | aeternity |
 
-## Tokens (17763)
+## Tokens (17565)
 | parent currency | ticker | contract | name | status | ledger id |
 |--|--|--|--|--|--|
 | Algorand | GEMS | 5XU7ASL2PLB2C43N6JNFPMSXGATO2VIVNF7X6NTJ4BRCCKRGETEYS3LOAQ | AlgoGems |  | algorand/asa/230946361 |
@@ -15057,8 +15057,44 @@
 | Polygon | YPRED | 0xdFaF2680239d678d9551669727b93b62Ad0D18Cc | yPredict |  | polygon/erc20/ypredict |
 | Polygon | WATCH | 0x09211Dc67f9fe98Fb7bBB91Be0ef05f4a12FA2b2 | yieldwatch |  | polygon/erc20/yieldwatch |
 | Stellar | usdc | GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN | USDC |  | stellar/asset/USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN |
-| TON | ZDX | EQCstL4MHs8XnWvsiuL4yXJcI_ckHD-4yhUsjEQkTvKqjOU6 | Zondax Test |  | ton/jetton/eqcstl4mhs8xnwvsiul4yxjci_ckhd-4yhusjeqktvkqjou6 |
+| TON | PUNK | EQCdpz6QhJtDtm2s9-krV2ygl45Pwl-KJJCV1-XrP-Xuuxoq | $PUNK |  | ton/jetton/eqcdpz6qhjtdtm2s9-krv2ygl45pwl-kjjcv1-xrp-xuuxoq |
+| TON | ARBUZ | EQAM2KWDp9lN0YvxvfSbI0ryjBXwM70rakpNIHbuETatRWA1 | ARBUZ |  | ton/jetton/eqam2kwdp9ln0yvxvfsbi0ryjbxwm70rakpnihbuetatrwa1 |
+| TON | BOLT | EQD0vdSA_NedR9uvbgN9EikRX-suesDxGeFg69XQMavfLqIw | BOLT |  | ton/jetton/eqd0vdsa_nedr9uvbgn9eikrx-suesdxgefg69xqmavflqiw |
+| TON | jNANO-C | EQAAV0-SGQ9biuzgd5sgrnv0z_7s46bVvhQzBuWOLnSFCkhB | Classic Wrapped NANO |  | ton/jetton/eqaav0-sgq9biuzgd5sgrnv0z_7s46bvvhqzbuwolnsfckhb |
+| TON | DYOR | EQCQZpelevHNsbw5IUtwSa4Cs8kqWww0KsYeDri9kwS18eCz | DYOR Coin |  | ton/jetton/eqcqzpelevhnsbw5iutwsa4cs8kqwww0ksyedri9kws18ecz |
+| TON | DFC | EQD26zcd6Cqpz7WyLKVH8x_cD6D7tBrom6hKcycv8L8hV0GP | DeFinder Capital |  | ton/jetton/eqd26zcd6cqpz7wylkvh8x_cd6d7tbrom6hkcycv8l8hv0gp |
+| TON | FNZ | EQDCJL0iQHofcBBvFBHdVG233Ri2V4kCNFgfRT-gqAd3Oc86 | Fanzee Token |  | ton/jetton/eqdcjl0iqhofcbbvfbhdvg233ri2v4kcnfgfrt-gqad3oc86 |
+| TON | GEMSTON | EQBX6K9aXVl3nXINCyPPL86C4ONVmQ8vK360u6dykFKXpHCa | GEMSTON |  | ton/jetton/eqbx6k9axvl3nxincyppl86c4onvmq8vk360u6dykfkxphca |
+| TON | GLINT | EQCBdxpECfEPH2wUxi1a6QiOkSf-5qDjUWqLCUuKtD-GLINT | Glint Coin |  | ton/jetton/eqcbdxpecfeph2wuxi1a6qioksf-5qdjuwqlcuuktd-glint |
+| TON | GRAM | EQC47093oX5Xhb0xuk2lCr2RhS8rj-vul61u4W2UH5ORmG_O | Gram |  | ton/jetton/eqc47093ox5xhb0xuk2lcr2rhs8rj-vul61u4w2uh5ormg_o |
+| TON | hTON1 | EQBNo5qAG8I8J6IxGaz15SfQVB-kX98YhKV_mT36Xo5vYxUa | Hipo Staked TON v1 |  | ton/jetton/eqbno5qag8i8j6ixgaz15sfqvb-kx98yhkv_mt36xo5vyxua |
+| TON | JETTON | EQAQXlWJvGbbFfE8F3oS8s87lIgdovS455IsWFaRdmJetTon | JETTON |  | ton/jetton/eqaqxlwjvgbbffe8f3os8s87ligdovs455iswfardmjetton |
+| TON | KINGY | EQC-tdRjjoYMz3MXKW4pj95bNZgvRyWwZ23Jix3ph7guvHxJ | KINGYTON |  | ton/jetton/eqc-tdrjjoymz3mxkw4pj95bnzgvrywwz23jix3ph7guvhxj |
+| TON | LAVE | EQBl3gg6AAdjgjO2ZoNU5Q5EzUIl8XMNZrix8Z5dJmkHUfxI | Lavandos |  | ton/jetton/eqbl3gg6aadjgjo2zonu5q5ezuil8xmnzrix8z5djmkhufxi |
+| TON | MC | EQCbKMTmEAdSnzsK85LOpaDkDH3HjujEbTePMSeirvEaNq-U | Magic Crystal |  | ton/jetton/eqcbkmtmeadsnzsk85lopadkdh3hjujebtepmseirveanq-u |
+| TON | MARGA | EQBjEw-SOe8yV2kIbGVZGrsPpLTaaoAOE87CGXI2ca4XdzXA | Margaritis |  | ton/jetton/eqbjew-soe8yv2kibgvzgrsppltaaoaoe87cgxi2ca4xdzxa |
+| TON | MEGA | EQBf6-YoR9xylol_NwjHrLkrTFAZJCX-bsd-Xx_902OaPaBf | Megaton Finance |  | ton/jetton/eqbf6-yor9xylol_nwjhrlkrtfazjcx-bsd-xx_902oapabf |
+| TON | PET | EQBJOJ2eL_CUFT_0r9meoqjKUwRttC_-NUJyvWQxszVWe1WY | PET |  | ton/jetton/eqbjoj2el_cuft_0r9meoqjkuwrttc_-nujyvwqxszvwe1wy |
+| TON | PROTON | EQDgSR_-4FDlXPfMVefXX1IIXMWBH4YfYV1a_8cJ0XsGVdsf | PROTON JETTON |  | ton/jetton/eqdgsr_-4fdlxpfmvefxx1iixmwbh4yfyv1a_8cj0xsgvdsf |
+| TON | PLANKTON | EQATgD7dao9jWBdz_qKL-UJZCXZGQvV5HJVUC85ssgmHKWll | Plankton |  | ton/jetton/eqatgd7dao9jwbdz_qkl-ujzcxzgqvv5hjvuc85ssgmhkwll |
+| TON | RAFF | EQCJbp0kBpPwPoBG-U5C-cWfP_jnksvotGfArPF50Q9Qiv9h | RAFF |  | ton/jetton/eqcjbp0kbppwpobg-u5c-cwfp_jnksvotgfarpf50q9qiv9h |
+| TON | REDO | EQBZ_cafPyDr5KUTs0aNxh0ZTDhkpEZONmLJA2SNGlLm4Cko | Resistance Dog |  | ton/jetton/eqbz_cafpydr5kuts0anxh0ztdhkpezonmlja2sngllm4cko |
+| TON | SCALE | EQBlqsm144Dq6SjbPI4jjZvA1hqTIP3CvHovbIfW_t-SCALE | SCALE |  | ton/jetton/eqblqsm144dq6sjbpi4jjzva1hqtip3cvhovbifw_t-scale |
+| TON | STON | EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO | STON |  | ton/jetton/eqa2kcvnwvsil2em2mb0skxytxcqqjs4mttjdpnxmwg9t6bo |
+| TON | STBL | EQD5ty5IxV3HECEY1bbbdd7rNNY-ZcA-pAIGQXyyRZRED9v3 | Stable Metal |  | ton/jetton/eqd5ty5ixv3hecey1bbbdd7rnny-zca-paigqxyyrzred9v3 |
+| TON | stTON | EQDNhy-nxYFgUqzfUzImBEP67JqsyMIcyk2S5_RwNNEYku0k | Staked TON |  | ton/jetton/eqdnhy-nxyfguqzfuzimbep67jqsymicyk2s5_rwnneyku0k |
+| TON | FISH | EQATcUc69sGSCCMSadsVUKdGwM1BMKS-HKCWGPk60xZGgwsK | TON FISH MEMECOIN |  | ton/jetton/eqatcuc69sgsccmsadsvukdgwm1bmks-hkcwgpk60xzggwsk |
+| TON | TONNEL | EQDNDv54v_TEU5t26rFykylsdPQsv5nsSZaH_v7JSJPtMitv | TONNEL |  | ton/jetton/eqdndv54v_teu5t26rfykylsdpqsv5nsszah_v7jsjptmitv |
+| TON | wsTON | EQB0SoxuGDx5qjVt0P_bPICFeWdFLBmVopHhjgfs0q-wsTON | Ton Whales liquid staking token |  | ton/jetton/eqb0soxugdx5qjvt0p_bpicfewdflbmvophhjgfs0q-wston |
+| TON | UP | EQCvaf0JMrv6BOvPpAgee08uQM_uRpUd__fhA7Nm8twzvbE_ | TonUP |  | ton/jetton/eqcvaf0jmrv6bovppagee08uqm_urpud__fha7nm8twzvbe_ |
+| TON | JVT | EQC8FoZMlBcZhZ6Pr9sHGyHzkFv9y2B5X9tN61RvucLRzFZz | Vault Token |  | ton/jetton/eqc8fozmlbczhz6pr9shgyhzkfv9y2b5x9tn61rvuclrzfzz |
+| TON | WEB3 | EQBtcL4JA-PdPiUkB8utHcqdaftmUSTqdL8Z1EeXePLti_nK | Web3 TON Token |  | ton/jetton/eqbtcl4ja-pdpiukb8uthcqdaftmustqdl8z1eexeplti_nk |
 | TON | ZDXT | EQCV4wQkl5dOEhxlicXRY9usvx8c2punEdPROfTpKa45IQnB | Zondax Test Ton |  | ton/jetton/eqcv4wqkl5doehxlicxry9usvx8c2punedproftpka45iqnb |
+| TON | jMNT | EQAEuikLQVh2lDMrV99nTHqFL_TXEyCEJ1xKMuPT60tfvdps | jMNT |  | ton/jetton/eqaeuiklqvh2ldmrv99nthqfl_txeycej1xkmupt60tfvdps |
+| TON | jUSDC | EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728 | jUSDC |  | ton/jetton/eqb-mpwrd1g6wknklz_vnv6wqbdd142kmqv-g1o-8qua3728 |
+| TON | jUSDT | EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA | jUSDT |  | ton/jetton/eqbynbo23ywhy_cgary9nk9ftz0ydsg82ptcbstqggoxwiua |
+| TON | jWBTC | EQDcBkGHmC4pTf34x3Gm05XvepO5w60DNxZ-XT4I6-UGG5L5 | jWBTC |  | ton/jetton/eqdcbkghmc4ptf34x3gm05xvepo5w60dnxz-xt4i6-ugg5l5 |
+| TON | stTON | EQC98_qAmNEptUtPc7W6xdHh_ZHrBUFpw5Ft_IzNU20QAJav | tsTON |  | ton/jetton/eqc98_qamneptutpc7w6xdhh_zhrbufpw5ft_iznu20qajav |
 | Tron | GOLD | TKjLCYg1aQmtnC8HGLCgbrq89Ru7xifPP5 | !!!!GOLDCOIN | delisted | tron/trc10/1002341 |
 | Tron | GOLD | TP429SKrsp4BoTiEFXHj4TNSJwqDFsygnr | !!!!GoldSpot!!!! | delisted | tron/trc10/1002467 |
 | Tron | 666 | TMqNJwD3qVmuRxzzP3Q4A24fuByVBKQ39E | !!!666 | delisted | tron/trc10/1002438 |
