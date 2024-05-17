@@ -6082,6 +6082,9 @@
     "FailedToRetrieveFirmwareUpdateInfo": {
       "title": "OS update check failed",
       "description": "Something went wrong. Please try again or contact Ledger Support if in doubt."
+    },
+    "TonExcessFee": {
+      "title": "It constitutes a token transfer. You will pay 0.5 TON in fees, and any extra will be returned to you."
     }
   },
   "cryptoOrg": {
