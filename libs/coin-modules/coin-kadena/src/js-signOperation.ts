@@ -1,20 +1,20 @@
-import { KadenaOperation, Transaction } from "./types";
+import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
+import { SignerContext } from "@ledgerhq/coin-framework/signer";
 import type {
   Account,
-  SignOperationFnSignature,
   DeviceId,
   SignOperationEvent,
+  SignOperationFnSignature,
 } from "@ledgerhq/types-live";
-import { Observable } from "rxjs";
 import BigNumber from "bignumber.js";
 import { TransferCrossChainTxParams, TransferTxParams } from "hw-app-kda";
+import invariant from "invariant";
+import { Observable } from "rxjs";
 import { fetchCoinDetailsForAccount } from "./api/network";
 import { KDA_NETWORK } from "./constants";
-import invariant from "invariant";
-import { getAddress, kdaToBaseUnit } from "./utils";
-import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
 import { KadenaAddress, KadenaSignature, KadenaSigner } from "./signer";
-import { SignerContext } from "@ledgerhq/coin-framework/signer";
+import { KadenaOperation, Transaction } from "./types";
+import { getAddress, kdaToBaseUnit } from "./utils";
 
 export const buildSignOperation =
   (
@@ -30,6 +30,8 @@ export const buildSignOperation =
     deviceId: DeviceId;
   }): Observable<SignOperationEvent> =>
     new Observable(o => {
+      let cancelled = false;
+
       async function main() {
         // log("debug", "[signOperation] start fn");
 
@@ -37,9 +39,7 @@ export const buildSignOperation =
         const { id: accountId } = account;
         const { address, derivationPath } = getAddress(account);
 
-        const coinDetails = await fetchCoinDetailsForAccount(address, [
-          transaction.receiverChainId.toString(),
-        ]);
+        const coinDetails = await fetchCoinDetailsForAccount(address, [receiverChainId.toString()]);
 
         o.next({
           type: "device-signature-requested",
@@ -58,8 +58,8 @@ export const buildSignOperation =
           creationTime: Math.floor(creationTimeStamp / 1000),
           ttl: txnTTLSecs.toString(),
         };
-        if (transaction.senderChainId === transaction.receiverChainId) {
-          if (coinDetails[transaction.receiverChainId]) {
+        if (senderChainId === receiverChainId) {
+          if (coinDetails[receiverChainId]) {
             buildTxnRes = (await signerContext(deviceId, signer =>
               signer.signTransferTx(transferCommons),
             )) as KadenaSignature;
@@ -72,10 +72,11 @@ export const buildSignOperation =
           buildTxnRes = (await signerContext(deviceId, signer =>
             signer.signTransferCrossChainTx({
               ...transferCommons,
-              recipient_chainId: transaction.receiverChainId,
+              recipient_chainId: receiverChainId,
             }),
           )) as KadenaSignature;
         }
+        if (cancelled) return;
 
         invariant(buildTxnRes, "transferCmd is required");
 
@@ -118,6 +119,10 @@ export const buildSignOperation =
         () => o.complete(),
         e => o.error(e),
       );
+
+      return () => {
+        cancelled = true;
+      };
     });
 
 export default buildSignOperation;

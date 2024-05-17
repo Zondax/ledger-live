@@ -18,6 +18,7 @@ import bitcoin from "@ledgerhq/coin-bitcoin/deviceTransactionConfig";
 import evm from "@ledgerhq/coin-evm/deviceTransactionConfig";
 import near from "@ledgerhq/coin-near/deviceTransactionConfig";
 import polkadot from "@ledgerhq/coin-polkadot/deviceTransactionConfig";
+import kadena from "@ledgerhq/coin-kadena/deviceTransactionConfig";
 
 export default {
   cardano,
@@ -40,6 +41,7 @@ export default {
   evm,
   near,
   polkadot,
+  kadena,
 };
 import { ExtraDeviceTransactionField as ExtraDeviceTransactionField_casper } from "../families/casper/deviceTransactionConfig";
 import { ExtraDeviceTransactionField as ExtraDeviceTransactionField_cosmos } from "../families/cosmos/deviceTransactionConfig";
