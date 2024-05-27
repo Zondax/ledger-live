@@ -1,9 +1,9 @@
 import { Account, AccountLike } from "@ledgerhq/types-live";
-import { Transaction } from "./types";
 import BigNumber from "bignumber.js";
 import { fetchCoinDetailsForAccount } from "./api/network";
 import { KDA_FEES } from "./constants";
-import { getAddress } from "./utils";
+import { Transaction } from "./types";
+import { baseUnitToKda, getAddress } from "./utils";
 
 export const estimateMaxSpendable = async ({
   account,
@@ -30,8 +30,8 @@ export const estimateMaxSpendable = async ({
 
   const fees = KDA_FEES;
 
-  const estimate = BigNumber(balance[transaction.senderChainId]).minus(fees);
-
+  const estimate = baseUnitToKda(balance[transaction.senderChainId]).minus(fees);
+  
   return estimate.lt(0) ? new BigNumber(0) : estimate;
 };
 
