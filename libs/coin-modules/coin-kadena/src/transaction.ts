@@ -33,7 +33,8 @@ export const fromTransactionRaw = (tr: TransactionRaw): Transaction => {
   return {
     ...common,
     family: tr.family,
-    fees: new BigNumber(tr.fees),
+    gasLimit: new BigNumber(tr.gasLimit),
+    gasPrice: new BigNumber(tr.gasPrice),
     amount: new BigNumber(tr.amount),
     receiverChainId: tr.receiverChainId,
     senderChainId: tr.senderChainId,
@@ -47,7 +48,8 @@ const toTransactionRaw = (t: Transaction): TransactionRaw => {
     ...common,
     family: t.family,
     amount: t.amount.toFixed(),
-    fees: t.fees.toString(),
+    gasLimit: t.gasLimit.toString(),
+    gasPrice: t.gasPrice.toString(),
     receiverChainId: t.receiverChainId,
     senderChainId: t.senderChainId,
   };

@@ -1,7 +1,6 @@
 import { Account, AccountLike } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
 import { fetchCoinDetailsForAccount } from "./api/network";
-import { KDA_FEES } from "./constants";
 import { Transaction } from "./types";
 import { baseUnitToKda, getAddress } from "./utils";
 
@@ -28,10 +27,10 @@ export const estimateMaxSpendable = async ({
     return new BigNumber(0);
   }
 
-  const fees = KDA_FEES;
+  const fees = transaction.gasPrice.multipliedBy(transaction.gasLimit);
 
   const estimate = baseUnitToKda(balance[transaction.senderChainId]).minus(fees);
-  
+
   return estimate.lt(0) ? new BigNumber(0) : estimate;
 };
 

@@ -45,7 +45,9 @@ export const validateRecipient = (account: Account, tx: Transaction): Array<Vali
  * Validate the amount of a transaction for an account
  */
 const validateAmount = async (a: Account, t: Transaction): Promise<Array<ValidationIssues>> => {
-  const totalSpent = t.amount.plus(t.fees);
+  const fees = t.gasPrice.multipliedBy(t.gasLimit);
+
+  const totalSpent = t.amount.plus(fees);
   const errors: ValidationIssues = {};
 
   // if no amount or 0
@@ -79,12 +81,14 @@ export const getTransactionStatus = async (
     ...amountErr,
   };
 
+  const fees = t.gasPrice.multipliedBy(t.gasLimit);
+
   return {
     amount: t.amount,
     errors,
     warnings: {},
-    estimatedFees: t.fees,
-    totalSpent: t.amount.plus(t.fees),
+    estimatedFees: fees,
+    totalSpent: t.amount.plus(fees),
   };
 };
 

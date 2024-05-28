@@ -14,7 +14,8 @@ export type KadenaAccount = Account;
 
 export type Transaction = TransactionCommon & {
   family: FamilyType;
-  fees: BigNumber;
+  gasLimit: BigNumber;
+  gasPrice: BigNumber;
   senderChainId: number;
   receiverChainId: number;
 };
@@ -30,7 +31,8 @@ export type TransactionRaw = TransactionCommonRaw & {
   family: FamilyType;
   senderChainId: number;
   receiverChainId: number;
-  fees: string;
+  gasLimit: string;
+  gasPrice: string;
 };
 
 export type TransactionStatus = TransactionStatusCommon;
