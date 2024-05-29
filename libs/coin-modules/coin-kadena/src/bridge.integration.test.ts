@@ -1,5 +1,11 @@
+import {
+  InvalidAddressBecauseDestinationIsAlsoSource,
+  NotEnoughBalance,
+  NotEnoughBalanceBecauseDestinationNotCreated,
+} from "@ledgerhq/errors";
 import type { DatasetTest, CurrenciesData } from "@ledgerhq/types-live";
 import type { Transaction } from "./types";
+import { BigNumber } from "bignumber.js";
 
 const PUBKEY = "15daab7d9ba9f8a465ffc4bfb33e68ca5e9f51ef0bab387284963129fe04ec3e";
 
@@ -31,7 +37,7 @@ const kadena: CurrenciesData<Transaction> = {
             derivationPath: "44'/626'/0'/0/0"
           }
         ],
-        blockHeight: 4270944,
+        blockHeight: 4333588,
         operations: [],
         pendingOperations: [],
         currencyId: "kadena",
@@ -41,6 +47,20 @@ const kadena: CurrenciesData<Transaction> = {
       },
       transactions: [
         // HERE WE WILL INSERT OUR test
+        {
+          name: "Same as Recipient",
+          transaction: t => ({
+            ...t,
+            amount: new BigNumber(20),
+            recipient: "k:77b021744ab3c003e8e4d0f38a598f0e39fe9a7fe61360754dc7321b112ab375",
+          }),
+          expectedStatus: {
+            errors: {
+              recipient: new InvalidAddressBecauseDestinationIsAlsoSource(),
+            },
+            warnings: {},
+          },
+        },
       ],
     }
   ]
@@ -52,3 +72,9 @@ export const dataset: DatasetTest<Transaction> = {
     kadena,
   },
 };
+
+describe("Kadena bridge", () => {
+  test.todo(
+    "This is an empty test to make jest command pass. Remove it once there is a real test.",
+  );
+});
