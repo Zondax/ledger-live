@@ -1,5 +1,6 @@
-import { decodeAccountId } from "@ledgerhq/coin-framework/account/index";
+import { decodeAccountId, findSubAccountById } from "@ledgerhq/coin-framework/account/index";
 import { Account, Address } from "@ledgerhq/types-live";
+import { TonPayloadFormat } from "@ton-community/ton-ledger";
 import {
   Cell,
   SendMode,
@@ -10,9 +11,11 @@ import {
   external,
   internal,
   storeMessage,
+  toNano,
 } from "@ton/ton";
 import BigNumber from "bignumber.js";
 import { estimateFee } from "./bridge/bridgeHelpers/api";
+import { maxFeeTokenTransfer } from "./constants";
 import { TonComment, TonHwParams, Transaction } from "./types";
 
 export const getAddress = (a: Account): Address => ({
@@ -20,15 +23,30 @@ export const getAddress = (a: Account): Address => ({
   derivationPath: a.freshAddressPath,
 });
 
-export const isAddressValid = (recipient: string) =>
-  TonAddress.isRaw(recipient) || TonAddress.isFriendly(recipient);
+export const isAddressValid = (recipient: string) => {
+  try {
+    return (
+      (TonAddress.isRaw(recipient) || TonAddress.isFriendly(recipient)) &&
+      TonAddress.parse(recipient)
+    );
+  } catch {
+    return false;
+  }
+};
 
-export const addressesAreEqual = (addr1: string, addr2: string) =>
-  isAddressValid(addr1) &&
-  isAddressValid(addr2) &&
-  TonAddress.parse(addr1).equals(TonAddress.parse(addr2));
+export const addressesAreEqual = (addr1: string, addr2: string) => {
+  try {
+    return (
+      isAddressValid(addr1) &&
+      isAddressValid(addr2) &&
+      TonAddress.parse(addr1).equals(TonAddress.parse(addr2))
+    );
+  } catch {
+    return false;
+  }
+};
 
-export const transactionToHwParams = (t: Transaction, seqno: number): TonHwParams => {
+export const transactionToHwParams = (t: Transaction, seqno: number, a: Account): TonHwParams => {
   let recipient = t.recipient;
   // if recipient is not valid calculate fees with empty address
   // we handle invalid addresses in account bridge
@@ -37,19 +55,43 @@ export const transactionToHwParams = (t: Transaction, seqno: number): TonHwParam
   } catch {
     recipient = new TonAddress(0, Buffer.alloc(32)).toRawString();
   }
-  return {
-    to: TonAddress.parse(recipient),
+
+  // if there is a sub account, the transaction is a token transfer
+  const subAccount = findSubAccountById(a, t.subAccountId ?? "");
+
+  const amount = subAccount
+    ? toNano(maxFeeTokenTransfer) // for commission fees, excess will be returned
+    : t.useAllAmount
+    ? BigInt(0)
+    : BigInt(t.amount.toFixed());
+  const to = subAccount ? subAccount.token.contractAddress : recipient;
+  const tonHwParams: TonHwParams = {
+    to: TonAddress.parse(to),
     seqno,
-    amount: t.useAllAmount ? BigInt(0) : BigInt(t.amount.toFixed()),
-    bounce: TonAddress.isFriendly(recipient)
-      ? TonAddress.parseFriendly(recipient).isBounceable
-      : true,
+    amount,
+    bounce: TonAddress.isFriendly(to) ? TonAddress.parseFriendly(to).isBounceable : true,
     timeout: getTransferExpirationTime(),
     sendMode: t.useAllAmount
       ? SendMode.CARRY_ALL_REMAINING_BALANCE
       : SendMode.IGNORE_ERRORS + SendMode.PAY_GAS_SEPARATELY,
-    payload: t.comment.text.length ? { type: "comment", text: t.comment.text } : undefined,
   };
+
+  if (t.comment.text.length) {
+    tonHwParams.payload = { type: "comment", text: t.comment.text };
+  }
+  if (subAccount) {
+    tonHwParams.payload = {
+      type: "jetton-transfer",
+      queryId: BigInt(1),
+      amount: t.useAllAmount ? BigInt(0) : BigInt(t.amount.toFixed()),
+      destination: TonAddress.parse(recipient),
+      responseDestination: TonAddress.parse(getAddress(a).address),
+      customPayload: null,
+      forwardAmount: BigInt(1),
+      forwardPayload: null,
+    };
+  }
+  return tonHwParams;
 };
 
 export const packTransaction = (a: Account, needsInit: boolean, signature: Cell): string => {
@@ -120,3 +162,6 @@ export const getLedgerTonPath = (path: string): number[] => {
   }
   return numPath;
 };
+
+export const isJettonTransfer = (payload: TonPayloadFormat): boolean =>
+  payload.type === "jetton-transfer";

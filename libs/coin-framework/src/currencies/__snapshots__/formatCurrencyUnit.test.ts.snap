@@ -280,6 +280,8 @@ exports[`formatCurrencyUnit with custom options with locale de-DE should correct
 
 exports[`formatCurrencyUnit with custom options with locale de-DE should correctly format Syscoin unit (SYS) 1`] = `"0,012345678900000000- -SYS"`;
 
+exports[`formatCurrencyUnit with custom options with locale de-DE should correctly format TON unit (TON) 1`] = `"12.345.678,900000000- -TON"`;
+
 exports[`formatCurrencyUnit with custom options with locale de-DE should correctly format Telos unit (TLOS) 1`] = `"0,012345678900000000- -TLOS"`;
 
 exports[`formatCurrencyUnit with custom options with locale de-DE should correctly format Tezos unit (XTZ) 1`] = `"12.345.678.900,000000- -XTZ"`;
@@ -601,6 +603,8 @@ exports[`formatCurrencyUnit with custom options with locale en-US should correct
 exports[`formatCurrencyUnit with custom options with locale en-US should correctly format Stride unit (Stride) 1`] = `"12,345,678,900.000000- -STRD"`;
 
 exports[`formatCurrencyUnit with custom options with locale en-US should correctly format Syscoin unit (SYS) 1`] = `"0.012345678900000000- -SYS"`;
+
+exports[`formatCurrencyUnit with custom options with locale en-US should correctly format TON unit (TON) 1`] = `"12,345,678.900000000- -TON"`;
 
 exports[`formatCurrencyUnit with custom options with locale en-US should correctly format Telos unit (TLOS) 1`] = `"0.012345678900000000- -TLOS"`;
 
@@ -924,6 +928,8 @@ exports[`formatCurrencyUnit with custom options with locale es-ES should correct
 
 exports[`formatCurrencyUnit with custom options with locale es-ES should correctly format Syscoin unit (SYS) 1`] = `"0,012345678900000000- -SYS"`;
 
+exports[`formatCurrencyUnit with custom options with locale es-ES should correctly format TON unit (TON) 1`] = `"12.345.678,900000000- -TON"`;
+
 exports[`formatCurrencyUnit with custom options with locale es-ES should correctly format Telos unit (TLOS) 1`] = `"0,012345678900000000- -TLOS"`;
 
 exports[`formatCurrencyUnit with custom options with locale es-ES should correctly format Tezos unit (XTZ) 1`] = `"12.345.678.900,000000- -XTZ"`;
@@ -1245,6 +1251,8 @@ exports[`formatCurrencyUnit with custom options with locale fr-FR should correct
 exports[`formatCurrencyUnit with custom options with locale fr-FR should correctly format Stride unit (Stride) 1`] = `"12 345 678 900,000000- -STRD"`;
 
 exports[`formatCurrencyUnit with custom options with locale fr-FR should correctly format Syscoin unit (SYS) 1`] = `"0,012345678900000000- -SYS"`;
+
+exports[`formatCurrencyUnit with custom options with locale fr-FR should correctly format TON unit (TON) 1`] = `"12 345 678,900000000- -TON"`;
 
 exports[`formatCurrencyUnit with custom options with locale fr-FR should correctly format Telos unit (TLOS) 1`] = `"0,012345678900000000- -TLOS"`;
 
@@ -1568,6 +1576,8 @@ exports[`formatCurrencyUnit with custom options with locale ja-JP should correct
 
 exports[`formatCurrencyUnit with custom options with locale ja-JP should correctly format Syscoin unit (SYS) 1`] = `"0.012345678900000000- -SYS"`;
 
+exports[`formatCurrencyUnit with custom options with locale ja-JP should correctly format TON unit (TON) 1`] = `"12,345,678.900000000- -TON"`;
+
 exports[`formatCurrencyUnit with custom options with locale ja-JP should correctly format Telos unit (TLOS) 1`] = `"0.012345678900000000- -TLOS"`;
 
 exports[`formatCurrencyUnit with custom options with locale ja-JP should correctly format Tezos unit (XTZ) 1`] = `"12,345,678,900.000000- -XTZ"`;
@@ -1889,6 +1899,8 @@ exports[`formatCurrencyUnit with custom options with locale ko-KR should correct
 exports[`formatCurrencyUnit with custom options with locale ko-KR should correctly format Stride unit (Stride) 1`] = `"12,345,678,900.000000- -STRD"`;
 
 exports[`formatCurrencyUnit with custom options with locale ko-KR should correctly format Syscoin unit (SYS) 1`] = `"0.012345678900000000- -SYS"`;
+
+exports[`formatCurrencyUnit with custom options with locale ko-KR should correctly format TON unit (TON) 1`] = `"12,345,678.900000000- -TON"`;
 
 exports[`formatCurrencyUnit with custom options with locale ko-KR should correctly format Telos unit (TLOS) 1`] = `"0.012345678900000000- -TLOS"`;
 
@@ -2212,6 +2224,8 @@ exports[`formatCurrencyUnit with custom options with locale pt-BR should correct
 
 exports[`formatCurrencyUnit with custom options with locale pt-BR should correctly format Syscoin unit (SYS) 1`] = `"0,012345678900000000- -SYS"`;
 
+exports[`formatCurrencyUnit with custom options with locale pt-BR should correctly format TON unit (TON) 1`] = `"12.345.678,900000000- -TON"`;
+
 exports[`formatCurrencyUnit with custom options with locale pt-BR should correctly format Telos unit (TLOS) 1`] = `"0,012345678900000000- -TLOS"`;
 
 exports[`formatCurrencyUnit with custom options with locale pt-BR should correctly format Tezos unit (XTZ) 1`] = `"12.345.678.900,000000- -XTZ"`;
@@ -2533,6 +2547,8 @@ exports[`formatCurrencyUnit with custom options with locale ru-RU should correct
 exports[`formatCurrencyUnit with custom options with locale ru-RU should correctly format Stride unit (Stride) 1`] = `"12 345 678 900,000000- -STRD"`;
 
 exports[`formatCurrencyUnit with custom options with locale ru-RU should correctly format Syscoin unit (SYS) 1`] = `"0,012345678900000000- -SYS"`;
+
+exports[`formatCurrencyUnit with custom options with locale ru-RU should correctly format TON unit (TON) 1`] = `"12 345 678,900000000- -TON"`;
 
 exports[`formatCurrencyUnit with custom options with locale ru-RU should correctly format Telos unit (TLOS) 1`] = `"0,012345678900000000- -TLOS"`;
 
@@ -2856,6 +2872,8 @@ exports[`formatCurrencyUnit with custom options with locale tr-TR should correct
 
 exports[`formatCurrencyUnit with custom options with locale tr-TR should correctly format Syscoin unit (SYS) 1`] = `"0,012345678900000000- -SYS"`;
 
+exports[`formatCurrencyUnit with custom options with locale tr-TR should correctly format TON unit (TON) 1`] = `"12.345.678,900000000- -TON"`;
+
 exports[`formatCurrencyUnit with custom options with locale tr-TR should correctly format Telos unit (TLOS) 1`] = `"0,012345678900000000- -TLOS"`;
 
 exports[`formatCurrencyUnit with custom options with locale tr-TR should correctly format Tezos unit (XTZ) 1`] = `"12.345.678.900,000000- -XTZ"`;
@@ -3178,6 +3196,8 @@ exports[`formatCurrencyUnit with custom options with locale zh-CN should correct
 
 exports[`formatCurrencyUnit with custom options with locale zh-CN should correctly format Syscoin unit (SYS) 1`] = `"0.012345678900000000- -SYS"`;
 
+exports[`formatCurrencyUnit with custom options with locale zh-CN should correctly format TON unit (TON) 1`] = `"12,345,678.900000000- -TON"`;
+
 exports[`formatCurrencyUnit with custom options with locale zh-CN should correctly format Telos unit (TLOS) 1`] = `"0.012345678900000000- -TLOS"`;
 
 exports[`formatCurrencyUnit with custom options with locale zh-CN should correctly format Tezos unit (XTZ) 1`] = `"12,345,678,900.000000- -XTZ"`;
@@ -3499,6 +3519,8 @@ exports[`formatCurrencyUnit with default options should correctly format Stratis
 exports[`formatCurrencyUnit with default options should correctly format Stride unit (Stride) 1`] = `"12,345,678,900"`;
 
 exports[`formatCurrencyUnit with default options should correctly format Syscoin unit (SYS) 1`] = `"0.0123456"`;
+
+exports[`formatCurrencyUnit with default options should correctly format TON unit (TON) 1`] = `"12,345,678"`;
 
 exports[`formatCurrencyUnit with default options should correctly format Telos unit (TLOS) 1`] = `"0.0123456"`;
 

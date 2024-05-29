@@ -775,17 +775,6 @@ const envDefinitions = {
     parser: intParser,
     desc: "Configure the low battery percentage threshold",
   },
-  API_TON_ENDPOINT: {
-    def: "https://toncenter.com/api/v3",
-    parser: stringParser,
-    desc: "Toncenter API for TON",
-  },
-  // TODO: TON remove apikey
-  API_TON_KEY: {
-    def: "1fe6f81ec629684a4242a578b179991990830616ccdd854393ca6379d5d3199a",
-    parser: stringParser,
-    desc: "Toncenter APIKEY for TON",
-  },
 };
 
 export const getDefinition = (name: string): EnvDef<any> => {

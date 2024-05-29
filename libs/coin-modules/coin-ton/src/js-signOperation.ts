@@ -1,3 +1,4 @@
+import { findSubAccountById, isTokenAccount } from "@ledgerhq/coin-framework/account/index";
 import { SignerContext } from "@ledgerhq/coin-framework/signer";
 import type {
   Account,
@@ -30,16 +31,14 @@ export const buildSignOperation =
     new Observable(o => {
       let cancelled = false;
       async function main() {
-        const { recipient, amount, fees, comment } = transaction;
-        const { id: accountId } = account;
-
         const { address, derivationPath } = getAddress(account);
         const accountInfo = await fetchAccountInfo(address);
-        const tonTx = transactionToHwParams(transaction, accountInfo.seqno);
+
+        const tonTx = transactionToHwParams(transaction, accountInfo.seqno, account);
+
         const ledgerPath = getLedgerTonPath(derivationPath);
 
         o.next({ type: "device-signature-requested" });
-
         const sig = (await signerContext(deviceId, signer =>
           signer.signTransaction(ledgerPath, tonTx),
         )) as TonSignature;
@@ -53,27 +52,8 @@ export const buildSignOperation =
         }
 
         const signature = packTransaction(account, accountInfo.status === "uninit", sig);
-        const hash = sig.hash().toString("hex");
 
-        const operation: TonOperation = {
-          id: hash,
-          hash,
-          type: "OUT",
-          senders: [address],
-          recipients: [recipient],
-          accountId: accountId,
-          value: amount.plus(fees),
-          fee: fees,
-          blockHash: null,
-          blockHeight: null,
-          date: new Date(),
-          extra: {
-            // we don't know yet, will be patched in final operation
-            lt: "",
-            explorerHash: "",
-            comment: comment,
-          },
-        };
+        const operation = buildOptimisticOperation(account, transaction, address);
 
         o.next({
           type: "signed",
@@ -93,5 +73,63 @@ export const buildSignOperation =
         cancelled = true;
       };
     });
+
+const buildOptimisticOperation = (
+  account: Account,
+  transaction: Transaction,
+  address: string,
+): TonOperation => {
+  const { recipient, amount, fees, comment, useAllAmount, subAccountId } = transaction;
+  const { id: accountId } = account;
+
+  const subAccount = findSubAccountById(account, subAccountId ?? "");
+  const tokenTransfer = Boolean(subAccount && isTokenAccount(subAccount));
+
+  const value = tokenTransfer ? fees : amount.plus(fees);
+
+  const op: TonOperation = {
+    id: "",
+    hash: "",
+    type: "OUT",
+    senders: [address],
+    recipients: [recipient],
+    accountId,
+    value,
+    fee: fees,
+    blockHash: null,
+    blockHeight: null,
+    date: new Date(),
+    extra: {
+      // we don't know yet, will be patched in final operation
+      lt: "",
+      explorerHash: "",
+      comment: comment,
+    },
+  };
+  if (tokenTransfer && subAccount) {
+    op.subOperations = [
+      {
+        id: "",
+        hash: "",
+        type: "OUT",
+        value: useAllAmount ? subAccount.balance : amount,
+        fee: fees,
+        blockHash: null,
+        blockHeight: null,
+        senders: [address],
+        recipients: [recipient],
+        accountId: subAccount.id,
+        date: new Date(),
+        extra: {
+          lt: "",
+          explorerHash: "",
+          comment: comment,
+        },
+        contract: subAccount.token.contractAddress,
+      },
+    ];
+  }
+  return op;
+};
 
 export default buildSignOperation;
