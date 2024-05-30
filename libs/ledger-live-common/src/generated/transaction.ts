@@ -8,8 +8,6 @@ import hedera from "../families/hedera/transaction";
 import internet_computer from "../families/internet_computer/transaction";
 import stacks from "../families/stacks/transaction";
 import stellar from "../families/stellar/transaction";
-import tezos from "../families/tezos/transaction";
-import ton from "../families/ton/transaction";
 import tron from "../families/tron/transaction";
 import vechain from "../families/vechain/transaction";
 import algorand from "@ledgerhq/coin-algorand/transaction";
@@ -18,10 +16,10 @@ import cardano from "@ledgerhq/coin-cardano/transaction";
 import evm from "@ledgerhq/coin-evm/transaction";
 import near from "@ledgerhq/coin-near/transaction";
 import polkadot from "@ledgerhq/coin-polkadot/transaction";
-import ton from "@ledgerhq/coin-ton/transaction";
 import solana from "@ledgerhq/coin-solana/transaction";
 import tezos from "@ledgerhq/coin-tezos/transaction";
 import xrp from "@ledgerhq/coin-xrp/transaction";
+import ton from "@ledgerhq/coin-ton/transaction";
 
 export default {
   casper,
@@ -34,8 +32,6 @@ export default {
   internet_computer,
   stacks,
   stellar,
-  tezos,
-  ton,
   tron,
   vechain,
   algorand,
@@ -44,8 +40,8 @@ export default {
   evm,
   near,
   polkadot,
-  ton,
   solana,
   tezos,
   xrp,
+  ton,
 };
