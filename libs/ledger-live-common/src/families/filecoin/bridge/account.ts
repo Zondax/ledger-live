@@ -31,7 +31,7 @@ import { toCBOR } from "./utils/serializer";
 import { Methods, calculateEstimatedFees, getPath, isError } from "../utils";
 import { log } from "@ledgerhq/logs";
 import {
-  convertAddressFilToEth,
+  convertAddressFilToEthAsync,
   isFilEthAddress,
   isRecipientValidForTokenTransfer,
   validateAddress,
@@ -254,6 +254,10 @@ const prepareTransaction = async (a: Account, t: Transaction): Promise<Transacti
       const fee = calculateEstimatedFees(patch.gasFeeCap, patch.gasLimit);
       if (useAllAmount) {
         patch.amount = subAccount ? subAccount.spendableBalance : balance.minus(fee);
+        patch.params =
+          tokenAccountTxn && patch.amount.gt(0)
+            ? await generateTokenTxnParams(recipient, patch.amount)
+            : "";
       }
 
       return defaultUpdateTransaction(t, patch);
@@ -341,8 +345,8 @@ const signOperation: SignOperationFnSignature<Transaction> = ({
 
             let operation: Operation;
             if (subAccount) {
-              const senderEthAddr = await convertAddressFilToEth(parsedSender);
-              const recipientEthAddr = await convertAddressFilToEth(transaction.recipient);
+              const senderEthAddr = await convertAddressFilToEthAsync(parsedSender);
+              const recipientEthAddr = await convertAddressFilToEthAsync(transaction.recipient);
               operation = {
                 id: encodeOperationId(subAccount.id, txHash, "OUT"),
                 hash: txHash,
