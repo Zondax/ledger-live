@@ -63,13 +63,6 @@ const kadena: CurrenciesData<Transaction> = {
   ]
 };
 
-describe("Kadena bridge", () => {
-  test.todo(
-    "This is an empty test to make jest command pass. Remove it once there is a real test.",
-  );
-});
-
-
 export const dataset: DatasetTest<Transaction> = {
   implementations: ["js"],
   currencies: {

@@ -56,7 +56,7 @@ export const getAccountShape: GetAccountShape = async info => {
     freshAddress: address,
     balance,
     spendableBalance: balance,
-    operations: flatMap(rawTxs, mapTxToOps(accountId, info.address)),
+    operations: rawTxsToOps(rawTxs, accountId, address),
     blockHeight: networkInfo.nodeLatestBehaviorHeight,
   };
 
@@ -75,6 +75,7 @@ function reconciliatePublicKey(
   throw new Error("publicKey wasn't properly restored");
 }
 
+// DEprecated
 const mapTxToOps = (accountId: string, address: string) => {
   return (txInfo: GetTxnsResponse): KadenaOperation[] => {
     try {
@@ -140,3 +141,65 @@ const mapTxToOps = (accountId: string, address: string) => {
     }
   };
 };
+
+const rawTxsToOps = (rawTxs: GetTxnsResponse[], accountId: string, address: string): KadenaOperation[] => {
+  const ops: KadenaOperation[] = [];
+  let txs = new Map();
+
+  // Gather ops from the same transaction
+  for (let rawTx of rawTxs) {
+    let tmp = [];
+
+    if (rawTx.token !== "coin") continue;
+
+    if (txs.has(rawTx.requestKey)) { tmp = txs.get(rawTx.requestKey); }
+    tmp.push(rawTx);
+
+    txs.set(rawTx.requestKey, tmp);
+  }
+
+  // Build ops by taking index 0 as fee and index 1 as the actual transaction
+  for (let tx of txs.values()) {
+    let k_op: KadenaOperation = {} as KadenaOperation;
+    k_op.fee = new BigNumber(0);
+
+    for (let op of tx) {
+      switch (op.idx) {
+        case 0: {
+          const value = new BigNumber(op.amount);
+          k_op.fee = baseUnitToKda(value)
+        }
+        case 1: {
+          const { requestKey, blockTime, height, amount, fromAccount, toAccount, blockHash, chain, crossChainId } = op;
+          const blockHeight = height;
+          const date = new Date(blockTime);
+          const value = new BigNumber(amount);
+    
+          const isSending = fromAccount === address;
+          const type = isSending ? "OUT" : "IN";
+
+          k_op.id = encodeOperationId(accountId, requestKey, type);
+          k_op.hash = requestKey;
+          k_op.type = type;
+          k_op.value = baseUnitToKda(value);
+          k_op.blockHeight = blockHeight;
+          k_op.blockHash = blockHash;
+          k_op.accountId = accountId;
+          k_op.senders = [fromAccount];
+          k_op.recipients = [toAccount];
+          k_op.date = date;
+          k_op.extra = {
+            senderChainId: chain,
+            receiverChainId: crossChainId ?? chain,
+          };
+        }        
+        default:
+          log("warn", "rawTxsToOps unknown operation");
+          continue
+      }
+    }
+    ops.push(k_op);
+  }
+
+  return ops;
+}
