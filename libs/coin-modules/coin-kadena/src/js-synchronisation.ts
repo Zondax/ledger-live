@@ -162,42 +162,46 @@ const rawTxsToOps = (rawTxs: GetTxnsResponse[], accountId: string, address: stri
   for (let tx of txs.values()) {
     let k_op: KadenaOperation = {} as KadenaOperation;
     k_op.fee = new BigNumber(0);
+    k_op.value = new BigNumber(0);
 
+    let transaction_op = null;
+    let fee_op = null;
+
+    // Find minimal amount value and 
     for (let op of tx) {
-      switch (op.idx) {
-        case 0: {
-          const value = new BigNumber(op.amount);
-          k_op.fee = baseUnitToKda(value)
-        }
-        case 1: {
-          const { requestKey, blockTime, height, amount, fromAccount, toAccount, blockHash, chain, crossChainId } = op;
-          const blockHeight = height;
-          const date = new Date(blockTime);
-          const value = new BigNumber(amount);
-    
-          const isSending = fromAccount === address;
-          const type = isSending ? "OUT" : "IN";
-
-          k_op.id = encodeOperationId(accountId, requestKey, type);
-          k_op.hash = requestKey;
-          k_op.type = type;
-          k_op.value = baseUnitToKda(value);
-          k_op.blockHeight = blockHeight;
-          k_op.blockHash = blockHash;
-          k_op.accountId = accountId;
-          k_op.senders = [fromAccount];
-          k_op.recipients = [toAccount];
-          k_op.date = date;
-          k_op.extra = {
-            senderChainId: chain,
-            receiverChainId: crossChainId ?? chain,
-          };
-        }        
-        default:
-          log("warn", "rawTxsToOps unknown operation");
-          continue
+      if (!transaction_op || (transaction_op && new BigNumber(transaction_op.amount) < new BigNumber(op.amount))) {
+        transaction_op = op;
+        fee_op = fee_op ? fee_op : transaction_op;
+      } else {
+        fee_op = op;
       }
     }
+
+    const { requestKey, blockTime, height, amount, fromAccount, toAccount, blockHash, chain, crossChainAccount, crossChainId } = transaction_op;
+    const blockHeight = height;
+    const date = new Date(blockTime);
+    const value = new BigNumber(amount);
+    const fee = new BigNumber(fee_op.amount);
+
+    const isSending = fromAccount === address;
+    const type = isSending ? "OUT" : "IN";
+
+    k_op.id = encodeOperationId(accountId, requestKey, type);
+    k_op.hash = requestKey;
+    k_op.type = type;
+    k_op.value = baseUnitToKda(value);
+    k_op.fee = baseUnitToKda(fee);
+    k_op.blockHeight = blockHeight;
+    k_op.blockHash = blockHash;
+    k_op.accountId = accountId;
+    k_op.senders = [fromAccount || crossChainAccount];
+    k_op.recipients = [toAccount || crossChainAccount];
+    k_op.date = date;
+    k_op.extra = {
+      senderChainId: chain,
+      receiverChainId: crossChainId ?? chain,
+    };
+  
     ops.push(k_op);
   }
 
