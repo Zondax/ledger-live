@@ -88,9 +88,13 @@ export async function runWithAppSpec<T extends Transaction>(
   const coinapps = getEnv("COINAPPS");
   invariant(coinapps, "COINAPPS is not set");
 
+  console.log("Why monorepo ?");
+
   if (!appCandidates) {
     appCandidates = await listAppCandidates(coinapps);
   }
+
+  console.log(appCandidates);
 
   const mutationReports: MutationReport<T>[] = [];
   const { appQuery, currency, dependency, onSpeculosDeviceCreated } = spec;
@@ -186,6 +190,7 @@ export async function runWithAppSpec<T extends Transaction>(
     // "Migrate" the FIRST and every {crossAccountFrequency} account to simulate an export/import (same logic as export to mobile) – default to every 10
     // this is made a subset of the accounts to help identify problem that would be specific to the "cross" or not.
     for (let i = 0; i < accounts.length; i += spec.crossAccountFrequency || 10) {
+      console.log("crossacount");
       accounts[i] = await crossAccount(accounts[i]);
     }
     appReport.accountsBefore = accounts;
@@ -733,6 +738,7 @@ export async function runOnAccount<T extends Transaction>({
 }
 
 async function syncAccount(initialAccount: Account): Promise<Account> {
+  console.log(initialAccount);
   const acc = await firstValueFrom(
     getAccountBridge(initialAccount)
       .sync(initialAccount, {

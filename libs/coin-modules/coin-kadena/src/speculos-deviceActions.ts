@@ -1,43 +1,49 @@
-// import type { DeviceAction } from "@ledgerhq/coin-framework/bot/types";
-// import type { Transaction } from "./types";
-// import { formatCurrencyUnit } from "@ledgerhq/coin-framework/currencies/index";
-// import { deviceActionFlow } from "@ledgerhq/coin-framework/bot/specs";
+import type { DeviceAction } from "@ledgerhq/coin-framework/bot/types";
+import type { Transaction } from "./types";
+import { formatCurrencyUnit } from "@ledgerhq/coin-framework/currencies/index";
+import { deviceActionFlow, SpeculosButton } from "@ledgerhq/coin-framework/bot/specs";
  
-// const expectedAmount = ({ account, status }) =>
-//   formatCurrencyUnit(account.unit, status.amount, {
-//     disableRounding: true,
-//   }) + " KDA";
- 
-// const acceptTransaction: DeviceAction<Transaction, any> = deviceActionFlow({
-//   steps: [
-//     {
-//       title: "Starting Balance",
-//       button: "Rr",
-//       expectedValue: expectedAmount,
-//     },
-//     {
-//       title: "Send",
-//       button: "Rr",
-//       expectedValue: expectedAmount,
-//     },
-//     {
-//       title: "Fee",
-//       button: "Rr",
-//       expectedValue: ({ account, status }) =>
-//         formatCurrencyUnit(account.unit, status.estimatedFees, {
-//           disableRounding: true,
-//         }) + " KDA",
-//     },
-//     {
-//       title: "Destination",
-//       button: "Rr",
-//       expectedValue: ({ transaction }) => transaction.recipient,
-//     },
-//     {
-//       title: "Accept",
-//       button: "LRlr",
-//     },
-//   ],
-// });
- 
-// export default { acceptTransaction };
+export const acceptTransaction: DeviceAction<Transaction, any> = deviceActionFlow({
+  steps: [
+    {
+      title: "Transfer",
+      button: SpeculosButton.RIGHT,
+    },
+    {
+      title: "From (1/2)",
+      button: SpeculosButton.RIGHT,
+    },
+    {
+      title: "From (2/2)",
+      button: SpeculosButton.RIGHT,
+    },
+    {
+      title: "To (1/2)",
+      button: SpeculosButton.RIGHT,
+    },
+    {
+      title: "To (2/2)",
+      button: SpeculosButton.RIGHT,
+    },
+    {
+      title: "Amount",
+      button: SpeculosButton.RIGHT,
+    },
+    {
+      title: "Gas fees",
+      button: SpeculosButton.RIGHT,
+    },
+    {
+      title: "Sign Transaction",
+      button: SpeculosButton.RIGHT,
+    },
+    {
+      title: "Reject",
+      button: SpeculosButton.RIGHT,
+    },
+    {
+      title: "Confirm",
+      button: SpeculosButton.BOTH,
+    },
+  ],
+});

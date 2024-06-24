@@ -19,6 +19,7 @@ import bitcoin from "@ledgerhq/coin-bitcoin/specs";
 import evm from "@ledgerhq/coin-evm/specs";
 import near from "@ledgerhq/coin-near/specs";
 import polkadot from "@ledgerhq/coin-polkadot/specs";
+import kadena from "@ledgerhq/coin-kadena/specs";
 
 export default {
   cardano,
@@ -42,4 +43,5 @@ export default {
   evm,
   near,
   polkadot,
+  kadena,
 };

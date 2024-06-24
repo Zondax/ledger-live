@@ -431,6 +431,8 @@ export const makeScanAccounts =
           });
         }
 
+        console.log(account);
+
         return account;
       }
 

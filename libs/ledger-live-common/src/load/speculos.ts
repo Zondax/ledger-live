@@ -478,6 +478,7 @@ export async function createImplicitSpeculos(query: string): Promise<{
   const seed = getEnv("SEED");
   invariant(seed, "SEED is missing!");
   const apps = await listAppCandidates(coinapps);
+  console.log(apps);
   const match = parseAppSearch(query);
   invariant(
     match,
