@@ -101,6 +101,7 @@ setSupportedCurrencies([
   "scroll",
   "scroll_sepolia",
   "ton",
+  "kadena",
 ]);
 LiveConfig.setConfig(liveConfig);
 

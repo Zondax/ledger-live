@@ -21,6 +21,7 @@ import tron from "@ledgerhq/coin-tron/transaction";
 import xrp from "@ledgerhq/coin-xrp/transaction";
 import icon from "@ledgerhq/coin-icon/transaction";
 import ton from "@ledgerhq/coin-ton/transaction";
+import kadena from "@ledgerhq/coin-kadena/transaction";
 
 export default {
   casper,
@@ -46,4 +47,5 @@ export default {
   xrp,
   icon,
   ton,
+  kadena,
 };

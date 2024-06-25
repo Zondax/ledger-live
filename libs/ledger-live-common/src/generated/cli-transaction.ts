@@ -19,6 +19,7 @@ import { cliTools as tron } from "../families/tron/setup";
 import { cliTools as xrp } from "../families/xrp/setup";
 import { cliTools as icon } from "../families/icon/setup";
 import { cliTools as ton } from "../families/ton/setup";
+import { cliTools as kadena } from "../families/kadena/setup";
 
 export default {
   celo,
@@ -42,4 +43,5 @@ export default {
   xrp,
   icon,
   ton,
+  kadena,
 };

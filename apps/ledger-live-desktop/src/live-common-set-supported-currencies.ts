@@ -93,4 +93,5 @@ setSupportedCurrencies([
   "scroll",
   "scroll_sepolia",
   "ton",
+  "kadena",
 ]);
