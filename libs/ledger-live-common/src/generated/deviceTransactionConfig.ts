@@ -20,6 +20,7 @@ import tezos from "@ledgerhq/coin-tezos/deviceTransactionConfig";
 import ton from "@ledgerhq/coin-ton/deviceTransactionConfig";
 import tron from "@ledgerhq/coin-tron/deviceTransactionConfig";
 import xrp from "@ledgerhq/coin-xrp/deviceTransactionConfig";
+import kadena from "@ledgerhq/coin-kadena/deviceTransactionConfig";
 
 export default {
   casper,
@@ -44,6 +45,7 @@ export default {
   ton,
   tron,
   xrp,
+  kadena,
 };
 import { ExtraDeviceTransactionField as ExtraDeviceTransactionField_casper } from "../families/casper/deviceTransactionConfig";
 import { ExtraDeviceTransactionField as ExtraDeviceTransactionField_filecoin } from "../families/filecoin/deviceTransactionConfig";

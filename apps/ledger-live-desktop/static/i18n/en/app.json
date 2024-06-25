@@ -2333,7 +2333,9 @@
         "suggested": "Suggested",
         "unitPerByte": "{{unit}} per byte",
         "nft": "NFT",
-        "nftQuantity": "Quantity"
+        "nftQuantity": "Quantity",
+        "senderChainId": "Sender Chain ID",
+        "receiverChainId": "Receiver Chain ID"
       },
       "verification": {
         "streaming": {

@@ -99,6 +99,7 @@ setSupportedCurrencies([
   "scroll",
   "scroll_sepolia",
   "etherlink",
+  "kadena",
 ]);
 
 for (const k in process.env) setEnvUnsafe(k as EnvName, process.env[k]);

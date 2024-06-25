@@ -21,6 +21,7 @@ import tezos from "@ledgerhq/coin-tezos/specs";
 import ton from "@ledgerhq/coin-ton/specs";
 import tron from "@ledgerhq/coin-tron/specs";
 import xrp from "@ledgerhq/coin-xrp/specs";
+import kadena from "@ledgerhq/coin-kadena/specs";
 
 export default {
   casper,
@@ -46,4 +47,5 @@ export default {
   ton,
   tron,
   xrp,
+  kadena,
 };
