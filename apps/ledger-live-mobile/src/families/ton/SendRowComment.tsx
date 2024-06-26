@@ -1,16 +1,16 @@
-import React, { useCallback } from "react";
-import { View, StyleSheet } from "react-native";
-import { Trans } from "react-i18next";
-import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
-import type { Account } from "@ledgerhq/types-live";
 import type { Transaction as TonTransaction } from "@ledgerhq/live-common/families/ton/types";
+import type { Account } from "@ledgerhq/types-live";
+import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
+import React, { useCallback } from "react";
+import { Trans } from "react-i18next";
+import { StyleSheet, View } from "react-native";
 import LText from "~/components/LText";
-import { ScreenName } from "~/const";
-import SummaryRow from "~/screens/SendFunds/SummaryRow";
-import { BaseComposite, StackNavigatorProps } from "~/components/RootNavigator/types/helpers";
 import { SendFundsNavigatorStackParamList } from "~/components/RootNavigator/types/SendFundsNavigator";
 import { SignTransactionNavigatorParamList } from "~/components/RootNavigator/types/SignTransactionNavigator";
 import { SwapNavigatorParamList } from "~/components/RootNavigator/types/SwapNavigator";
+import { BaseComposite, StackNavigatorProps } from "~/components/RootNavigator/types/helpers";
+import { ScreenName } from "~/const";
+import SummaryRow from "~/screens/SendFunds/SummaryRow";
 
 type Navigation = BaseComposite<
   | StackNavigatorProps<SendFundsNavigatorStackParamList, ScreenName.SendSummary>
@@ -38,8 +38,8 @@ export default function TonCommentRow({ account, transaction }: Props) {
   const comment = transaction.comment;
   return (
     <View>
-      {!comment || comment.isEncrypted || !transaction.comment.text ? (
-        <SummaryRow title={<Trans i18nKey="send.summary.comment" />} onPress={editComment}>
+      <SummaryRow title={<Trans i18nKey="send.summary.comment" />} onPress={editComment}>
+        {!comment || comment.isEncrypted || !transaction.comment.text ? (
           <LText
             style={[
               styles.link,
@@ -52,14 +52,12 @@ export default function TonCommentRow({ account, transaction }: Props) {
           >
             <Trans i18nKey="common.edit" />
           </LText>
-        </SummaryRow>
-      ) : (
-        <SummaryRow title={<Trans i18nKey="common.edit" />} onPress={editComment}>
+        ) : (
           <LText semiBold style={styles.tagText} onPress={editComment}>
             {String(comment.text)}
           </LText>
-        </SummaryRow>
-      )}
+        )}
+      </SummaryRow>
     </View>
   );
 }
