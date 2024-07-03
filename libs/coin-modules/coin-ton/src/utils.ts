@@ -150,3 +150,8 @@ export const getLedgerTonPath = (path: string): number[] => {
 
 export const isJettonTransfer = (payload: TonPayloadFormat): boolean =>
   payload.type === "jetton-transfer";
+
+export enum BotScenario {
+  DEFAULT = "default",
+  TOKEN_TRANSFER = "token-transfer",
+}
