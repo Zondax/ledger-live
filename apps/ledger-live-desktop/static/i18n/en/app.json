@@ -6122,9 +6122,6 @@
     },
     "newAddressTRC20": {
       "title": "You first need to send at least 0.1 TRX to this address to activate it."
-    },
-    "TonExcessFee": {
-      "title": "It constitutes a token transfer. You will pay 0.05 TON in fees, and any extra will be returned to you."
     }
   },
   "cryptoOrg": {
