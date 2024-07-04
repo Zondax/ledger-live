@@ -2,11 +2,13 @@ import { botTest, pickSiblings } from "@ledgerhq/coin-framework/bot/specs";
 import type { AppSpec, TransactionDestinationTestInput } from "@ledgerhq/coin-framework/bot/types";
 import { getCryptoCurrencyById } from "@ledgerhq/cryptoassets";
 import { DeviceModelId } from "@ledgerhq/devices";
+import { Account } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
 import expect from "expect";
 import invariant from "invariant";
-import { acceptTransaction } from "./speculos-deviceActions";
+import { generateDeviceActionFlow } from "./speculos-deviceActions";
 import { Transaction } from "./types";
+import { BotScenario } from "./utils";
 
 const MIN_SAFE = new BigNumber(1.5e7); // approx two txs' fees (0.015 TON)
 
@@ -39,11 +41,12 @@ export const testDestination = <T>({
 const tonSpecs: AppSpec<Transaction> = {
   name: "TON",
   currency: getCryptoCurrencyById("ton"),
+  genericDeviceAction: generateDeviceActionFlow(BotScenario.DEFAULT),
   appQuery: {
-    model: DeviceModelId.nanoS,
+    model: DeviceModelId.nanoSP,
     appName: "TON",
+    appVersion: "1.2.0",
   },
-  genericDeviceAction: acceptTransaction,
   testTimeout: 6 * 60 * 1000,
   minViableAmount: MIN_SAFE,
   transactionCheck: ({ maxSpendable }) => {
