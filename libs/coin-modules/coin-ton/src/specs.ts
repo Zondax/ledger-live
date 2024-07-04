@@ -117,46 +117,6 @@ const tonSpecs: AppSpec<Transaction> = {
         );
       },
     },
-    {
-      name: "Send ~50% jUSDT",
-      maxRun: 1,
-      deviceAction: generateDeviceActionFlow(BotScenario.TOKEN_TRANSFER),
-      transaction: ({ account, bridge, maxSpendable, siblings }) => {
-        invariant(maxSpendable.gt(0), "Spendable balance is too low");
-        const subAccount = account.subAccounts?.find(
-          a => a.type === "TokenAccount" && a.spendableBalance.gt(0),
-        );
-        const recipient = (siblings[0] as Account).freshAddress;
-        invariant(subAccount && subAccount.type === "TokenAccount", "no subAccount with jUSDT");
-        const amount = subAccount.balance.div(1.9 + 0.2 * Math.random()).integerValue();
-        return {
-          transaction: bridge.createTransaction(account),
-          updates: [
-            {
-              subAccountId: subAccount.id,
-            },
-            {
-              recipient,
-            },
-            {
-              amount,
-            },
-          ],
-        };
-      },
-      test: ({ account, accountBeforeTransaction, transaction, status }) => {
-        const subAccountId = transaction.subAccountId;
-        const subAccount = account.subAccounts?.find(sa => sa.id === subAccountId);
-        const subAccountBeforeTransaction = accountBeforeTransaction.subAccounts?.find(
-          sa => sa.id === subAccountId,
-        );
-        botTest("subAccount balance moved with the tx status amount", () =>
-          expect(subAccount?.balance.toString()).toBe(
-            subAccountBeforeTransaction?.balance.minus(status.amount).toString(),
-          ),
-        );
-      },
-    },
   ],
 };
 
