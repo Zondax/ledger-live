@@ -126,6 +126,7 @@ setSupportedCurrencies([
   "scroll",
   "scroll_sepolia",
   "ton",
+  "kadena",
 ]);
 
 if (Config.BLE_LOG_LEVEL) BluetoothTransport.setLogLevel(Config.BLE_LOG_LEVEL);
