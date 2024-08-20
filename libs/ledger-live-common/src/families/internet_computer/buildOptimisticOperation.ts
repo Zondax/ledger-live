@@ -1,22 +1,26 @@
 import { OperationType } from "@ledgerhq/types-live";
 import { encodeOperationId } from "../../operation";
-import { InternetComputerOperation } from "./types";
+import { ICPAccount, InternetComputerOperation, Transaction } from "./types";
 import { getAddress } from "./bridge/bridgeHelpers/addresses";
 
-export const buildOptimisticOperation = async (
-  account,
-  transaction,
-  hash,
+export const buildOptimisticSendOperation = async (
+  account: ICPAccount,
+  transaction: Transaction,
+  hash: string,
   operationType: OperationType = "OUT",
 ): Promise<InternetComputerOperation> => {
   const { id: accountId } = account;
   const { recipient, amount } = transaction;
   const { address } = getAddress(account);
 
+  if (transaction.type === "list") {
+    operationType = "NONE";
+  }
+
   return {
     id: encodeOperationId(accountId, hash, operationType),
     hash,
-    type: "OUT",
+    type: operationType,
     senders: [address],
     recipients: [recipient],
     accountId,

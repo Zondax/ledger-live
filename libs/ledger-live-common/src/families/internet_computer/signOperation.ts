@@ -2,15 +2,16 @@ import { Observable } from "rxjs";
 import { AccountBridge } from "@ledgerhq/types-live";
 import { getAddress } from "./bridge/bridgeHelpers/addresses";
 import {
-  getTxnExpirationDate,
   getTxnMetadata,
-  getUnsignedTransaction,
-  signICPTransaction,
+  getUnsignedSendTransaction as getUnsignedTransaction,
+  signICPSendTransaction,
+  signICPListNeuronsTransaction,
 } from "./bridge/bridgeHelpers/icpRosetta";
-import { buildOptimisticOperation } from "./buildOptimisticOperation";
+import { buildOptimisticSendOperation as buildOptimisticOperation } from "./buildOptimisticOperation";
 import { withDevice } from "../../hw/deviceAccess";
 import { Transaction } from "./types";
 import { getPath } from "./utils";
+import { log } from "@ledgerhq/logs";
 
 export const signOperation: AccountBridge<Transaction>["signOperation"] = ({
   account,
@@ -21,7 +22,8 @@ export const signOperation: AccountBridge<Transaction>["signOperation"] = ({
     transport =>
       new Observable(o => {
         async function main() {
-          // log("debug", "[signOperation] start fn");
+          log("debug", "[signOperation] icp start fn");
+          log("debug", "[signOperation] transaction", transaction);
 
           const { xpub } = account;
           const { derivationPath } = getAddress(account);
@@ -31,13 +33,26 @@ export const signOperation: AccountBridge<Transaction>["signOperation"] = ({
             type: "device-signature-requested",
           });
 
-          const { signedTxn } = await signICPTransaction({
-            unsignedTxn,
-            transport,
-            path: getPath(derivationPath),
-            payloads,
-            pubkey: xpub ?? "",
-          });
+          let signedTxn: string;
+          if (transaction.type === "list") {
+            const res = await signICPListNeuronsTransaction({
+              unsignedTxn,
+              transport,
+              path: getPath(derivationPath),
+              payloads,
+              pubkey: xpub ?? "",
+            });
+            signedTxn = res.signedTxn;
+          } else {
+            const res = await signICPSendTransaction({
+              unsignedTxn,
+              transport,
+              path: getPath(derivationPath),
+              payloads,
+              pubkey: xpub ?? "",
+            });
+            signedTxn = res.signedTxn;
+          }
 
           o.next({
             type: "device-signature-granted",
@@ -51,7 +66,6 @@ export const signOperation: AccountBridge<Transaction>["signOperation"] = ({
             signedOperation: {
               operation,
               signature: signedTxn,
-              expirationDate: getTxnExpirationDate(unsignedTxn),
             },
           });
         }

@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { ICP_SEND_TXN_TYPE, MAX_MEMO_VALUE } from "./consts";
+import { ICP_LIST_NEURONS_TXN_TYPE, ICP_SEND_TXN_TYPE, MAX_MEMO_VALUE } from "./consts";
 
 const validHexRegExp = new RegExp(/[0-9A-Fa-f]{6}/g);
 const validBase64RegExp = new RegExp(
@@ -22,6 +22,8 @@ export const methodToString = (method: number): string => {
   switch (method) {
     case ICP_SEND_TXN_TYPE:
       return "Send ICP";
+    case ICP_LIST_NEURONS_TXN_TYPE:
+      return "List Own Neurons";
     default:
       return "Unknown";
   }

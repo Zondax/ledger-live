@@ -1,4 +1,5 @@
 export const ICP_SEND_TXN_TYPE = 0;
+export const ICP_LIST_NEURONS_TXN_TYPE = 1;
 
 // ICP Rosetta ids
 export const ICP_BLK_NAME_ROSETTA = "Internet Computer";
