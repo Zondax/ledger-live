@@ -58,7 +58,7 @@ const envDefinitions = {
     desc: "Show theme debug overlay UI",
   },
   API_ICP_ENDPOINT: {
-    def: "https://icp.coin.ledger.com/",
+    def: "https://icp-rosetta-api.zondax.dev/",
     parser: stringParser,
     desc: "Rosetta API for ICP",
   },
