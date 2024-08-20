@@ -73,7 +73,7 @@ const mapTxToOps = (accountId: string, address: string, fee = ICP_FEES) => {
     if (!ownerOperation || !counterOperation) return ops;
 
     const timeStamp = txInfo.transaction.metadata.timestamp;
-    const amount = BigNumber(ownerOperation.amount.value);
+    const amount = BigNumber(ownerOperation.amount?.value ?? 0);
     const hash = txInfo.transaction.transaction_identifier.hash;
     const fromAccount = amount.isPositive()
       ? counterOperation.account.address

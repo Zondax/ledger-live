@@ -11,7 +11,7 @@ import { Account } from "@ledgerhq/types-live";
 import { getAddress } from "../addresses";
 import BigNumber from "bignumber.js";
 
-export const generateOperations = (
+export const generateSendOperations = (
   tr: Transaction,
   a: Account,
 ): ICPRosettaICPRosettaOperation[] => {
@@ -148,4 +148,20 @@ export const generateSignaturesPayload = (
   });
 
   return signatures;
+};
+
+export const generateListNeuronsOperations = (
+  tr: Transaction,
+  a: Account,
+): ICPRosettaICPRosettaOperation[] => {
+  return [
+    {
+      operation_identifier: { index: 0 },
+      type: "LIST_NEURONS",
+      account: {
+        address: a.freshAddress,
+      },
+      signature_type: "secp256k1",
+    },
+  ];
 };

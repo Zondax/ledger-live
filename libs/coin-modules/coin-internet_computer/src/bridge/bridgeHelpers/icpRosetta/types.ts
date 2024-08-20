@@ -1,4 +1,5 @@
 import { SubmitResponse } from "@dfinity/agent";
+import { FullNeuron, NeuronInfo } from "../../../types";
 
 export interface ICPRosettaBlockHeightResponse {
   current_block_identifier: ICPRosettaBlockIdentifier;
@@ -55,10 +56,16 @@ export interface ICPRosettaICPRosettaOperation {
     index: number;
   };
   type: string;
+  signature_type?: "secp256k1";
   status?: string;
   account: ICPRosettaAccountIdentifier;
-  amount: ICPRosettaBalance;
+  amount?: ICPRosettaBalance;
   metadata?: {
+    operations?: ICPRosettaICPRosettaOperation[];
+    full_neurons?: FullNeuron[];
+    neuron_infos?: {
+      [key: string]: NeuronInfo;
+    };
     block_index: number;
     transaction_identifier: ICPRosettaTransactionidentifier;
   };
