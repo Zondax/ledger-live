@@ -1,3 +1,6 @@
+import { NetworkError } from "@ledgerhq/errors";
+import { getEnv } from "@ledgerhq/live-env";
+import { makeLRUCache, minutes } from "@ledgerhq/live-network/cache";
 import {
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
@@ -6,15 +9,12 @@ import {
 import {
   Connection,
   FetchMiddleware,
-  VersionedMessage,
   PublicKey,
-  sendAndConfirmRawTransaction,
   SignaturesForAddressOptions,
   StakeProgram,
+  VersionedMessage,
+  sendAndConfirmRawTransaction,
 } from "@solana/web3.js";
-import { makeLRUCache, minutes } from "@ledgerhq/live-network/cache";
-import { getEnv } from "@ledgerhq/live-env";
-import { NetworkError } from "@ledgerhq/errors";
 import { Awaited } from "../../logic";
 
 export const LATEST_BLOCKHASH_MOCK = "EEbZs6DmDyDjucyYbo3LwVJU7pQYuVopYcYTSEZXskW3";
@@ -87,7 +87,7 @@ export function getChainAPI(
     logger === undefined
       ? undefined
       : (url, options, fetch) => {
-          logger(url, options);
+          logger(url as string, options);
           fetch(url, options);
         };
 
