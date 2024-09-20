@@ -1,5 +1,8 @@
 import { BigNumber } from "bignumber.js";
 import { ICP_LIST_NEURONS_TXN_TYPE, ICP_SEND_TXN_TYPE, MAX_MEMO_VALUE } from "./consts";
+import { Secp256k1PublicKey } from "@dfinity/identity-secp256k1";
+import { Principal } from "@dfinity/principal";
+import { AccountIdentifier } from "@dfinity/ledger-icp";
 
 const validHexRegExp = new RegExp(/[0-9A-Fa-f]{6}/g);
 const validBase64RegExp = new RegExp(
@@ -53,3 +56,11 @@ function randomIntFromInterval(min, max): string {
 export function getRandomTransferID(): string {
   return randomIntFromInterval(0, MAX_MEMO_VALUE);
 }
+
+export const deriveAddressFromPubkey = async (publicKey: string): Promise<string> => {
+  const pubkey = Secp256k1PublicKey.fromRaw(Buffer.from(publicKey, "hex"));
+  const principal = Principal.selfAuthenticating(new Uint8Array(pubkey.toDer()));
+  const address = AccountIdentifier.fromPrincipal({ principal: principal });
+
+  return address.toHex();
+};

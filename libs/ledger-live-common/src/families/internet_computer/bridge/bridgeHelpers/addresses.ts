@@ -2,7 +2,7 @@ import { log } from "@ledgerhq/logs";
 import { Account } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
 import { MAX_MEMO_VALUE } from "../../consts";
-import { fetchBalances } from "./api";
+import { AccountIdentifier } from "@dfinity/ledger-icp";
 
 export const getAddress = (
   a: Account,
@@ -13,8 +13,10 @@ export const getAddress = (
 
 export async function validateAddress(address: string): Promise<{ isValid: boolean }> {
   try {
-    const res = await fetchBalances(address);
-    if (!res.balances) throw Error(res.details?.error_message);
+    const accId = AccountIdentifier.fromHex(address);
+    if (!accId) {
+      throw new Error("Invalid address, account identifier could not be created.");
+    }
     return { isValid: true };
   } catch (e: any) {
     log("error", e.message ?? "Failed to validate address");

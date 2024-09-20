@@ -1,9 +1,8 @@
 export const ICP_SEND_TXN_TYPE = 0;
 export const ICP_LIST_NEURONS_TXN_TYPE = 1;
 
-// ICP Rosetta ids
-export const ICP_BLK_NAME_ROSETTA = "Internet Computer";
-export const ICP_NET_ID_ROSETTA = "00000000000000020101";
+// ICP Canister Ids
+export const MAINNET_LEDGER_CANISTER_ID = "ryjl3-tyaaa-aaaaa-aaaba-cai";
 
 // Mac ICP fees
 export const ICP_FEES = 1e4;
