@@ -1814,7 +1814,9 @@
       "withdrawUnbondedAmount": "Withdrawn Amount",
       "palletMethod": "Method",
       "transferAmount": "Transfer Amount",
-      "validatorsCount": "Validators ({{number}})"
+      "validatorsCount": "Validators ({{number}})",
+      "senderChainId": "Sender Chain ID",
+      "receiverChainId": "Receiver Chain ID"
     }
   },
   "operationList": {
