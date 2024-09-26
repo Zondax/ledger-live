@@ -3,6 +3,7 @@ import { ICP_LIST_NEURONS_TXN_TYPE, ICP_SEND_TXN_TYPE, MAX_MEMO_VALUE } from "./
 import { Secp256k1PublicKey } from "@dfinity/identity-secp256k1";
 import { Principal } from "@dfinity/principal";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
+import { log } from "@ledgerhq/logs";
 
 const validHexRegExp = new RegExp(/[0-9A-Fa-f]{6}/g);
 const validBase64RegExp = new RegExp(
@@ -57,10 +58,18 @@ export function getRandomTransferID(): string {
   return randomIntFromInterval(0, MAX_MEMO_VALUE);
 }
 
-export const deriveAddressFromPubkey = async (publicKey: string): Promise<string> => {
-  const pubkey = Secp256k1PublicKey.fromRaw(Buffer.from(publicKey, "hex"));
+export const deriveAddressFromPubkey = (publicKey: string): string => {
+  log("debug", `[ICP] Deriving address from public key: ${publicKey}`);
+  const pubkey = Secp256k1PublicKey.fromRaw(new Uint8Array(Buffer.from(publicKey, "hex")));
   const principal = Principal.selfAuthenticating(new Uint8Array(pubkey.toDer()));
+  log("debug", `[ICP] Derived principal: ${principal.toText()}`);
   const address = AccountIdentifier.fromPrincipal({ principal: principal });
+  log("debug", `[ICP] Derived address: ${address.toHex()}`);
 
   return address.toHex();
+};
+
+export const derivePrincipalFromPubkey = (publicKey: string): Principal => {
+  const pubkey = Secp256k1PublicKey.fromRaw(new Uint8Array(Buffer.from(publicKey, "hex")));
+  return Principal.selfAuthenticating(new Uint8Array(pubkey.toDer()));
 };

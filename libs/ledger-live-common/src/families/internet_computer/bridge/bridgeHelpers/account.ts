@@ -7,9 +7,10 @@ import BigNumber from "bignumber.js";
 import { ICP_FEES } from "../../consts";
 import { encodeOperationId } from "../../../../operation";
 import { deriveAddressFromPubkey, normalizeEpochTimestamp } from "../../utils";
-import { TransactionWithId } from "@dfinity/ledger-icp/dist/candid/index.d";
+import { TransactionWithId } from "@dfinity/ledger-icp/dist/candid/index";
 import { InternetComputerOperation } from "../../types";
 import invariant from "invariant";
+import { hashTransaction } from "./hash";
 
 export const getAccountShape: GetAccountShape = async info => {
   const { currency, derivationMode, rest = {}, initialAccount } = info;
@@ -17,7 +18,7 @@ export const getAccountShape: GetAccountShape = async info => {
   invariant(publicKey, "publicKey is required");
 
   // deriving address from public key
-  const address = await deriveAddressFromPubkey(publicKey);
+  const address = deriveAddressFromPubkey(publicKey);
   invariant(address, "address is required");
 
   const accountId = encodeAccountId({
@@ -62,16 +63,23 @@ const mapTxToOps = (accountId: string, address: string, fee = ICP_FEES) => {
     const ops: InternetComputerOperation[] = [];
 
     const timeStamp = txn.timestamp[0]?.timestamp_nanos ?? Date.now();
-    let amount, fromAccount, toAccount;
+    let amount, fromAccount, toAccount, hash;
     if ("Transfer" in txn.operation) {
       amount = BigNumber(txn.operation.Transfer.amount.e8s.toString());
       fromAccount = txn.operation.Transfer.from;
       toAccount = txn.operation.Transfer.to;
+      hash = hashTransaction({
+        from: fromAccount,
+        to: toAccount,
+        amount: txn.operation.Transfer.amount.e8s,
+        fee: txn.operation.Transfer.fee.e8s,
+        memo: txn.memo,
+        created_at_time: txn.created_at_time[0]?.timestamp_nanos ?? BigInt(0),
+      });
     }
 
-    // TODO: calculate hash, block height, block hash
-    const hash = "";
-    const blockHeight = 0;
+    // TODO: calculate block height, block hash
+    const blockHeight = Number(txInfo.id);
     const blockHash = "";
 
     const memo = txInfo.transaction.memo.toString();
@@ -80,8 +88,8 @@ const mapTxToOps = (accountId: string, address: string, fee = ICP_FEES) => {
     const value = amount.abs();
     const feeToUse = BigNumber(fee);
 
-    const isSending = amount.isNegative();
-    const isReceiving = amount.isPositive();
+    const isSending = address === fromAccount;
+    const isReceiving = address === toAccount;
 
     if (isSending) {
       ops.push({
