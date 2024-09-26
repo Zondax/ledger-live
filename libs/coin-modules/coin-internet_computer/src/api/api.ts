@@ -1,7 +1,7 @@
 import { log } from "@ledgerhq/logs";
 import { MAINNET_LEDGER_CANISTER_ID } from "../../consts";
 import { HttpAgent, Actor } from "@dfinity/agent";
-import { idlFactory } from "@dfinity/ledger-icp/dist/candid/ledger.idl";
+import { idlFactory } from "../../idlFactory";
 import { AccountIdentifier, IndexCanister } from "@dfinity/ledger-icp";
 import BigNumber from "bignumber.js";
 
@@ -35,6 +35,16 @@ export const fetchBlockHeight = async (): Promise<BigNumber> => {
   const res: any = await actor.query_blocks({ start: 0, length: 1 });
 
   return BigNumber(res.chain_length.toString());
+};
+
+export const broadcastTxn = async (payload: Buffer) => {
+  await fetch(`https://ic0.app/api/v3/canister/${MAINNET_LEDGER_CANISTER_ID}/call`, {
+    body: payload,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/cbor",
+    },
+  });
 };
 
 export const fetchBalance = async (address: string): Promise<BigNumber> => {

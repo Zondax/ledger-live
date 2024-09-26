@@ -216,6 +216,8 @@
     "blakejs": "^1.2.1",
     "bs58": "^4.0.1",
     "casper-js-sdk": "^2.15.2",
+    "cbor": "^9.0.2",
+    "cosmjs-types": "0.2.1",
     "date-fns": "^2.23.0",
     "expect": "^27.4.6",
     "fuse.js": "^6.6.2",
