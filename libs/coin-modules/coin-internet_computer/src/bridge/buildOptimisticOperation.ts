@@ -6,14 +6,14 @@ import { getAddress } from "./bridge/bridgeHelpers/addresses";
 export const buildOptimisticSendOperation = async (
   account: ICPAccount,
   transaction: Transaction,
-  hash: string,
+  hash: string = "",
   operationType: OperationType = "OUT",
 ): Promise<InternetComputerOperation> => {
   const { id: accountId } = account;
   const { recipient, amount } = transaction;
   const { address } = getAddress(account);
 
-  if (transaction.type === "list") {
+  if (transaction.type === "list_neurons") {
     operationType = "NONE";
   }
 
