@@ -45,15 +45,7 @@ const mapStateToProps = createStructuredSelector({
 const mapDispatchToProps = {
   openModal,
 };
-function Body({
-  t,
-  account: accountProp,
-  stepId,
-  onChangeStepId,
-  onClose,
-  openModal,
-  device,
-}: Props) {
+function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal, device }: Props) {
   const dispatch = useDispatch();
   const [optimisticOperation, setOptimisticOperation] = useState<Operation | null>(null);
   const [transactionError, setTransactionError] = useState<Error | null>(null);
@@ -70,7 +62,7 @@ function Body({
     invariant(accountProp, "icp: account");
     const bridge = getAccountBridge(accountProp, undefined);
     const initTx = bridge.createTransaction(accountProp);
-    const transaction = bridge.updateTransaction(initTx, { type: "list" });
+    const transaction = bridge.updateTransaction(initTx, { type: "list_neurons" });
     return {
       account: accountProp,
       transaction,

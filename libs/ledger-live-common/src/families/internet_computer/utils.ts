@@ -4,6 +4,7 @@ import { Secp256k1PublicKey } from "@dfinity/identity-secp256k1";
 import { Principal } from "@dfinity/principal";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { log } from "@ledgerhq/logs";
+import { DerEncodedPublicKey } from "@dfinity/agent";
 
 const validHexRegExp = new RegExp(/[0-9A-Fa-f]{6}/g);
 const validBase64RegExp = new RegExp(
@@ -72,4 +73,9 @@ export const deriveAddressFromPubkey = (publicKey: string): string => {
 export const derivePrincipalFromPubkey = (publicKey: string): Principal => {
   const pubkey = Secp256k1PublicKey.fromRaw(new Uint8Array(Buffer.from(publicKey, "hex")));
   return Principal.selfAuthenticating(new Uint8Array(pubkey.toDer()));
+};
+
+export const pubkeyToDer = (publicKey: string): DerEncodedPublicKey => {
+  const pubkey = Secp256k1PublicKey.fromRaw(new Uint8Array(Buffer.from(publicKey, "hex")));
+  return pubkey.toDer();
 };

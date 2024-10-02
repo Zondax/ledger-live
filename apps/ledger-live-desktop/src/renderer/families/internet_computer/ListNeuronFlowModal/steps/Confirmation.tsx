@@ -6,7 +6,6 @@ import TrackPage from "~/renderer/analytics/TrackPage";
 import Box from "~/renderer/components/Box";
 import FormattedVal from "~/renderer/components/FormattedVal";
 import WarnBox from "~/renderer/components/WarnBox";
-import Text from "~/renderer/components/CopyWithFeedback";
 import BroadcastErrorDisclaimer from "~/renderer/components/BroadcastErrorDisclaimer";
 import Button from "~/renderer/components/Button";
 import ErrorDisplay from "~/renderer/components/ErrorDisplay";
@@ -55,14 +54,16 @@ export default function StepConfirmation({
             <Box></Box>
           </Box>
           {optimisticOperation.extra.neurons?.fullNeurons.map(neuron => (
-            <Box key={neuron.id.id}>
+            <Box key={neuron.id[0]?.id}>
               <Box padding={"1rem"} horizontal justifyContent="space-between" alignItems={"center"}>
                 <Box ff="Inter|SemiBold" fontSize={4}>
-                  <CopiableField value={`${neuron.id.id}`}>{neuron.id.id}</CopiableField>
+                  <CopiableField value={`${neuron.id[0]?.id}`}>
+                    {neuron.id[0]?.id.toString()}
+                  </CopiableField>
                 </Box>
                 <Box ff="Inter|Regular" fontSize={3}>
                   <FormattedVal
-                    val={neuron.cached_neuron_stake_e8s}
+                    val={Number(neuron.cached_neuron_stake_e8s)}
                     unit={unit}
                     style={{
                       textAlign: "center",

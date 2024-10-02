@@ -1,9 +1,17 @@
 import { log } from "@ledgerhq/logs";
 import { MAINNET_LEDGER_CANISTER_ID } from "../../consts";
-import { HttpAgent, Actor } from "@dfinity/agent";
-import { idlFactory } from "../../idlFactory";
+import {
+  HttpAgent,
+  Actor,
+  Cbor,
+  Certificate,
+  bufFromBufLike,
+  lookupResultToBuffer,
+} from "@dfinity/agent";
+import { idlFactory } from "../../idlFactoryLedger";
 import { AccountIdentifier, IndexCanister } from "@dfinity/ledger-icp";
 import BigNumber from "bignumber.js";
+import { Principal } from "@dfinity/principal";
 
 const getAgent = async () => {
   return await HttpAgent.create({ host: "https://ic0.app/" });
@@ -37,14 +45,71 @@ export const fetchBlockHeight = async (): Promise<BigNumber> => {
   return BigNumber(res.chain_length.toString());
 };
 
-export const broadcastTxn = async (payload: Buffer) => {
-  await fetch(`https://ic0.app/api/v3/canister/${MAINNET_LEDGER_CANISTER_ID}/call`, {
+export const broadcastTxn = async (
+  payload: Buffer,
+  canisterId: string,
+  type: "call" | "read_state",
+) => {
+  log("debug", `[ICP] Broadcasting ${type} to ${canisterId}, body: ${payload.toString("hex")}`);
+  const res = await fetch(`https://ic0.app/api/v2/canister/${canisterId}/${type}`, {
     body: payload,
     method: "POST",
     headers: {
       "Content-Type": "application/cbor",
     },
   });
+
+  // If the status is not 2XX, throw an error
+  if (res.status >= 400) {
+    throw new Error(`Failed to broadcast transaction: ${res.text()}`);
+  }
+
+  return await res.arrayBuffer();
+};
+
+export const pollForReadState = async (payload: Buffer, canisterId: string, requestId: string) => {
+  let reply: ArrayBuffer | undefined = undefined;
+  for (let i = 0; i < 5; i++) {
+    const readStateResponse = await broadcastTxn(payload, canisterId, "read_state");
+    const readStateData: any = Cbor.decode(readStateResponse);
+    const agent = await getAgent();
+    // console.log("readStateData", readStateData);
+
+    const encodedCertificate = readStateData.certificate;
+    const cert = Uint8Array.from(Buffer.from(encodedCertificate, "hex"));
+    const certificate = await Certificate.create({
+      certificate: bufFromBufLike(cert),
+      rootKey: agent.rootKey,
+      maxAgeInMinutes: 100,
+      canisterId: Principal.from(canisterId),
+    });
+
+    // console.log("requestId: ", Buffer.from(requestId).toString("hex"));
+    const path = [
+      new TextEncoder().encode("request_status"),
+      Uint8Array.from(Buffer.from(requestId, "hex")),
+    ];
+    const status = new TextDecoder().decode(
+      lookupResultToBuffer(certificate.lookup([...path, "status"])),
+    );
+
+    switch (status) {
+      case "replied":
+        reply = lookupResultToBuffer(certificate.lookup([...path, "reply"]));
+        // console.log("reply: ", reply);
+        break;
+    }
+
+    if (!reply) {
+      // wait 1 second
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  if (!reply) {
+    throw new Error(`[ICP](pollForReadState) Reply not found`);
+  }
+  return reply;
 };
 
 export const fetchBalance = async (address: string): Promise<BigNumber> => {

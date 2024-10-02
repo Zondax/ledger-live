@@ -1,8 +1,12 @@
 import { AccountBridge } from "@ledgerhq/types-live";
-import { broadcastTxn } from "./bridge/bridgeHelpers/api";
-import { Transaction } from "./types";
+import { broadcastTxn, pollForReadState } from "./bridge/bridgeHelpers/api";
+import { InternetComputerOperation, Transaction } from "./types";
+import { ListNeuronsResponse } from "@dfinity/nns/dist/candid/governance";
 import { log } from "@ledgerhq/logs";
 import invariant from "invariant";
+import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "./consts";
+import { idlFactory as idlFactoryGovernance } from "./idlFactoryGovernanceOld";
+import { IDL } from "@dfinity/candid";
 
 export const broadcast: AccountBridge<Transaction>["broadcast"] = async ({
   signedOperation: { operation, rawData },
@@ -10,20 +14,47 @@ export const broadcast: AccountBridge<Transaction>["broadcast"] = async ({
   log("debug", "[broadcast] internet_computer start fn");
 
   invariant(rawData, "[ICP](broadcast) rawData not found");
-  invariant(rawData.encodedSignedBlob, "[ICP](broadcast) encodedSignedBlob not found");
+  invariant(rawData.encodedSignedCallBlob, "[ICP](broadcast) encodedSignedCallBlob not found");
 
-  await broadcastTxn(Buffer.from(rawData.encodedSignedBlob as string, "hex"));
+  if (rawData.methodName === "list_neurons") {
+    await broadcastTxn(
+      Buffer.from(rawData.encodedSignedCallBlob as string, "hex"),
+      MAINNET_GOVERNANCE_CANISTER_ID,
+      "call",
+    );
+  } else {
+    await broadcastTxn(
+      Buffer.from(rawData.encodedSignedCallBlob as string, "hex"),
+      MAINNET_LEDGER_CANISTER_ID,
+      "call",
+    );
+  }
 
-  // log("debug", "[broadcast] internet computer broadcast reponse", response);
-  // if (response.metadata.operations[0].type === ICPOperationTypeListNeuron) {
-  //   const op = response.metadata.operations[0];
-  //   return {
-  //     ...operation,
-  //     extra: {
-  //       neurons: { fullNeurons: op.metadata?.full_neurons, neuronInfos: op.metadata?.neuron_infos },
-  //     },
-  //   };
-  // }
+  if (rawData.encodedSignedReadStateBlob && rawData.requestId && rawData.methodName) {
+    const reply = await pollForReadState(
+      Buffer.from(rawData.encodedSignedReadStateBlob as string, "hex"),
+      MAINNET_GOVERNANCE_CANISTER_ID,
+      rawData.requestId as string,
+    );
+
+    const listNeuronsIdlFunc = idlFactoryGovernance({ IDL })._fields.find(
+      func => func[0] === rawData.methodName,
+    );
+
+    const [listNeuronsResponse]: [ListNeuronsResponse] = IDL.decode(
+      listNeuronsIdlFunc[1].retTypes,
+      reply,
+    ) as any;
+
+    return {
+      ...operation,
+      extra: {
+        neurons: {
+          fullNeurons: listNeuronsResponse.full_neurons,
+        },
+      },
+    } as InternetComputerOperation;
+  }
 
   return operation;
 };
