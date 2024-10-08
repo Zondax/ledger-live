@@ -3426,6 +3426,30 @@ export const cryptocurrenciesById: Record<CryptoCurrencyId, CryptoCurrency> = {
       },
     ],
   },
+  mina: {
+    type: "CryptoCurrency",
+    id: "mina",
+    coinType: CoinType.MINA,
+    name: "Mina",
+    managerAppName: "Mina",
+    ticker: "MINA",
+    scheme: "mina",
+    color: "#e1effa",
+    family: "mina",
+    units: [
+      {
+        name: "MINA",
+        code: "MINA",
+        magnitude: 9,
+      },
+    ],
+    explorerViews: [
+      {
+        tx: "https://minascan.io/mainnet/tx/$hash/txInfo",
+        address: "https://minascan.io/mainnet/account/$address",
+      },
+    ],
+  },
   injective: {
     type: "CryptoCurrency",
     id: "injective",
@@ -4250,6 +4274,28 @@ export const cryptocurrenciesById: Record<CryptoCurrencyId, CryptoCurrency> = {
       {
         tx: "https://binance.mintscan.io/txs/$hash",
         address: "https://binance.mintscan.io/validators/$address",
+      },
+    ],
+  },
+  etherlink: {
+    type: "CryptoCurrency",
+    id: "etherlink",
+    coinType: CoinType.ETH,
+    name: "Etherlink",
+    managerAppName: "Ethereum",
+    ticker: "XTZ",
+    scheme: "etherlink",
+    color: "#38FF9C",
+    family: "evm",
+    units: ethereumUnits("XTZ", "XTZ"),
+    ethereumLikeInfo: {
+      chainId: 42793,
+    },
+    explorerViews: [
+      {
+        tx: "https://explorer.etherlink.com/tx/$hash",
+        address: "https://explorer.etherlink.com/address/$address",
+        token: "https://explorer.etherlink.com/token/$contractAddress?a=$address",
       },
     ],
   },

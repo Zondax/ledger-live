@@ -1,6 +1,6 @@
 import { handleActions } from "redux-actions";
 import { Handlers } from "./types";
-import { TrustchainMember } from "@ledgerhq/trustchain/types";
+import { TrustchainMember } from "@ledgerhq/ledger-key-ring-protocol/types";
 
 export enum Flow {
   Activation = "Activation",
@@ -12,7 +12,6 @@ export enum Flow {
 
 export enum Step {
   //ManageBackup
-  ManageBackup = "ManageBackup",
   DeleteBackup = "DeleteBackup",
   BackupDeleted = "BackupDeleted",
   BackupDeletionError = "BackupDeletionError",

@@ -77,6 +77,7 @@ export enum ScreenName {
   DisplayResult = "DisplayResult",
   EditAccountName = "EditAccountName",
   EditDeviceName = "EditDeviceName",
+  Card = "Card",
   Exchange = "Exchange",
   ExchangeBuy = "ExchangeBuy",
   ExchangeHistory = "ExchangeHistory",
@@ -313,6 +314,8 @@ export enum ScreenName {
 
   // ton
   TonEditComment = "TonEditComment",
+  // mina
+  MinaEditMemo = "MinaEditMemo",
 
   // crypto_org
   CryptoOrgEditMemo = "CryptoOrgEditMemo",
@@ -541,6 +544,7 @@ export enum NavigatorName {
   AccountSettings = "AccountSettings",
   AddAccounts = "AddAccounts",
   Analytics = "Analytics",
+  Card = "CardFlow",
   Exchange = "Exchange",
   ExchangeStack = "ExchangeStack",
   Base = "Base",

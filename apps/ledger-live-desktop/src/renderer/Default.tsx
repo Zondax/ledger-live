@@ -55,6 +55,7 @@ import {
 import { isLocked as isLockedSelector } from "~/renderer/reducers/application";
 import { useAutoDismissPostOnboardingEntryPoint } from "@ledgerhq/live-common/postOnboarding/hooks/index";
 import { setShareAnalytics, setSharePersonalizedRecommendations } from "./actions/settings";
+import useEnv from "@ledgerhq/live-common/hooks/useEnv";
 
 const PlatformCatalog = lazy(() => import("~/renderer/screens/platform"));
 const Dashboard = lazy(() => import("~/renderer/screens/dashboard"));
@@ -190,6 +191,7 @@ export default function Default() {
   const history = useHistory();
   const hasCompletedOnboarding = useSelector(hasCompletedOnboardingSelector);
   const accounts = useSelector(accountsSelector);
+  const analyticsConsoleActive = useEnv("ANALYTICS_CONSOLE");
 
   useAccountsWithFundsListener(accounts, updateIdentify);
   useListenToHidDevices();
@@ -328,7 +330,7 @@ export default function Default() {
                               <Route path="/" exact render={withSuspense(Dashboard)} />
                               <Route path="/settings" render={withSuspense(Settings)} />
                               <Route path="/accounts" render={withSuspense(Accounts)} />
-                              <Route path="/card" render={withSuspense(Card)} />
+                              <Route exact path="/card/:appId?" render={withSuspense(Card)} />
                               <Redirect from="/manager/reload" to="/manager" />
                               <Route path="/manager" render={withSuspense(Manager)} />
                               <Route
@@ -394,7 +396,7 @@ export default function Default() {
         </BridgeSyncProvider>
       </IsUnlocked>
 
-      {process.env.ANALYTICS_CONSOLE ? <AnalyticsConsole /> : null}
+      {analyticsConsoleActive ? <AnalyticsConsole /> : null}
     </>
   );
 }

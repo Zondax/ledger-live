@@ -120,6 +120,8 @@ export type CurrencyFeatures = {
   currencyScrollSepolia: DefaultFeature;
   currencyIcon: DefaultFeature;
   currencyTon: DefaultFeature;
+  currencyEtherlink: DefaultFeature;
+  currencyMina: DefaultFeature;
 };
 
 /**
@@ -143,6 +145,7 @@ export type Features = CurrencyFeatures & {
   disableNftLedgerMarket: Feature_DisableNftLedgerMarket;
   disableNftRaribleOpensea: Feature_DisableNftRaribleOpensea;
   receiveStakingFlowConfigDesktop: Feature_ReceiveStakingFlowConfigDesktop;
+  ethStakingModalWithFilters: DefaultFeature;
   ethStakingProviders: Feature_EthStakingProviders;
   storyly: Feature_Storyly;
   postOnboardingAssetsTransfer: Feature_PostOnboardingAssetsTransfer;
@@ -179,7 +182,6 @@ export type Features = CurrencyFeatures & {
   nftsFromSimplehash: Feature_NftsFromSimpleHash;
   lldActionCarousel: Feature_lldActionCarousel;
   marketperformanceWidgetDesktop: Feature_MarketperformanceWidgetDesktop;
-  supportDeviceEuropa: Feature_SupportDeviceEuropa;
   lldRefreshMarketData: Feature_LldRefreshMarketData;
   llmRefreshMarketData: Feature_LlmRefreshMarketData;
   spamReportNfts: Feature_SpamReportNfts;
@@ -190,6 +192,9 @@ export type Features = CurrencyFeatures & {
   enableAppsBackup: Feature_EnableAppsBackup;
   web3hub: Feature_web3hub;
   llmMarketQuickActions: DefaultFeature;
+  spamFilteringTx: Feature_SpamFilteringTx;
+  llmMemoTag: Feature_MemoTag;
+  lldMemoTag: Feature_MemoTag;
 };
 
 /**
@@ -198,17 +203,43 @@ export type Features = CurrencyFeatures & {
 export type FeatureId = keyof Features;
 
 /**
+ * EthStakingProvider category type.
+ */
+export type EthStakingProviderCategory = "liquid" | "pooling" | "protocol" | "restaking";
+
+/**
+ * EthStakingProvider rewards strategy.
+ */
+export type EthStakingProviderRewardsStrategy =
+  | "basic"
+  | "auto-compounded"
+  | "daily"
+  | "eigenlayer_points"
+  | "validator";
+
+/**
+ * EthStakingProvider.
+ */
+export interface EthStakingProvider {
+  id: string;
+  category: EthStakingProviderCategory;
+  disabled?: boolean;
+  icon?: string;
+  liveAppId: string;
+  /** Requires Liquid Staking Token */
+  lst?: boolean;
+  min?: number;
+  name: string;
+  queryParams?: Record<string, string>;
+  rewardsStrategy: EthStakingProviderRewardsStrategy;
+  supportLink?: string;
+}
+
+/**
  * Features types.
  */
 export type Feature_EthStakingProviders = Feature<{
-  listProvider: {
-    id: string;
-    name: string;
-    liveAppId: string;
-    supportLink?: string;
-    icon?: string;
-    queryParams?: Record<string, string>;
-  }[];
+  listProvider: EthStakingProvider[];
 }>;
 
 export type Feature_TransactionsAlerts = Feature<{
@@ -481,10 +512,12 @@ export type Feature_BuySellUiManifest = Feature<{
 export type Feature_LldWalletSync = Feature<{
   environment: WalletSyncEnvironment;
   watchConfig: WalletSyncWatchConfig;
+  learnMoreLink: string;
 }>;
 export type Feature_LlmWalletSync = Feature<{
   environment: WalletSyncEnvironment;
   watchConfig: WalletSyncWatchConfig;
+  learnMoreLink: string;
 }>;
 
 export type Feature_CounterValue = DefaultFeature;
@@ -504,7 +537,6 @@ export type Feature_PtxSwapThorswapProvider = DefaultFeature;
 export type Feature_PtxSwapReceiveTRC20WithoutTrx = DefaultFeature;
 export type Feature_FlexibleContentCards = DefaultFeature;
 export type Feature_MyLedgerDisplayAppDeveloperName = DefaultFeature;
-export type Feature_SupportDeviceEuropa = DefaultFeature;
 export type Feature_LldChatbotSupport = DefaultFeature;
 export type Feature_LlmChatbotSupport = DefaultFeature;
 export type Feature_SpamReportNfts = DefaultFeature;
@@ -512,6 +544,8 @@ export type Feature_EnableAppsBackup = DefaultFeature;
 export type Feature_web3hub = DefaultFeature;
 export type Feature_lldNftsGalleryNewArch = DefaultFeature;
 export type Feature_lldnewArchOrdinals = DefaultFeature;
+export type Feature_SpamFilteringTx = DefaultFeature;
+export type Feature_MemoTag = DefaultFeature;
 
 /**
  * Utils types.

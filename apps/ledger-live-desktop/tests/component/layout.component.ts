@@ -20,9 +20,11 @@ export class Layout extends Component {
   private drawerManagerButton = this.page.getByTestId("drawer-manager-button");
   private drawerBuycryptoButton = this.page.getByTestId("drawer-exchange-button");
   private drawerEarnButton = this.page.getByTestId("drawer-earn-button");
+  private drawerSwapButton = this.page.getByTestId("drawer-swap-button");
   readonly drawerExperimentalButton = this.page.getByTestId("drawer-experimental-button");
   private bookmarkedAccountsList = this.page.getByTestId("drawer-bookmarked-accounts");
   readonly bookmarkedAccounts = this.bookmarkedAccountsList.locator(".bookmarked-account-item");
+  readonly inputWarning = this.page.locator("id=input-warning");
 
   // topbar
   private topbarDiscreetButton = this.page.getByTestId("topbar-discreet-button");
@@ -34,8 +36,7 @@ export class Layout extends Component {
 
   // general
   readonly inputError = this.page.locator("id=input-error"); // no data-testid because css style is applied
-  readonly inputWarning = this.page.getByTestId("alert-insufficient-funds-warning");
-  private loadingSpinner = this.page.getByTestId("loading-spinner");
+  readonly insufficientFundsWarning = this.page.getByTestId("insufficient-funds-warning");
   readonly logo = this.page.getByTestId("logo");
 
   // updater
@@ -77,14 +78,17 @@ export class Layout extends Component {
     await this.drawerDiscoverButton.click();
   }
 
+  @step("Go to manager")
   async goToManager() {
     await this.drawerManagerButton.click();
   }
 
+  @step("Go to buy crypto")
   async goToBuyCrypto() {
     await this.drawerBuycryptoButton.click();
   }
 
+  @step("Go to earn")
   async goToEarn() {
     await this.drawerEarnButton.click();
   }
@@ -100,10 +104,21 @@ export class Layout extends Component {
   }
 
   @step("Check warning message")
-  async checkWarningMessage(expectedWarningMessage: RegExp) {
-    await this.inputWarning.waitFor({ state: "visible" });
-    const warningText = await this.inputWarning.innerText();
-    expect(warningText).toMatch(expectedWarningMessage);
+  async checkAmoutWarningMessage(expectedWarningMessage: RegExp) {
+    if (expectedWarningMessage !== null) {
+      await expect(this.insufficientFundsWarning).toBeVisible();
+      const warningText = await this.insufficientFundsWarning.innerText();
+      expect(warningText).toMatch(expectedWarningMessage);
+    }
+  }
+
+  @step("Check warning message")
+  async checkInputWarningMessage(expectedWarningMessage: string | null) {
+    if (expectedWarningMessage !== null) {
+      await expect(this.inputWarning).toBeVisible();
+      const warningText = await this.inputWarning.innerText();
+      expect(warningText).toMatch(expectedWarningMessage);
+    }
   }
 
   @step("Check if the error message is the same as expected")
@@ -116,19 +131,27 @@ export class Layout extends Component {
     }
   }
 
+  @step("Lock app")
   async lockApp() {
     await this.topbarLockButton.click();
   }
 
+  @step("Open send modal")
   async openSendModal() {
     await this.drawerSendButton.click();
   }
 
+  @step("Open receive modal")
   async openReceiveModal() {
     await this.drawerReceiveButton.click();
   }
 
   async waitForLoadingSpinnerToHaveDisappeared() {
     await this.loadingSpinner.waitFor({ state: "detached" });
+  }
+
+  @step("Go to swap")
+  async goToSwap() {
+    await this.drawerSwapButton.click();
   }
 }

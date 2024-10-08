@@ -26,16 +26,18 @@ const familiesWPackage = [
   "bitcoin",
   "cardano",
   "cosmos",
+  "elrond",
   "evm",
+  "icon",
   "near",
   "polkadot",
   "solana",
   "stellar",
   "tezos",
+  "ton",
   "tron",
   "xrp",
-  "icon",
-  "ton",
+  "mina",
 ];
 
 cd(path.join(__dirname, "..", "src"));

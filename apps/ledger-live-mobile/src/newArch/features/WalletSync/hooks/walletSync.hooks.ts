@@ -1,10 +1,10 @@
-import { resetTrustchainStore } from "@ledgerhq/trustchain/store";
+import { resetTrustchainStore } from "@ledgerhq/ledger-key-ring-protocol/store";
 import { useDispatch } from "react-redux";
 import {
   TrustchainEjected,
   TrustchainNotAllowed,
   TrustchainOutdated,
-} from "@ledgerhq/trustchain/errors";
+} from "@ledgerhq/ledger-key-ring-protocol/errors";
 import { ErrorType } from "./type.hooks";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import { useTrustchainSdk } from "./useTrustchainSdk";
@@ -30,8 +30,6 @@ export const useLifeCycle = () => {
   };
 
   function handleError(error: Error) {
-    console.error("GetMember :" + error);
-
     if (error instanceof TrustchainEjected) reset();
     if (error instanceof TrustchainNotAllowed) reset();
 

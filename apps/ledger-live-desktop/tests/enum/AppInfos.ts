@@ -124,5 +124,17 @@ export class AppInfos {
     [DeviceLabels.AMOUT, DeviceLabels.TO, DeviceLabels.APPROVE, DeviceLabels.REJECT],
     [DeviceLabels.ADDRESS, DeviceLabels.APPROVE, DeviceLabels.REJECT],
   );
+  static readonly NEAR = new AppInfos(
+    "Near",
+    [DeviceLabels.AMOUT, DeviceLabels.DESTINATION, DeviceLabels.ACCEPT, DeviceLabels.REJECT],
+    [DeviceLabels.WALLET_ID, DeviceLabels.APPROVE, DeviceLabels.REJECT],
+  );
   static readonly LS = new AppInfos("LedgerSync", [DeviceLabels.LOGIN_LEDGER_SYNC]);
+  static readonly EXCHANGE = new AppInfos("Exchange", [
+    DeviceLabels.SEND,
+    DeviceLabels.GET,
+    DeviceLabels.FEES,
+    DeviceLabels.ACCEPT_AND_SEND,
+    DeviceLabels.REJECT,
+  ]);
 }

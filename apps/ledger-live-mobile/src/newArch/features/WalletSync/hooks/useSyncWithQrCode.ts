@@ -1,13 +1,15 @@
 import { useCallback, useState } from "react";
-import { MemberCredentials, TrustchainMember } from "@ledgerhq/trustchain/types";
-import { createQRCodeCandidateInstance } from "@ledgerhq/trustchain/qrcode/index";
+import { MemberCredentials, TrustchainMember } from "@ledgerhq/ledger-key-ring-protocol/types";
+import { createQRCodeCandidateInstance } from "@ledgerhq/ledger-key-ring-protocol/qrcode/index";
 import {
+  ScannedOldImportQrCode,
+  ScannedInvalidQrCode,
   InvalidDigitsError,
   NoTrustchainInitialized,
   TrustchainAlreadyInitialized,
   TrustchainAlreadyInitializedWithOtherSeed,
-} from "@ledgerhq/trustchain/errors";
-import { setTrustchain, trustchainSelector } from "@ledgerhq/trustchain/store";
+} from "@ledgerhq/ledger-key-ring-protocol/errors";
+import { setTrustchain, trustchainSelector } from "@ledgerhq/ledger-key-ring-protocol/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { Steps } from "../types/Activation";
@@ -72,7 +74,11 @@ export const useSyncWithQrCode = () => {
         onSyncFinished();
         return true;
       } catch (e) {
-        if (e instanceof InvalidDigitsError) {
+        if (e instanceof ScannedOldImportQrCode) {
+          setCurrentStep(Steps.ScannedOldImportQrCode);
+        } else if (e instanceof ScannedInvalidQrCode) {
+          setCurrentStep(Steps.ScannedInvalidQrCode);
+        } else if (e instanceof InvalidDigitsError) {
           setCurrentStep(Steps.SyncError);
           return;
         } else if (e instanceof NoTrustchainInitialized) {

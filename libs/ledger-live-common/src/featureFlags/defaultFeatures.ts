@@ -79,6 +79,8 @@ export const CURRENCY_DEFAULT_FEATURES = {
   currencyScrollSepolia: DEFAULT_FEATURE,
   currencyIcon: DEFAULT_FEATURE,
   currencyTon: DEFAULT_FEATURE,
+  currencyEtherlink: DEFAULT_FEATURE,
+  currencyMina: DEFAULT_FEATURE,
 };
 
 /**
@@ -100,6 +102,7 @@ export const DEFAULT_FEATURES: Features = {
   disableNftRaribleOpensea: DEFAULT_FEATURE,
   disableNftSend: DEFAULT_FEATURE,
   flexibleContentCards: DEFAULT_FEATURE,
+  ethStakingModalWithFilters: DEFAULT_FEATURE,
   ethStakingProviders: initFeature(),
   newsfeedPage: initFeature(),
   swapWalletApiPartnerList: initFeature(),
@@ -460,7 +463,6 @@ export const DEFAULT_FEATURES: Features = {
 
   lldChatbotSupport: DEFAULT_FEATURE,
   llmChatbotSupport: DEFAULT_FEATURE,
-  supportDeviceEuropa: DEFAULT_FEATURE,
   lldRefreshMarketData: {
     ...DEFAULT_FEATURE,
     params: {
@@ -479,6 +481,7 @@ export const DEFAULT_FEATURES: Features = {
     params: {
       environment: "STAGING",
       watchConfig: {},
+      learnMoreLink: "",
     },
   },
   llmWalletSync: {
@@ -486,6 +489,7 @@ export const DEFAULT_FEATURES: Features = {
     params: {
       environment: "STAGING",
       watchConfig: {},
+      learnMoreLink: "",
     },
   },
   lldNftsGalleryNewArch: DEFAULT_FEATURE,
@@ -493,6 +497,9 @@ export const DEFAULT_FEATURES: Features = {
   enableAppsBackup: DEFAULT_FEATURE,
   web3hub: DEFAULT_FEATURE,
   llmMarketQuickActions: DEFAULT_FEATURE,
+  spamFilteringTx: DEFAULT_FEATURE,
+  llmMemoTag: DEFAULT_FEATURE,
+  lldMemoTag: DEFAULT_FEATURE,
 };
 
 // Firebase SDK treat JSON values as strings

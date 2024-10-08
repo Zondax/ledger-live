@@ -130,7 +130,7 @@ jobs:
           export COINAPPS=$PWD/coin-apps
           export MOCK=0
           if [ "${{ inputs.invert_filter }}" = true ]; then invert_filter="-invert"; fi
-          xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- pnpm desktop test:playwright:speculos ${INPUTS_TEST_FILTER:+--grep$invert_filter} "${{ inputs.test_filter }}" --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- pnpm desktop test:playwright:speculos --max-failures 50 ${INPUTS_TEST_FILTER:+--grep$invert_filter} "${{ inputs.test_filter }}" --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
         env:
           INPUTS_TEST_FILTER: ${{ inputs.test_filter }}
           SEED: ${{ secrets.SEED_QAA_B2C }}
@@ -212,7 +212,7 @@ jobs:
             echo "STATUS_EMOJI=✅" >> $GITHUB_ENV;
           fi
 
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         if: ${{ !cancelled() }}
         name: prepare status
         id: status
@@ -383,8 +383,7 @@ jobs:
           merge-multiple: false
 
       - name: Extract and Aggregate Xray results
-        run:
-          ./aggregate-xray-reports.sh
+        run: ./aggregate-xray-reports.sh
 
       - name: Upload aggregated xray results
         uses: actions/upload-artifact@v4.3.0

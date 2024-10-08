@@ -1,10 +1,18 @@
 import { SwapLiveError } from "@ledgerhq/live-common/exchange/swap/types";
 import { LiveAppManifest } from "@ledgerhq/live-common/platform/types";
+
 import { handlers as loggerHandlers } from "@ledgerhq/live-common/wallet-api/CustomLogger/server";
 import { getEnv } from "@ledgerhq/live-env";
+
+import {
+  accountToWalletAPIAccount,
+  getAccountIdFromWalletAccountId,
+} from "@ledgerhq/live-common/wallet-api/converters";
+import BigNumber from "bignumber.js";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { track } from "~/renderer/analytics/segment";
 import { Web3AppWebview } from "~/renderer/components/Web3AppWebview";
 import { initialWebviewState } from "~/renderer/components/Web3AppWebview/helpers";
 import { WebviewAPI, WebviewProps, WebviewState } from "~/renderer/components/Web3AppWebview/types";
@@ -13,6 +21,7 @@ import { usePTXCustomHandlers } from "~/renderer/components/WebPTXPlayer/CustomH
 import { context } from "~/renderer/drawers/Provider";
 import useTheme from "~/renderer/hooks/useTheme";
 import logger from "~/renderer/logger";
+import { flattenAccountsSelector } from "~/renderer/reducers/accounts";
 import {
   counterValueCurrencySelector,
   enablePlatformDevToolsSelector,
@@ -20,13 +29,9 @@ import {
 } from "~/renderer/reducers/settings";
 import { captureException } from "~/sentry/renderer";
 import WebviewErrorDrawer from "./WebviewErrorDrawer/index";
-import BigNumber from "bignumber.js";
-import { getAccountIdFromWalletAccountId } from "@ledgerhq/live-common/wallet-api/converters";
-import { track } from "~/renderer/analytics/segment";
-import { flattenAccountsSelector } from "~/renderer/reducers/accounts";
 
+import { GasOptions } from "@ledgerhq/coin-evm/lib/types/transaction";
 import { getMainAccount, getParentAccount } from "@ledgerhq/live-common/account/helpers";
-import { transformToBigNumbers, useGetSwapTrackingProperties } from "../utils/index";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/impl";
 import { getAbandonSeedAddress } from "@ledgerhq/live-common/exchange/swap/hooks/useFromState";
 import {
@@ -34,10 +39,17 @@ import {
   convertToNonAtomicUnit,
   getCustomFeesPerFamily,
 } from "@ledgerhq/live-common/exchange/swap/webApp/utils";
-import FeesDrawerLiveApp from "./FeesDrawerLiveApp";
+import { Account, AccountLike } from "@ledgerhq/types-live";
 import { useTranslation } from "react-i18next";
-import { GasOptions } from "@ledgerhq/coin-evm/lib/types/transaction";
 import { useLocation } from "react-router";
+import { NetworkStatus, useNetworkStatus } from "~/renderer/hooks/useNetworkStatus";
+import { walletSelector } from "~/renderer/reducers/wallet";
+import {
+  transformToBigNumbers,
+  useGetSwapTrackingProperties,
+  useRedirectToSwapHistory,
+} from "../utils/index";
+import FeesDrawerLiveApp from "./FeesDrawerLiveApp";
 
 export class UnableToLoadSwapLiveError extends Error {
   constructor(message: string) {
@@ -79,6 +91,11 @@ const SwapWebAppWrapper = styled.div`
   flex: 1;
 `;
 
+// remove the account id from the from path
+function simplifyFromPath(path: string): string {
+  return path.replace(/^\/account.*/, "/account/{id}");
+}
+
 const SWAP_API_BASE = getEnv("SWAP_API_BASE");
 const getSegWitAbandonSeedAddress = (): string => "bc1qed3mqr92zvq2s782aqkyx785u23723w02qfrgs";
 
@@ -90,7 +107,7 @@ const SwapWebView = ({ manifest, liveAppUnavailable }: SwapWebProps) => {
       palette: { type: themeType },
     },
   } = useTheme();
-
+  const walletState = useSelector(walletSelector);
   const webviewAPIRef = useRef<WebviewAPI>(null);
   const { setDrawer } = React.useContext(context);
   const [webviewState, setWebviewState] = useState<WebviewState>(initialWebviewState);
@@ -100,7 +117,15 @@ const SwapWebView = ({ manifest, liveAppUnavailable }: SwapWebProps) => {
   const accounts = useSelector(flattenAccountsSelector);
   const { t } = useTranslation();
   const swapDefaultTrack = useGetSwapTrackingProperties();
-  const { state } = useLocation<{ defaultCurrency?: { id: string } }>();
+  const { state } = useLocation<{
+    defaultAccount?: AccountLike;
+    defaultParentAccount?: Account;
+    from?: string;
+  }>();
+  const redirectToHistory = useRedirectToSwapHistory();
+
+  const { networkStatus } = useNetworkStatus();
+  const isOffline = networkStatus === NetworkStatus.OFFLINE;
 
   const customPTXHandlers = usePTXCustomHandlers(manifest);
   const customHandlers = useMemo(
@@ -230,7 +255,7 @@ const SwapWebView = ({ manifest, liveAppUnavailable }: SwapWebProps) => {
             FeesDrawerLiveApp,
             {
               setTransaction,
-              mainAccount: fromAccount,
+              account: fromAccount,
               parentAccount: fromParentAccount,
               status: status,
               provider: undefined,
@@ -246,6 +271,9 @@ const SwapWebView = ({ manifest, liveAppUnavailable }: SwapWebProps) => {
           );
         });
       },
+      "custom.swapRedirectToHistory": () => {
+        redirectToHistory();
+      },
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -254,9 +282,19 @@ const SwapWebView = ({ manifest, liveAppUnavailable }: SwapWebProps) => {
   const hashString = useMemo(
     () =>
       new URLSearchParams({
-        ...(state?.defaultCurrency?.id ? { from: state?.defaultCurrency?.id } : {}),
+        ...(isOffline ? { isOffline: "true" } : {}),
+        ...(state?.defaultAccount
+          ? {
+              fromAccountId: accountToWalletAPIAccount(
+                walletState,
+                state.defaultAccount,
+                state?.defaultParentAccount,
+              ).id,
+            }
+          : {}),
+        ...(state?.from ? { fromPath: simplifyFromPath(state.from) } : {}),
       }).toString(),
-    [state?.defaultCurrency?.id],
+    [isOffline, state?.defaultAccount, state?.defaultParentAccount, walletState, state?.from],
   );
 
   const onSwapWebviewError = (error?: SwapLiveError) => {
@@ -308,7 +346,6 @@ const SwapWebView = ({ manifest, liveAppUnavailable }: SwapWebProps) => {
           onStateChange={onStateChange}
           ref={webviewAPIRef}
           customHandlers={customHandlers as never}
-          hideLoader
         />
       </SwapWebAppWrapper>
     </>

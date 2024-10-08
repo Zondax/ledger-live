@@ -21,9 +21,17 @@ export type Spec = {
     model: DeviceModelId;
     appName: string;
   };
-  dependency: string;
+  /** @deprecated */
+  dependency?: string;
+  dependencies?: Dependency[];
   onSpeculosDeviceCreated?: (device: Device) => Promise<void>;
 };
+
+export type Dependency = { name: string; appVersion?: string };
+
+export function setExchangeDependencies(dependencies: Dependency[]) {
+  specs["Exchange"].dependencies = dependencies;
+}
 
 type Specs = {
   [key: string]: Spec;
@@ -44,7 +52,13 @@ export const specs: Specs = {
     },
     dependency: "",
   },
-
+  Exchange: {
+    appQuery: {
+      model: DeviceModelId.nanoSP,
+      appName: "Exchange",
+    },
+    dependencies: [],
+  },
   LedgerSync: {
     appQuery: {
       model: DeviceModelId.nanoX,
@@ -52,7 +66,6 @@ export const specs: Specs = {
     },
     dependency: "",
   },
-
   Dogecoin: {
     currency: getCryptoCurrencyById("dogecoin"),
     appQuery: {
@@ -205,6 +218,14 @@ export const specs: Specs = {
     },
     dependency: "",
   },
+  Near: {
+    currency: getCryptoCurrencyById("near"),
+    appQuery: {
+      model: DeviceModelId.nanoSP,
+      appName: "NEAR",
+    },
+    dependency: "",
+  },
 };
 
 export async function startSpeculos(
@@ -227,6 +248,15 @@ export async function startSpeculos(
 
   const { appQuery, dependency, onSpeculosDeviceCreated } = spec;
   const appCandidate = findLatestAppCandidate(appCandidates, appQuery);
+  const { model } = appQuery;
+  const { dependencies } = spec;
+  const newAppQuery = dependencies?.map(dep => {
+    return findLatestAppCandidate(appCandidates, { model, appName: dep.name });
+  });
+  const appVersionMap = new Map(newAppQuery?.map(app => [app?.appName, app?.appVersion]));
+  dependencies?.forEach(dependency => {
+    dependency.appVersion = appVersionMap.get(dependency.name) || "1.0.0";
+  });
   if (!appCandidate) {
     console.warn("no app found for " + testName);
     console.warn(appQuery);
@@ -247,6 +277,7 @@ export async function startSpeculos(
     appName: spec.currency ? spec.currency.managerAppName : spec.appQuery.appName,
     seed,
     dependency,
+    dependencies,
     coinapps,
     onSpeculosDeviceCreated,
   };
@@ -341,6 +372,11 @@ export function verifyAddress(address: string, text: string[]): boolean {
 
 export function verifyAmount(amount: string, text: string[]): boolean {
   const amountDevice = text[1];
+  return amountDevice.includes(amount);
+}
+
+export function verifySwapFeesAmount(amount: string, text: string[]): boolean {
+  const amountDevice = text[3];
   return amountDevice.includes(amount);
 }
 

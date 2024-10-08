@@ -45,7 +45,7 @@ import type {
   TransactionRaw as elrondTransactionRaw,
   TransactionStatus as elrondTransactionStatus,
   TransactionStatusRaw as elrondTransactionStatusRaw,
-} from "../families/elrond/types";
+} from "@ledgerhq/coin-elrond/types";
 import type {
   Transaction as evmTransaction,
   TransactionRaw as evmTransactionRaw,
@@ -76,6 +76,12 @@ import type {
   TransactionStatus as internet_computerTransactionStatus,
   TransactionStatusRaw as internet_computerTransactionStatusRaw,
 } from "../families/internet_computer/types";
+import type {
+  Transaction as minaTransaction,
+  TransactionRaw as minaTransactionRaw,
+  TransactionStatus as minaTransactionStatus,
+  TransactionStatusRaw as minaTransactionStatusRaw,
+} from "@ledgerhq/coin-mina/types";
 import type {
   Transaction as nearTransaction,
   TransactionRaw as nearTransactionRaw,
@@ -151,6 +157,7 @@ export type Transaction =
   | hederaTransaction
   | iconTransaction
   | internet_computerTransaction
+  | minaTransaction
   | nearTransaction
   | polkadotTransaction
   | solanaTransaction
@@ -176,6 +183,7 @@ export type TransactionRaw =
   | hederaTransactionRaw
   | iconTransactionRaw
   | internet_computerTransactionRaw
+  | minaTransactionRaw
   | nearTransactionRaw
   | polkadotTransactionRaw
   | solanaTransactionRaw
@@ -201,6 +209,7 @@ export type TransactionStatus =
   | hederaTransactionStatus
   | iconTransactionStatus
   | internet_computerTransactionStatus
+  | minaTransactionStatus
   | nearTransactionStatus
   | polkadotTransactionStatus
   | solanaTransactionStatus
@@ -226,6 +235,7 @@ export type TransactionStatusRaw =
   | hederaTransactionStatusRaw
   | iconTransactionStatusRaw
   | internet_computerTransactionStatusRaw
+  | minaTransactionStatusRaw
   | nearTransactionStatusRaw
   | polkadotTransactionStatusRaw
   | solanaTransactionStatusRaw
