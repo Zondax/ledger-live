@@ -2475,7 +2475,9 @@
       "gasLimit": "Gas Limit",
       "id": "Id",
       "autoClaimedRewards": "Auto Claimed Rewards",
-      "stakedAmount": "Staked amount"
+      "stakedAmount": "Staked amount",
+      "senderChainId": "Sender Chain ID",
+      "receiverChainId": "Receiver Chain ID"
     },
     "multipleAddresses": "Why multiple addresses?",
     "tokenName": "Token Name",
@@ -3672,6 +3674,7 @@
       "validateMemo": "Validate memo",
       "comment": "Comment",
       "validateComment": "Validate comment",
+      "validateChainId": "Validate chain ID",
       "quantity": "Quantity"
     },
     "validation": {

@@ -530,7 +530,8 @@ export enum ScreenName {
   Web3HubApp = "Web3HubApp",
 
   // Kadena
-  KadenaEditChainID = "KadenaEditChainID",
+  KadenaEditSenderChainId = "KadenaEditSenderChainId",
+  KadenaEditReceiverChainId = "KadenaEditReceiverChainId",
 }
 
 export enum NavigatorName {
