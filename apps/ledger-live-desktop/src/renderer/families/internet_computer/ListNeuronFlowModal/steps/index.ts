@@ -10,14 +10,16 @@ export function useSteps(): St[] {
       {
         id: "device",
         label: t("cosmos.undelegation.flow.steps.device.title"),
-        component: GenericStepConnectDevice,
-        onBack: ({ transitionTo }: StepProps) => transitionTo("amount"),
+        component: GenericStepConnectDevice as React.ComponentType<StepProps>,
+        noScroll: true,
       },
       {
         id: "confirmation",
         label: "Select neuron",
         component: StepConfirmation,
         footer: StepConfirmationFooter,
+        onBack: ({ transitionTo }: StepProps) => transitionTo("device"),
+        noScroll: true,
       },
     ],
     [t],
