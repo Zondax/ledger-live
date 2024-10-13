@@ -122,11 +122,12 @@ const signICPSendTransaction = async (
   derivationPath: string,
   transport: Transport,
   account: Account,
+  isCreateNeuron: boolean,
 ) => {
   const icp = new ICP(transport);
   const blob = Cbor.encode({ content: unsignedTxn });
   log("debug", "[signICPSendTransaction] blob", Buffer.from(blob).toString("hex"));
-  const signatures = await icp.sign(derivationPath, Buffer.from(blob), 0);
+  const signatures = await icp.sign(derivationPath, Buffer.from(blob), isCreateNeuron ? 1 : 0);
 
   invariant(signatures.signatureRS, "[ICP](signICPSendTransaction) Signature not found");
   invariant(account.xpub, "[ICP](signICPSendTransaction) Account xpub is required");
@@ -238,6 +239,7 @@ export const signOperation: AccountBridge<Transaction>["signOperation"] = ({
               getPath(derivationPath),
               transport,
               account,
+              transaction.type === "create_neuron",
             );
             signature = res.signature;
             encodedSignedCallBlob = Buffer.from(Cbor.encode(res.callBody)).toString("hex");

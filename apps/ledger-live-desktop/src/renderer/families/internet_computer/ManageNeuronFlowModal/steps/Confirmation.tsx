@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { SyncOneAccountOnMount } from "@ledgerhq/live-common/bridge/react/index";
@@ -12,10 +12,6 @@ import ErrorDisplay from "~/renderer/components/ErrorDisplay";
 import TableContainer from "~/renderer/components/TableContainer";
 import { StepProps } from "../types";
 import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
-import { useDispatch } from "react-redux";
-import { ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/types";
-import { closeModal, openModal } from "~/renderer/actions/modals";
-import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 export default function StepConfirmation({
   account,
   optimisticOperation,
@@ -23,23 +19,8 @@ export default function StepConfirmation({
   signed,
 }: StepProps) {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const currencyId = account.currency.id;
   const unit = account.currency.units[0];
-  const onClickManage = useCallback(
-    (neuron: ICPNeuron) => {
-      console.log("neuron", neuron);
-      if (account.type !== "Account" || !neuron) return;
-      dispatch(closeModal("MODAL_ICP_LIST_NEURONS"));
-      dispatch(
-        openModal("MODAL_ICP_MANAGE_NEURON", {
-          account,
-          neuron,
-        }),
-      );
-    },
-    [account, dispatch],
-  );
   // const locale = useSelector(localeSelector);
   // const unit = useAccountUnit(account);
   if (optimisticOperation) {
@@ -72,42 +53,33 @@ export default function StepConfirmation({
             </Box>
             <Box></Box>
           </Box>
-          <Box maxHeight={"300px"} overflow={"scroll"}>
-            {optimisticOperation.extra.neurons?.fullNeurons
-              .sort((a, b) => Number(b.cached_neuron_stake_e8s) - Number(a.cached_neuron_stake_e8s))
-              .map(neuron => (
-                <Box key={neuron.id[0]?.id}>
-                  <Box
-                    padding={"1rem"}
-                    horizontal
-                    justifyContent="space-between"
-                    alignItems={"center"}
-                  >
-                    <Box ff="Inter|SemiBold" fontSize={4}>
-                      <CopiableField value={`${neuron.id[0]?.id}`}>
-                        {neuron.id[0]?.id.toString()}
-                      </CopiableField>
-                    </Box>
-                    <Box ff="Inter|Regular" fontSize={3}>
-                      <FormattedVal
-                        val={Number(neuron.cached_neuron_stake_e8s)}
-                        unit={unit}
-                        style={{
-                          textAlign: "center",
-                          minWidth: 120,
-                        }}
-                        showCode
-                        fontSize={4}
-                        color="palette.text.white"
-                      />
-                    </Box>
-                    <Button primary onClick={() => onClickManage(neuron)}>
-                      {"Manage"}
-                    </Button>
-                  </Box>
+          {optimisticOperation.extra.neurons?.fullNeurons.map(neuron => (
+            <Box key={neuron.id[0]?.id}>
+              <Box padding={"1rem"} horizontal justifyContent="space-between" alignItems={"center"}>
+                <Box ff="Inter|SemiBold" fontSize={4}>
+                  <CopiableField value={`${neuron.id[0]?.id}`}>
+                    {neuron.id[0]?.id.toString()}
+                  </CopiableField>
                 </Box>
-              ))}
-          </Box>
+                <Box ff="Inter|Regular" fontSize={3}>
+                  <FormattedVal
+                    val={Number(neuron.cached_neuron_stake_e8s)}
+                    unit={unit}
+                    style={{
+                      textAlign: "center",
+                      minWidth: 120,
+                    }}
+                    showCode
+                    fontSize={4}
+                    color="palette.text.white"
+                  />
+                </Box>
+                <Button primary onClick={() => console.log("manage")}>
+                  {"Manage"}
+                </Button>
+              </Box>
+            </Box>
+          ))}
         </TableContainer>
       </Container>
     );
@@ -147,21 +119,6 @@ const Container = styled(Box).attrs<{
 export function StepConfirmationFooter({ account, onClose, error }: StepProps) {
   const { t } = useTranslation();
   const currencyName = account.currency.name;
-  const dispatch = useDispatch();
-  const onClickCreate = useCallback(() => {
-    const bridge = getAccountBridge(account, undefined);
-    const initTx = bridge.createTransaction(account);
-    dispatch(closeModal("MODAL_ICP_LIST_NEURONS"));
-    dispatch(
-      openModal("MODAL_SEND", {
-        stepId: "amount",
-        transaction: {
-          ...initTx,
-          type: "create_neuron",
-        },
-      }),
-    );
-  }, [account, dispatch]);
   return (
     <Box horizontal alignItems="right">
       <Button ml={2} onClick={onClose}>
@@ -172,7 +129,7 @@ export function StepConfirmationFooter({ account, onClose, error }: StepProps) {
         disabled={!!error}
         ml={2}
         event={`Manage Neurons ${currencyName} Flow Step 3 Create Neuron Clicked`}
-        onClick={onClickCreate}
+        onClick={() => console.log("create neurons")}
       >
         {"Create New"}
       </Button>
