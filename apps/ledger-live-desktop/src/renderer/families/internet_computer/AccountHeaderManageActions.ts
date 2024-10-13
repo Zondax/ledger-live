@@ -11,7 +11,7 @@ type Props = {
   source?: string;
 };
 
-const AccountHeaderActions = ({ account, parentAccount, source }: Props) => {
+const AccountHeaderActions = ({ account, parentAccount }: Props) => {
   // const { t } = useTranslation();
   const dispatch = useDispatch();
   const onClick = useCallback(() => {

@@ -1,10 +1,11 @@
 import { BigNumber } from "bignumber.js";
-import { ICP_LIST_NEURONS_TXN_TYPE, ICP_SEND_TXN_TYPE, MAX_MEMO_VALUE } from "./consts";
+import { MAX_MEMO_VALUE } from "./consts";
 import { Secp256k1PublicKey } from "@dfinity/identity-secp256k1";
 import { Principal } from "@dfinity/principal";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { log } from "@ledgerhq/logs";
 import { DerEncodedPublicKey } from "@dfinity/agent";
+import { Transaction } from "./types";
 
 const validHexRegExp = new RegExp(/[0-9A-Fa-f]{6}/g);
 const validBase64RegExp = new RegExp(
@@ -23,11 +24,13 @@ export const isError = (r: { returnCode: number; errorMessage?: string }): void 
   if (!isNoErrorReturnCode(r.returnCode)) throw new Error(`${r.returnCode} - ${r.errorMessage}`);
 };
 
-export const methodToString = (method: number): string => {
+export const methodToString = (method: Transaction["type"]): string => {
   switch (method) {
-    case ICP_SEND_TXN_TYPE:
+    case undefined:
       return "Send ICP";
-    case ICP_LIST_NEURONS_TXN_TYPE:
+    case "create_neuron":
+      return "Stake Neuron";
+    case "list_neurons":
       return "List Own Neurons";
     default:
       return "Unknown";

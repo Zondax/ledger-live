@@ -9,7 +9,8 @@ import BigNumber from "bignumber.js";
 import { AccountBridge } from "@ledgerhq/types-live";
 import { getAddress, validateAddress, validateMemo } from "./bridge/bridgeHelpers/addresses";
 import { Transaction, TransactionStatus } from "./types";
-import { InvalidMemoICP } from "./errors";
+import { InvalidMemoICP, NotEnoughTransferAmount } from "./errors";
+import { ICP_MIN_STAKING_AMOUNT } from "./consts";
 
 export const getTransactionStatus: AccountBridge<Transaction>["getTransactionStatus"] = async (
   account,
@@ -41,6 +42,10 @@ export const getTransactionStatus: AccountBridge<Transaction>["getTransactionSta
 
   if (!validateMemo(transaction.memo).isValid) {
     errors.transaction = new InvalidMemoICP();
+  }
+
+  if (transaction.type === "create_neuron" && transaction.amount.lte(ICP_MIN_STAKING_AMOUNT)) {
+    errors.amount = new NotEnoughTransferAmount();
   }
 
   // This is the worst case scenario (the tx won't cost more than this value)

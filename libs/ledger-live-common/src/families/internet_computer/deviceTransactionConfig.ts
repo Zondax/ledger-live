@@ -20,7 +20,7 @@ function getDeviceTransactionConfig({
   fields.push({
     type: "text",
     label: "Transaction Type",
-    value: methodToString(transaction.type ? 1 : 0),
+    value: methodToString(transaction.type),
   });
   if (transaction.type !== "list_neurons") {
     fields.push({

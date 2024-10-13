@@ -3,7 +3,6 @@ import { log } from "@ledgerhq/logs";
 
 import type { SignMessage, Result } from "../../hw/signMessage/types";
 import { getBufferFromString, getPath, isError } from "./utils";
-import { ICP_SEND_TXN_TYPE } from "./consts";
 
 function bufferToArrayBuffer(buffer: Buffer): Buffer {
   const sig = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
@@ -21,7 +20,7 @@ const signMessage: SignMessage = async (transport, account, { message }): Promis
   const r: ResponseSign = await icp.sign(
     getPath(account.freshAddressPath),
     getBufferFromString(message),
-    ICP_SEND_TXN_TYPE,
+    0,
   );
   isError(r);
   if (!r.signatureRS) {

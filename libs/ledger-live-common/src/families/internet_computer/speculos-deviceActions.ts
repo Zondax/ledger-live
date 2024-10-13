@@ -11,7 +11,7 @@ export const acceptTransaction: DeviceAction<Transaction, any> = deviceActionFlo
       title: "Transaction type",
       button: SpeculosButton.RIGHT,
       expectedValue: () => {
-        return methodToString(0);
+        return methodToString(undefined);
       },
     },
     {
