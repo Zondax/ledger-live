@@ -1826,7 +1826,8 @@
       "transferAmount": "Transfer Amount",
       "validatorsCount": "Validators ({{number}})",
       "senderChainId": "Sender Chain ID",
-      "receiverChainId": "Receiver Chain ID"
+      "receiverChainId": "Receiver Chain ID",
+      "finishCrossChainTransfer": "Finish Kadena Cross Chain Transfer"
     }
   },
   "operationList": {
@@ -2337,7 +2338,8 @@
         "nft": "NFT",
         "nftQuantity": "Quantity",
         "senderChainId": "Sender Chain ID",
-        "receiverChainId": "Receiver Chain ID"
+        "receiverChainId": "Receiver Chain ID",
+        "transferCrossChainWarning": "Completion is required for this transaction involving an account in a different chain."
       },
       "verification": {
         "streaming": {
