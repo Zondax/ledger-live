@@ -13,7 +13,7 @@ export const buildOptimisticSendOperation = async (
   const { recipient, amount } = transaction;
   const { address } = getAddress(account);
 
-  if (transaction.type === "list_neurons") {
+  if (transaction.type === "list_neurons" || transaction.type === "disburse") {
     operationType = "NONE";
   }
 

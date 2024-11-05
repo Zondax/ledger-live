@@ -18,7 +18,6 @@ export function useSteps(): St[] {
         label: "Select neuron",
         component: StepConfirmation,
         footer: StepConfirmationFooter,
-        onBack: ({ transitionTo }: StepProps) => transitionTo("device"),
         noScroll: true,
       },
     ],

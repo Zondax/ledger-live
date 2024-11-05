@@ -36,7 +36,7 @@ export function useSteps(): St[] {
         // label: t("internet_computer.manageNeuron.steps.confirmation.title"),
         label: "Confirmation",
         component: StepConfirmation,
-        onBack: ({ transitionTo }: StepProps) => transitionTo("fund"),
+        onBack: ({ transitionTo }: StepProps) => transitionTo("manage"),
       },
     ],
     [],

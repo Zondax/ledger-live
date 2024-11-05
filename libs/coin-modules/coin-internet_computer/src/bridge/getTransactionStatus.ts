@@ -44,8 +44,21 @@ export const getTransactionStatus: AccountBridge<Transaction>["getTransactionSta
     errors.transaction = new InvalidMemoICP();
   }
 
-  if (transaction.type === "create_neuron" && transaction.amount.lte(ICP_MIN_STAKING_AMOUNT)) {
-    errors.amount = new NotEnoughTransferAmount();
+  // This is also be true if topup existing neuron and amount is less than min staking amount
+  // TODO: Check if this is the best way to check for topup
+  if (transaction.type === "create_neuron") {
+    warnings.staking = new Error(
+      "This operation will transfer the amount to a new neuron. Upon successful confirmation, the neuron will be available for further operations.",
+    );
+    if (transaction.amount.lt(ICP_MIN_STAKING_AMOUNT)) {
+      errors.amount = new NotEnoughTransferAmount();
+    }
+  }
+
+  if (transaction.type === "increase_stake") {
+    warnings.staking = new Error(
+      "This operation will transfer the amount to increase the stake of an existing neuron.",
+    );
   }
 
   // This is the worst case scenario (the tx won't cost more than this value)

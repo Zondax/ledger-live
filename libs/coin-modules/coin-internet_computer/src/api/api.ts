@@ -69,7 +69,7 @@ export const broadcastTxn = async (
 
 export const pollForReadState = async (payload: Buffer, canisterId: string, requestId: string) => {
   let reply: ArrayBuffer | undefined = undefined;
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 15; i++) {
     const readStateResponse = await broadcastTxn(payload, canisterId, "read_state");
     const readStateData: any = Cbor.decode(readStateResponse);
     const agent = await getAgent();

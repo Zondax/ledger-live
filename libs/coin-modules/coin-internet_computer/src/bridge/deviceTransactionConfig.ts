@@ -23,10 +23,25 @@ function getDeviceTransactionConfig({
     label: "Transaction Type",
     value: methodToString(transaction.type),
   });
+
+  if (transaction.type === "disburse") {
+    fields.push({
+      type: "text",
+      label: "Neuron Id",
+      value: transaction.neuronId ?? "0",
+    });
+
+    fields.push({
+      type: "text",
+      label: "Disburse To",
+      value: "Self",
+    });
+  }
+
   if (transaction.type !== "list_neurons") {
     fields.push({
       type: "text",
-      label: "Payment (ICP)",
+      label: "Amount (ICP)",
       value: formatCurrencyUnit(currency.units[0], transaction.amount, {
         showCode: false,
         disableRounding: true,
@@ -40,6 +55,9 @@ function getDeviceTransactionConfig({
         disableRounding: true,
       }),
     });
+  }
+
+  if (transaction.type !== "list_neurons" && transaction.type !== "disburse") {
     fields.push({
       type: "text",
       label: "Memo",

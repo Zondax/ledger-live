@@ -6,10 +6,11 @@ import { ICPAccount } from "@ledgerhq/live-common/families/internet_computer/typ
 
 export type Props = {
   account: ICPAccount;
+  refresh?: boolean;
 };
 
-export default function UndelegationModal() {
-  const [stepId, setStepId] = useState<StepId>("device");
+export default function ListNeuronsModal({ refresh }: Props) {
+  const [stepId, setStepId] = useState<StepId>(refresh ? "device" : "confirmation");
   const onHide = useCallback(() => {
     setStepId("device");
   }, []);

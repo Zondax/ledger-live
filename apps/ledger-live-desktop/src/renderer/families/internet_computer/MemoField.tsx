@@ -33,8 +33,6 @@ const MemoField = ({
     [onChange, transaction, bridge],
   );
 
-  // We use transaction as an error here.
-  // on the ledger-live mobile
   return (
     <MemoTagField
       warning={status.warnings.transaction}

@@ -34,8 +34,10 @@ export const methodToString = (method: Transaction["type"]): string => {
       return "Stake Neuron";
     case "list_neurons":
       return "List Own Neurons";
+    case "disburse":
+      return "Disburse Neuron";
     default:
-      return "Unknown";
+      return "Send ICP";
   }
 };
 
