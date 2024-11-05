@@ -9,7 +9,8 @@ import ICP from "@zondax/ledger-icp";
 import { log } from "@ledgerhq/logs";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { idlFactory as idlFactoryLedger } from "./idlFactoryLedger";
-import { idlFactory as idlFactoryGovernance } from "./idlFactoryGovernanceOld";
+import { idlFactory as idlFactoryGovernanceOld } from "./idlFactoryGovernanceOld";
+import { idlFactory as idlFactoryGovernance } from "./idlFactoryGovernance";
 import { IDL } from "@dfinity/candid";
 import invariant from "invariant";
 import { Principal } from "@dfinity/principal";
@@ -49,6 +50,12 @@ interface TransferRawRequest {
   from_subaccount: [];
 }
 
+interface DisburseRawRequest {
+  id: [{ id: bigint }];
+  command: [{ Disburse: { to_account: string[]; amount: [{ e8s: bigint }] } }];
+  neuron_id_or_subaccount: [];
+}
+
 interface ListNeuronsRawRequest {
   include_public_neurons_in_full_neurons: [boolean] | [];
   neuron_ids: BigUint64Array;
@@ -66,7 +73,7 @@ const createUnsignedListNeuronsTransaction = (
     include_neurons_readable_by_caller: true,
   };
 
-  const p = idlFactoryGovernance({ IDL })._fields.find(f => f[0] === "list_neurons");
+  const p = idlFactoryGovernanceOld({ IDL })._fields.find(f => f[0] === "list_neurons");
   invariant(p, "[ICP](createUnsignedListNeuronsTransaction) Method not found");
   const args = IDL.encode(p[1].argTypes, [listNeuronsRawRequest]);
 
@@ -82,6 +89,46 @@ const createUnsignedListNeuronsTransaction = (
   };
 
   return { unsignedTransaction, listNeuronsRawRequest };
+};
+
+const createUnsignedDisburseTransaction = (
+  transaction: Transaction,
+  account: Account,
+): { unsignedTransaction: UnsignedTransaction; disburseRawRequest: DisburseRawRequest } => {
+  const { neuronId, amount } = transaction;
+  invariant(neuronId, "[ICP](createUnsignedDisburseTransaction) Neuron ID is required");
+
+  const disburseRawRequest: DisburseRawRequest = {
+    id: [{ id: BigInt(neuronId) }],
+    command: [
+      {
+        Disburse: {
+          to_account: [],
+          amount: [{ e8s: BigInt(amount.toString()) }],
+        },
+      },
+    ],
+    neuron_id_or_subaccount: [],
+  };
+
+  const disburseIDLMethod = idlFactoryGovernance({ IDL })._fields.find(
+    f => f[0] === "manage_neuron",
+  );
+  invariant(disburseIDLMethod, "[ICP](createUnsignedDisburseTransaction) Method not found");
+  const args = IDL.encode(disburseIDLMethod[1].argTypes, [disburseRawRequest]);
+
+  const canisterID = Principal.from(MAINNET_GOVERNANCE_CANISTER_ID);
+  invariant(account.xpub, "[ICP](createUnsignedTransaction) Account xpub is required");
+  const unsignedTransaction: UnsignedTransaction = {
+    request_type: SubmitRequestType.Call,
+    canister_id: canisterID,
+    method_name: "manage_neuron",
+    arg: args,
+    sender: derivePrincipalFromPubkey(account.xpub),
+    ingress_expiry: new Expiry(DEFAULT_INGRESS_EXPIRY_DELTA_IN_MSECS),
+  };
+
+  return { unsignedTransaction, disburseRawRequest };
 };
 
 const createUnsignedSendTransaction = (
@@ -117,7 +164,7 @@ const createUnsignedSendTransaction = (
   return { unsignedTransaction, transferRawRequest };
 };
 
-const signICPSendTransaction = async (
+const signICPTransaction = async (
   unsignedTxn: UnsignedTransaction,
   derivationPath: string,
   transport: Transport,
@@ -126,11 +173,11 @@ const signICPSendTransaction = async (
 ) => {
   const icp = new ICP(transport);
   const blob = Cbor.encode({ content: unsignedTxn });
-  log("debug", "[signICPSendTransaction] blob", Buffer.from(blob).toString("hex"));
+  log("debug", "[signICPTransaction] blob", Buffer.from(blob).toString("hex"));
   const signatures = await icp.sign(derivationPath, Buffer.from(blob), isCreateNeuron ? 1 : 0);
 
-  invariant(signatures.signatureRS, "[ICP](signICPSendTransaction) Signature not found");
-  invariant(account.xpub, "[ICP](signICPSendTransaction) Account xpub is required");
+  invariant(signatures.signatureRS, "[ICP](signICPTransaction) Signature not found");
+  invariant(account.xpub, "[ICP](signICPTransaction) Account xpub is required");
   return {
     signature: Buffer.from(signatures.signatureRS).toString("hex"),
     callBody: {
@@ -156,7 +203,7 @@ const createReadStateRequest = async (body: UnsignedTransaction) => {
   };
 };
 
-const signICPListNeuronsTransaction = async (
+const signUpdateICPTransaction = async (
   unsignedTxn: UnsignedTransaction,
   derivationPath: string,
   transport: Transport,
@@ -172,14 +219,14 @@ const signICPListNeuronsTransaction = async (
     0,
   );
 
-  invariant(account.xpub, "[ICP](signICPListNeuronsTransaction) Account xpub is required");
+  invariant(account.xpub, "[ICP](signUpdateICPTransaction) Account xpub is required");
   invariant(
     signatures.RequestSignatureRS,
-    "[ICP](signICPListNeuronsTransaction) Request signature not found",
+    "[ICP](signUpdateICPTransaction) Request signature not found",
   );
   invariant(
     signatures.StatusReadSignatureRS,
-    "[ICP](signICPListNeuronsTransaction) Status read signature not found",
+    "[ICP](signUpdateICPTransaction) Status read signature not found",
   );
 
   return {
@@ -214,10 +261,10 @@ export const signOperation: AccountBridge<Transaction>["signOperation"] = ({
           const { derivationPath } = getAddress(account);
           let unsignedTransaction: UnsignedTransaction;
           let transferRawRequest: TransferRawRequest | undefined;
-          let listNeuronsRawRequest: ListNeuronsRawRequest | undefined;
           if (transaction.type === "list_neurons") {
-            ({ unsignedTransaction, listNeuronsRawRequest } =
-              createUnsignedListNeuronsTransaction(account));
+            ({ unsignedTransaction } = createUnsignedListNeuronsTransaction(account));
+          } else if (transaction.type === "disburse") {
+            ({ unsignedTransaction } = createUnsignedDisburseTransaction(transaction, account));
           } else {
             ({ unsignedTransaction, transferRawRequest } = createUnsignedSendTransaction(
               transaction,
@@ -233,18 +280,8 @@ export const signOperation: AccountBridge<Transaction>["signOperation"] = ({
           let encodedSignedCallBlob: string = "";
           let encodedSignedReadStateBlob: string = "";
           let requestId: string = "";
-          if (transferRawRequest) {
-            const res = await signICPSendTransaction(
-              unsignedTransaction,
-              getPath(derivationPath),
-              transport,
-              account,
-              transaction.type === "create_neuron",
-            );
-            signature = res.signature;
-            encodedSignedCallBlob = Buffer.from(Cbor.encode(res.callBody)).toString("hex");
-          } else if (listNeuronsRawRequest) {
-            const res = await signICPListNeuronsTransaction(
+          if (transaction.type === "list_neurons") {
+            const res = await signUpdateICPTransaction(
               unsignedTransaction,
               getPath(derivationPath),
               transport,
@@ -256,6 +293,16 @@ export const signOperation: AccountBridge<Transaction>["signOperation"] = ({
               "hex",
             );
             requestId = Buffer.from(res.requestId).toString("hex");
+          } else {
+            const res = await signICPTransaction(
+              unsignedTransaction,
+              getPath(derivationPath),
+              transport,
+              account,
+              transaction.type === "create_neuron",
+            );
+            signature = res.signature;
+            encodedSignedCallBlob = Buffer.from(Cbor.encode(res.callBody)).toString("hex");
           }
           invariant(signature, "[ICP](signOperation) Signature not found");
 

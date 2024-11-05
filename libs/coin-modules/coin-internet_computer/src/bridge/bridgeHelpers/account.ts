@@ -8,7 +8,7 @@ import { ICP_FEES } from "../../consts";
 import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
 import { deriveAddressFromPubkey, normalizeEpochTimestamp } from "../../common-logic/utils";
 import { TransactionWithId } from "@dfinity/ledger-icp/dist/candid/index.d";
-import { InternetComputerOperation } from "../../types";
+import { ICPAccount, InternetComputerOperation } from "../../types";
 import invariant from "invariant";
 import { hashTransaction } from "./hash";
 
@@ -35,7 +35,7 @@ export const getAccountShape: GetAccountShape = async info => {
   const balance = await fetchBalance(address);
 
   const txns = await fetchTxns(address);
-  const result: Partial<Account> = {
+  const result: Partial<ICPAccount> = {
     id: accountId,
     balance,
     spendableBalance: balance,

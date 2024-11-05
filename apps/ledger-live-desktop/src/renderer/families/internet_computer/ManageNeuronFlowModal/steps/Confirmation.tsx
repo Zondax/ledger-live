@@ -4,14 +4,12 @@ import styled from "styled-components";
 import { SyncOneAccountOnMount } from "@ledgerhq/live-common/bridge/react/index";
 import TrackPage from "~/renderer/analytics/TrackPage";
 import Box from "~/renderer/components/Box";
-import FormattedVal from "~/renderer/components/FormattedVal";
 import WarnBox from "~/renderer/components/WarnBox";
 import BroadcastErrorDisclaimer from "~/renderer/components/BroadcastErrorDisclaimer";
 import Button from "~/renderer/components/Button";
 import ErrorDisplay from "~/renderer/components/ErrorDisplay";
 import TableContainer from "~/renderer/components/TableContainer";
 import { StepProps } from "../types";
-import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
 export default function StepConfirmation({
   account,
   optimisticOperation,
@@ -20,7 +18,6 @@ export default function StepConfirmation({
 }: StepProps) {
   const { t } = useTranslation();
   const currencyId = account.currency.id;
-  const unit = account.currency.units[0];
   // const locale = useSelector(localeSelector);
   // const unit = useAccountUnit(account);
   if (optimisticOperation) {
@@ -53,33 +50,6 @@ export default function StepConfirmation({
             </Box>
             <Box></Box>
           </Box>
-          {optimisticOperation.extra.neurons?.fullNeurons.map(neuron => (
-            <Box key={neuron.id[0]?.id}>
-              <Box padding={"1rem"} horizontal justifyContent="space-between" alignItems={"center"}>
-                <Box ff="Inter|SemiBold" fontSize={4}>
-                  <CopiableField value={`${neuron.id[0]?.id}`}>
-                    {neuron.id[0]?.id.toString()}
-                  </CopiableField>
-                </Box>
-                <Box ff="Inter|Regular" fontSize={3}>
-                  <FormattedVal
-                    val={Number(neuron.cached_neuron_stake_e8s)}
-                    unit={unit}
-                    style={{
-                      textAlign: "center",
-                      minWidth: 120,
-                    }}
-                    showCode
-                    fontSize={4}
-                    color="palette.text.white"
-                  />
-                </Box>
-                <Button primary onClick={() => console.log("manage")}>
-                  {"Manage"}
-                </Button>
-              </Box>
-            </Box>
-          ))}
         </TableContainer>
       </Container>
     );

@@ -1,7 +1,7 @@
 import { AccountBridge } from "@ledgerhq/types-live";
 import { broadcastTxn, pollForReadState } from "./bridge/bridgeHelpers/api";
 import { GovernanceCanister } from "@dfinity/nns";
-import { InternetComputerOperation, Transaction } from "./types";
+import { ICPAccount, InternetComputerOperation, Transaction } from "./types";
 import { ListNeuronsResponse } from "@dfinity/nns/dist/candid/governance";
 import { log } from "@ledgerhq/logs";
 import invariant from "invariant";
@@ -9,39 +9,64 @@ import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "./co
 import { idlFactory as idlFactoryGovernance } from "./idlFactoryGovernanceOld";
 import { IDL } from "@dfinity/candid";
 import { derivePrincipalFromPubkey } from "./utils";
+import { setICPPreloadData } from "./preload";
+import { NeuronsData } from "./neurons";
 
-export const broadcast: AccountBridge<Transaction>["broadcast"] = async ({
+// Interface to structure raw data for broadcasting transactions
+interface BroadcastRawData {
+  encodedSignedCallBlob: string;
+  encodedSignedReadStateBlob: string;
+  requestId: string;
+  methodName: Transaction["type"];
+}
+
+// Main broadcast function for handling Internet Computer transactions
+export const broadcast: AccountBridge<Transaction, ICPAccount>["broadcast"] = async ({
   account,
   signedOperation: { operation, rawData },
 }) => {
-  log("debug", "[broadcast] internet_computer start fn");
+  log("debug", "[broadcast] Internet Computer transaction broadcast initiated");
 
-  invariant(rawData, "[ICP](broadcast) rawData not found");
-  invariant(rawData.encodedSignedCallBlob, "[ICP](broadcast) encodedSignedCallBlob not found");
+  // Type assertion and validation for rawData
+  const rawDataTyped = rawData as unknown as BroadcastRawData;
+  invariant(rawDataTyped, "[ICP](broadcast) Missing rawData");
+  invariant(rawDataTyped.encodedSignedCallBlob, "[ICP](broadcast) Missing encodedSignedCallBlob");
 
-  if (rawData.methodName === "list_neurons") {
-    await broadcastTxn(
-      Buffer.from(rawData.encodedSignedCallBlob as string, "hex"),
-      MAINNET_GOVERNANCE_CANISTER_ID,
-      "call",
-    );
-  } else {
-    await broadcastTxn(
-      Buffer.from(rawData.encodedSignedCallBlob as string, "hex"),
-      MAINNET_LEDGER_CANISTER_ID,
-      "call",
-    );
+  // Logic for different transaction types
+  switch (rawDataTyped.methodName) {
+    case "list_neurons":
+    case "disburse":
+      await broadcastTxn(
+        Buffer.from(rawDataTyped.encodedSignedCallBlob, "hex"),
+        MAINNET_GOVERNANCE_CANISTER_ID,
+        "call",
+      );
+      break;
+
+    case "send":
+    case "create_neuron":
+      await broadcastTxn(
+        Buffer.from(rawDataTyped.encodedSignedCallBlob, "hex"),
+        MAINNET_LEDGER_CANISTER_ID,
+        "call",
+      );
+      break;
   }
 
-  if (rawData.encodedSignedReadStateBlob && rawData.requestId && rawData.methodName) {
+  // Synchronizing neurons if "list_neurons" is called
+  if (
+    rawDataTyped.encodedSignedReadStateBlob &&
+    rawDataTyped.requestId &&
+    rawDataTyped.methodName === "list_neurons"
+  ) {
     const reply = await pollForReadState(
-      Buffer.from(rawData.encodedSignedReadStateBlob as string, "hex"),
+      Buffer.from(rawDataTyped.encodedSignedReadStateBlob, "hex"),
       MAINNET_GOVERNANCE_CANISTER_ID,
-      rawData.requestId as string,
+      rawDataTyped.requestId,
     );
 
     const listNeuronsIdlFunc = idlFactoryGovernance({ IDL })._fields.find(
-      func => func[0] === rawData.methodName,
+      func => func[0] === rawDataTyped.methodName,
     );
 
     const [listNeuronsResponse]: [ListNeuronsResponse] = IDL.decode(
@@ -49,21 +74,19 @@ export const broadcast: AccountBridge<Transaction>["broadcast"] = async ({
       reply,
     ) as any;
 
-    return {
-      ...operation,
-      extra: {
-        neurons: {
-          fullNeurons: listNeuronsResponse.full_neurons,
-        },
-      },
-    } as InternetComputerOperation;
+    setICPPreloadData({
+      neurons: new NeuronsData(listNeuronsResponse.full_neurons, Date.now()),
+    });
+
+    return operation;
   }
 
-  if (rawData.methodName === "create_neuron") {
-    invariant(account.xpub, "[ICP](broadcast) xpub not found");
+  // Additional step for neuron creation
+  if (rawDataTyped.methodName === "create_neuron") {
+    invariant(account.xpub, "[ICP](broadcast) Missing account xpub");
     const govCanister = GovernanceCanister.create();
     const memo = (operation as InternetComputerOperation).extra.memo;
-    invariant(memo, "[ICP](broadcast) memo not found");
+    invariant(memo, "[ICP](broadcast) Missing memo");
 
     const neuronId = await govCanister.claimOrRefreshNeuronFromAccount({
       memo: BigInt(memo),

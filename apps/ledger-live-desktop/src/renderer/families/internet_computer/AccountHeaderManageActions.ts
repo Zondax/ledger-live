@@ -1,3 +1,4 @@
+import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import { ICPAccount } from "@ledgerhq/live-common/families/internet_computer/types";
 import { useCallback } from "react";
 // import { useTranslation } from "react-i18next";
@@ -14,26 +15,54 @@ type Props = {
 const AccountHeaderActions = ({ account, parentAccount }: Props) => {
   // const { t } = useTranslation();
   const dispatch = useDispatch();
-  const onClick = useCallback(() => {
+  const onClickManageNeurons = useCallback(() => {
     if (account.type !== "Account") return;
     dispatch(
       openModal("MODAL_ICP_LIST_NEURONS", {
         account,
+        refresh: false,
       }),
     );
   }, [account, dispatch]);
+  const onClickStakeIcp = useCallback(() => {
+    if (parentAccount) return;
+    const bridge = getAccountBridge(account, undefined);
+    const initTx = bridge.createTransaction(account);
+    dispatch(
+      openModal("MODAL_SEND", {
+        stepId: "amount",
+        account,
+        transaction: {
+          ...initTx,
+          type: "create_neuron",
+        },
+      }),
+    );
+  }, [account, dispatch, parentAccount]);
+
   if (parentAccount) return null;
-  const disabledLabel = "disabled label text";
   return [
     {
+      key: "stake-icp",
+      onClick: onClickStakeIcp,
+      icon: IconCoins,
+      label: "Stake ICP",
+      tooltip: "Create neurons to stake ICP",
+      event: "stake_icp_button_clicked",
+      eventProperties: {
+        button: "stake_icp_button",
+      },
+      accountActionsTestId: "stake-icp-button-icp",
+    },
+    {
       key: "manage-neurons",
-      onClick: onClick,
+      onClick: onClickManageNeurons,
       icon: IconCoins,
       label: "Manage Neurons",
-      tooltip: disabledLabel,
-      event: "button_clicked2",
+      tooltip: "Manage neurons for staking",
+      event: "manage_neurons_dashboard_clicked",
       eventProperties: {
-        button: "Manage Neurons",
+        button: "manage_neurons_button",
       },
       accountActionsTestId: "manage-neurons-button-icp",
     },

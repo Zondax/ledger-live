@@ -1,27 +1,31 @@
 import invariant from "invariant";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { withTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { compose } from "redux";
-import { connect, useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import { UserRefusedOnDevice } from "@ledgerhq/errors";
-import { addPendingOperation } from "@ledgerhq/live-common/account/index";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import { SyncSkipUnderPriority } from "@ledgerhq/live-common/bridge/react/index";
 import useBridgeTransaction from "@ledgerhq/live-common/bridge/useBridgeTransaction";
-import { Account, Operation } from "@ledgerhq/types-live";
 import { StepId, St } from "./types";
 import { Device } from "@ledgerhq/live-common/hw/actions/types";
 import logger from "~/renderer/logger";
-import { updateAccountWithUpdater } from "~/renderer/actions/accounts";
+// import { updateAccountWithUpdater } from "~/renderer/actions/accounts";
 import { OpenModal, openModal } from "~/renderer/actions/modals";
 
 import Track from "~/renderer/analytics/Track";
 import Stepper from "~/renderer/components/Stepper";
 import { getCurrentDevice } from "~/renderer/reducers/devices";
 import { useSteps } from "./steps";
-import { ICPAccount } from "@ledgerhq/live-common/families/internet_computer/types";
+import {
+  ICPAccount,
+  InternetComputerOperation,
+} from "@ledgerhq/live-common/families/internet_computer/types";
+import { useICPPreloadData } from "@ledgerhq/live-common/families/internet_computer/react";
+import { setCurrencyCache } from "~/renderer/bridge/cache";
+import { getCryptoCurrencyById } from "@ledgerhq/live-common/currencies/index";
 
 export type Data = {
   account: ICPAccount;
@@ -35,7 +39,7 @@ type OwnProps = {
 type StateProps = {
   t: TFunction;
   device: Device | undefined | null;
-  accounts: Account[];
+  accounts: ICPAccount[];
   openModal: OpenModal;
 };
 type Props = OwnProps & StateProps;
@@ -46,8 +50,16 @@ const mapDispatchToProps = {
   openModal,
 };
 function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal, device }: Props) {
-  const dispatch = useDispatch();
-  const [optimisticOperation, setOptimisticOperation] = useState<Operation | null>(null);
+  // const dispatch = useDispatch();
+  const { neurons } = useICPPreloadData();
+  useEffect(() => {
+    if (neurons && neurons.fullNeurons.length) {
+      setCurrencyCache(getCryptoCurrencyById("internet_computer"), neurons.serialize());
+    }
+  }, [neurons]);
+  const [optimisticOperation, setOptimisticOperation] = useState<InternetComputerOperation | null>(
+    null,
+  );
   const [transactionError, setTransactionError] = useState<Error | null>(null);
   const [signed, setSigned] = useState(false);
   const {
@@ -77,17 +89,20 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
   const handleStepChange = useCallback(({ id }: St) => onChangeStepId(id), [onChangeStepId]);
 
   const handleOperationBroadcasted = useCallback(
-    (optimisticOperation: Operation) => {
+    (optimisticOperation: InternetComputerOperation) => {
       if (!account) return;
-      dispatch(
-        updateAccountWithUpdater(account.id, account =>
-          addPendingOperation(account, optimisticOperation),
-        ),
-      );
+      // dispatch(
+      //   updateAccountWithUpdater(account.id, account => {
+      //     return {
+      //       ...account,
+      //       // neurons: optimisticOperation.extra.neurons,
+      //     };
+      //   }),
+      // );
       setOptimisticOperation(optimisticOperation);
       setTransactionError(null);
     },
-    [account, dispatch],
+    [account],
   );
   const handleTransactionError = useCallback((error: Error) => {
     if (!(error instanceof UserRefusedOnDevice)) {
@@ -109,6 +124,7 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
     signed,
     stepId,
     steps,
+    neurons,
     errorSteps,
     disabledSteps: [],
     hideBreadcrumb: !!error && ["amount"].includes(stepId),

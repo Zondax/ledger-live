@@ -8,6 +8,7 @@ export const createTransaction: AccountBridge<Transaction>["createTransaction"] 
   return {
     family: "internet_computer",
     amount: new BigNumber(0),
+    type: "send",
     fees: getEstimatedFees(),
     recipient: "",
     useAllAmount: false,

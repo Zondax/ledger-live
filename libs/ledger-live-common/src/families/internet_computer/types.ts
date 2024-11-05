@@ -12,17 +12,20 @@ import {
 import BigNumber from "bignumber.js";
 
 type FamilyType = "internet_computer";
-export type ICPAccount = Account;
+export interface ICPAccount extends Account {}
 
+type ICPTransactionType = "list_neurons" | "increase_stake" | "create_neuron" | "disburse" | "send";
 export type Transaction = TransactionCommon & {
   family: FamilyType;
   fees: BigNumber;
-  type?: "list_neurons" | "increase_stake" | "create_neuron";
+  type: ICPTransactionType;
   neuronAccount?: string;
+  neuronId?: string;
   memo?: string;
 };
 export type TransactionRaw = TransactionCommonRaw & {
   family: FamilyType;
+  type: ICPTransactionType;
   fees: string;
   memo?: string;
 };
@@ -37,9 +40,6 @@ export type ICPNeuron = Neuron;
 export type InternetComputerOperationExtra = {
   memo?: string;
   createdNeuronId?: string;
-  neurons?: {
-    fullNeurons: Neuron[];
-  };
 };
 
 export const ICPOperationTypeListNeuron = "LIST_NEURONS";

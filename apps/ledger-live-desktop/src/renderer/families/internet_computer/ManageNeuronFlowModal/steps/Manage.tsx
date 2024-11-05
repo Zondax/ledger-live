@@ -12,7 +12,13 @@ import { StepProps } from "../types";
 import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import { closeModal, openModal } from "~/renderer/actions/modals";
-export default function StepManage({ account, neuron }: StepProps) {
+import BigNumber from "bignumber.js";
+export default function StepManage({
+  account,
+  neuron,
+  onChangeTransaction,
+  transitionTo,
+}: StepProps) {
   //   const { t } = useTranslation();
   const currencyId = account.currency.id;
   const dispatch = useDispatch();
@@ -24,6 +30,7 @@ export default function StepManage({ account, neuron }: StepProps) {
     dispatch(
       openModal("MODAL_SEND", {
         stepId: "amount",
+        account,
         transaction: {
           ...initTx,
           neuronAccount: Buffer.from(neuron.account).toString("hex"),
@@ -32,6 +39,20 @@ export default function StepManage({ account, neuron }: StepProps) {
       }),
     );
   }, [account, dispatch, neuron]);
+
+  const onClickDisburseStake = useCallback(() => {
+    const bridge = getAccountBridge(account, undefined);
+    const initTx = bridge.createTransaction(account);
+    onChangeTransaction(
+      bridge.updateTransaction(initTx, {
+        neuronId: neuron.id[0]?.id.toString(),
+        amount: new BigNumber(neuron.cached_neuron_stake_e8s.toString()),
+        type: "disburse",
+      }),
+    );
+    transitionTo("device");
+  }, [account, onChangeTransaction, transitionTo, neuron]);
+
   // const locale = useSelector(localeSelector);
   // const unit = useAccountUnit(account);
   if (neuron) {
@@ -56,7 +77,13 @@ export default function StepManage({ account, neuron }: StepProps) {
             <Box></Box>
           </Box>
           <Box key={neuron.id[0]?.id}>
-            <Box padding={"1rem"} horizontal justifyContent="space-between" alignItems={"center"}>
+            <Box
+              flexWrap={"wrap"}
+              padding={"1rem"}
+              horizontal
+              justifyContent="space-between"
+              alignItems={"center"}
+            >
               <Box ff="Inter|SemiBold" fontSize={4}>
                 <CopiableField value={`${neuron.id[0]?.id}`}>
                   {neuron.id[0]?.id.toString()}
@@ -77,6 +104,9 @@ export default function StepManage({ account, neuron }: StepProps) {
               </Box>
               <Button primary onClick={onClickIncreaseStake}>
                 {"Increase stake"}
+              </Button>
+              <Button primary onClick={onClickDisburseStake}>
+                {"Disburse"}
               </Button>
             </Box>
           </Box>
