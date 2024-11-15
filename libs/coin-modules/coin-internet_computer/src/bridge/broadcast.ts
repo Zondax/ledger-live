@@ -9,7 +9,6 @@ import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "./co
 import { idlFactory as idlFactoryGovernance } from "./idlFactoryGovernanceOld";
 import { IDL } from "@dfinity/candid";
 import { derivePrincipalFromPubkey } from "./utils";
-import { setICPPreloadData } from "./preload";
 import { NeuronsData } from "./neurons";
 
 // Interface to structure raw data for broadcasting transactions
@@ -74,11 +73,16 @@ export const broadcast: AccountBridge<Transaction, ICPAccount>["broadcast"] = as
       reply,
     ) as any;
 
-    setICPPreloadData({
-      neurons: new NeuronsData(listNeuronsResponse.full_neurons, Date.now()),
-    });
+    return {
+      ...operation,
+      extra: {
+        neurons: new NeuronsData(listNeuronsResponse.full_neurons, Date.now()),
+      },
+    } as InternetComputerOperation;
 
-    return operation;
+    // setICPPreloadData({
+    //   neurons: new NeuronsData(listNeuronsResponse.full_neurons, Date.now()),
+    // });
   }
 
   // Additional step for neuron creation

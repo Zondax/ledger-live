@@ -1,7 +1,7 @@
 import { AccountBridge } from "@ledgerhq/types-live";
 import { Transaction } from "./types";
 import { getAddress, validateAddress } from "./bridge/bridgeHelpers/addresses";
-import { AccountIdentifier, principalToAccountIdentifier, SubAccount } from "@dfinity/ledger-icp";
+import { AccountIdentifier, SubAccount } from "@dfinity/ledger-icp";
 import { Principal } from "@dfinity/principal";
 import { MAINNET_GOVERNANCE_CANISTER_ID } from "./consts";
 import { randomBytes } from "crypto";
@@ -45,14 +45,8 @@ export const prepareTransaction: AccountBridge<Transaction>["prepareTransaction"
     }
   }
 
-  if (transaction.neuronAccount && transaction.type === "increase_stake") {
-    const neuronAccount = Buffer.from(transaction.neuronAccount, "hex");
-    const neuronAccountIdentifier = principalToAccountIdentifier(
-      Principal.from(MAINNET_GOVERNANCE_CANISTER_ID),
-      Uint8Array.from(neuronAccount),
-    );
-
-    return { ...transaction, recipient: neuronAccountIdentifier };
+  if (transaction.neuronAccountIdentifier && transaction.type === "increase_stake") {
+    return { ...transaction, recipient: transaction.neuronAccountIdentifier };
   }
 
   if (transaction.type === "create_neuron" && transaction.recipient === "" && !transaction.memo) {

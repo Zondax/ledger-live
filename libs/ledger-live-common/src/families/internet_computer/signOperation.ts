@@ -3,7 +3,7 @@ import { Account, AccountBridge } from "@ledgerhq/types-live";
 import { getAddress } from "./bridge/bridgeHelpers/addresses";
 import { buildOptimisticSendOperation as buildOptimisticOperation } from "./buildOptimisticOperation";
 import { withDevice } from "../../hw/deviceAccess";
-import { Transaction } from "./types";
+import { ICPAccount, Transaction } from "./types";
 import { derivePrincipalFromPubkey, getPath, pubkeyToDer } from "./utils";
 import ICP from "@zondax/ledger-icp";
 import { log } from "@ledgerhq/logs";
@@ -245,7 +245,7 @@ const signUpdateICPTransaction = async (
   };
 };
 
-export const signOperation: AccountBridge<Transaction>["signOperation"] = ({
+export const signOperation: AccountBridge<Transaction, ICPAccount>["signOperation"] = ({
   account,
   deviceId,
   transaction,

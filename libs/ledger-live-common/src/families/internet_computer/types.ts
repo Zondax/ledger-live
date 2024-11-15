@@ -1,8 +1,10 @@
 // Encapsulate for LLD & LLM
 export * from "@ledgerhq/coin-internet_computer/types/index";
 import { Neuron } from "@dfinity/nns/dist/candid/governance";
+import { Neuron as NNSNeuron } from "@dfinity/nns/dist/candid/governance";
 import {
   Account,
+  AccountRaw,
   Operation,
   TransactionCommon,
   TransactionCommonRaw,
@@ -10,19 +12,30 @@ import {
   TransactionStatusCommonRaw,
 } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
+import { NeuronsData } from "./neurons";
 
 type FamilyType = "internet_computer";
-export interface ICPAccount extends Account {}
+export interface ICPAccount extends Account {
+  neurons: NeuronsData;
+}
+
+export interface ICPAccountRaw extends AccountRaw {
+  neuronsData: {
+    neurons: string;
+    lastUpdated: number;
+  };
+}
 
 type ICPTransactionType = "list_neurons" | "increase_stake" | "create_neuron" | "disburse" | "send";
 export type Transaction = TransactionCommon & {
   family: FamilyType;
   fees: BigNumber;
   type: ICPTransactionType;
-  neuronAccount?: string;
+  neuronAccountIdentifier?: string;
   neuronId?: string;
   memo?: string;
 };
+
 export type TransactionRaw = TransactionCommonRaw & {
   family: FamilyType;
   type: ICPTransactionType;
@@ -36,10 +49,14 @@ export type TransactionStatusRaw = TransactionStatusCommonRaw;
 
 export type InternetComputerOperation = Operation<InternetComputerOperationExtra>;
 
-export type ICPNeuron = Neuron;
 export type InternetComputerOperationExtra = {
   memo?: string;
   createdNeuronId?: string;
+  neurons?: NeuronsData;
 };
+
+export interface ICPNeuron extends NNSNeuron {
+  accountIdentifier: string;
+}
 
 export const ICPOperationTypeListNeuron = "LIST_NEURONS";

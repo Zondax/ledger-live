@@ -1,9 +1,9 @@
 import invariant from "invariant";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { withTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { compose } from "redux";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import { UserRefusedOnDevice } from "@ledgerhq/errors";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
@@ -23,9 +23,7 @@ import {
   ICPAccount,
   InternetComputerOperation,
 } from "@ledgerhq/live-common/families/internet_computer/types";
-import { useICPPreloadData } from "@ledgerhq/live-common/families/internet_computer/react";
-import { setCurrencyCache } from "~/renderer/bridge/cache";
-import { getCryptoCurrencyById } from "@ledgerhq/live-common/currencies/index";
+import { updateAccountWithUpdater } from "~/renderer/actions/accounts";
 
 export type Data = {
   account: ICPAccount;
@@ -50,13 +48,7 @@ const mapDispatchToProps = {
   openModal,
 };
 function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal, device }: Props) {
-  // const dispatch = useDispatch();
-  const { neurons } = useICPPreloadData();
-  useEffect(() => {
-    if (neurons && neurons.fullNeurons.length) {
-      setCurrencyCache(getCryptoCurrencyById("internet_computer"), neurons.serialize());
-    }
-  }, [neurons]);
+  const dispatch = useDispatch();
   const [optimisticOperation, setOptimisticOperation] = useState<InternetComputerOperation | null>(
     null,
   );
@@ -91,18 +83,18 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
   const handleOperationBroadcasted = useCallback(
     (optimisticOperation: InternetComputerOperation) => {
       if (!account) return;
-      // dispatch(
-      //   updateAccountWithUpdater(account.id, account => {
-      //     return {
-      //       ...account,
-      //       // neurons: optimisticOperation.extra.neurons,
-      //     };
-      //   }),
-      // );
+      dispatch(
+        updateAccountWithUpdater(account.id, account => {
+          return {
+            ...account,
+            neurons: optimisticOperation.extra.neurons,
+          };
+        }),
+      );
       setOptimisticOperation(optimisticOperation);
       setTransactionError(null);
     },
-    [account],
+    [account, dispatch],
   );
   const handleTransactionError = useCallback((error: Error) => {
     if (!(error instanceof UserRefusedOnDevice)) {
@@ -124,7 +116,7 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
     signed,
     stepId,
     steps,
-    neurons,
+    neurons: optimisticOperation ? optimisticOperation.extra.neurons : accountProp.neurons,
     errorSteps,
     disabledSteps: [],
     hideBreadcrumb: !!error && ["amount"].includes(stepId),
