@@ -11,8 +11,9 @@ import { TransactionWithId } from "@dfinity/ledger-icp/dist/candid/index.d";
 import { ICPAccount, InternetComputerOperation } from "../../types";
 import invariant from "invariant";
 import { hashTransaction } from "./hash";
+import { NeuronsData } from "../../neurons";
 
-export const getAccountShape: GetAccountShape = async info => {
+export const getAccountShape: GetAccountShape<ICPAccount> = async info => {
   const { currency, derivationMode, rest = {}, initialAccount } = info;
   const publicKey = reconciliatePublicKey(rest.publicKey, initialAccount);
   invariant(publicKey, "publicKey is required");
@@ -41,6 +42,7 @@ export const getAccountShape: GetAccountShape = async info => {
     spendableBalance: balance,
     operations: flatMap(txns, mapTxToOps(accountId, address)),
     blockHeight: blockHeight.toNumber(),
+    neurons: initialAccount ? initialAccount.neurons : NeuronsData.empty(),
     operationsCount: txns.length,
     xpub: publicKey,
   };

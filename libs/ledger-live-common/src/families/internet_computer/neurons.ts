@@ -1,5 +1,9 @@
-import { Neuron } from "@dfinity/nns/dist/candid/governance";
 import { IDL } from "@dfinity/candid";
+import { ICPNeuron } from "./types";
+import { principalToAccountIdentifier } from "@dfinity/ledger-icp";
+import { Principal } from "@dfinity/principal";
+import { MAINNET_GOVERNANCE_CANISTER_ID } from "./consts";
+import { Neuron } from "@dfinity/nns/dist/candid/governance";
 
 const NeuronId = IDL.Record({ id: IDL.Nat64 });
 const BallotInfo = IDL.Record({
@@ -50,11 +54,17 @@ const Neuron = IDL.Record({
 const Neurons = IDL.Vec(Neuron);
 
 export class NeuronsData {
-  fullNeurons: Neuron[];
+  fullNeurons: ICPNeuron[];
   lastUpdated: number;
 
-  constructor(fullNeurons: Neuron[], lastUpdated: number) {
-    this.fullNeurons = fullNeurons;
+  constructor(neurons: Neuron[], lastUpdated: number) {
+    this.fullNeurons = neurons.map(neuron => ({
+      ...neuron,
+      accountIdentifier: principalToAccountIdentifier(
+        Principal.from(MAINNET_GOVERNANCE_CANISTER_ID),
+        Uint8Array.from(neuron.account),
+      ),
+    }));
     this.lastUpdated = lastUpdated;
   }
 
@@ -65,9 +75,13 @@ export class NeuronsData {
     };
   }
 
-  public static deserialize(data: string) {
+  public static empty() {
+    return new NeuronsData([], Date.now());
+  }
+
+  public static deserialize(data: string, lastUpdated?: number) {
     const encoded = new Uint8Array(Buffer.from(data, "hex"));
     const [fullNeurons]: any = IDL.decode([Neurons], encoded);
-    return new NeuronsData(fullNeurons, Date.now());
+    return new NeuronsData(fullNeurons, lastUpdated ?? Date.now());
   }
 }

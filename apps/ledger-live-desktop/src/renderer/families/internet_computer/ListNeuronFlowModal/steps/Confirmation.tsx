@@ -109,7 +109,9 @@ export default function StepConfirmation({ account, error, signed, neurons }: St
         ) : (
           <Box>
             <WarnBox>
-              {"No neurons found, you can create a new neuron by clicking the button below"}
+              {
+                "No neurons found, try syncing existing neurons created through NNS dapp or stake to create new neurons."
+              }
             </WarnBox>
           </Box>
         )}
