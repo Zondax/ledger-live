@@ -7,7 +7,9 @@ import { Principal } from "@dfinity/principal";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { log } from "@ledgerhq/logs";
 import { DerEncodedPublicKey } from "@dfinity/agent";
-import { Transaction } from "./types";
+import { InternetComputerOperation, Transaction } from "./types";
+import { encodeOperationId } from "../../operation";
+import { OperationType } from "@ledgerhq/types-live";
 
 const validHexRegExp = new RegExp(/[0-9A-Fa-f]{6}/g);
 const validBase64RegExp = new RegExp(
@@ -85,4 +87,25 @@ export const derivePrincipalFromPubkey = (publicKey: string): Principal => {
 export const pubkeyToDer = (publicKey: string): DerEncodedPublicKey => {
   const pubkey = Secp256k1PublicKey.fromRaw(new Uint8Array(Buffer.from(publicKey, "hex")));
   return pubkey.toDer();
+};
+
+export const reassignOperationType = (
+  operations: InternetComputerOperation[],
+  neuronAddresses: string[],
+) => {
+  return operations.map(op => {
+    if (neuronAddresses.includes(op.senders[0])) {
+      const type: OperationType = "DISBURSE_NEURON";
+      return { ...op, id: encodeOperationId(op.accountId, op.hash, type), type };
+    }
+
+    if (neuronAddresses.includes(op.recipients[0])) {
+      const type: OperationType = BigNumber(op.extra.memo ?? "0").gt(0)
+        ? "STAKE_NEURON"
+        : "TOP_UP_NEURON";
+      return { ...op, id: encodeOperationId(op.accountId, op.hash, type), type };
+    }
+
+    return op;
+  });
 };

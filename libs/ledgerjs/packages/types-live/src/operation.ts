@@ -51,8 +51,11 @@ export type OperationType =
   // NEAR
   | "STAKE"
   | "UNSTAKE"
-  | "WITHDRAW_UNSTAKED";
-
+  | "WITHDRAW_UNSTAKED"
+  // INTERNET COMPUTER
+  | "STAKE_NEURON"
+  | "TOP_UP_NEURON"
+  | "DISBURSE_NEURON";
 export type OperationExtra = unknown;
 /**
  * An Operation is the Ledger Live abstraction of a transaction for any blockchain

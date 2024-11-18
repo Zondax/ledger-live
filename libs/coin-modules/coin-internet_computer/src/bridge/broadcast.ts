@@ -73,16 +73,13 @@ export const broadcast: AccountBridge<Transaction, ICPAccount>["broadcast"] = as
       reply,
     ) as any;
 
+    const neurons = new NeuronsData(listNeuronsResponse.full_neurons, Date.now());
     return {
       ...operation,
       extra: {
-        neurons: new NeuronsData(listNeuronsResponse.full_neurons, Date.now()),
+        neurons,
       },
     } as InternetComputerOperation;
-
-    // setICPPreloadData({
-    //   neurons: new NeuronsData(listNeuronsResponse.full_neurons, Date.now()),
-    // });
   }
 
   // Additional step for neuron creation

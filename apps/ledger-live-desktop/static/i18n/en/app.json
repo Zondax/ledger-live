@@ -200,7 +200,10 @@
       "STAKE": "Staked",
       "UNSTAKE": "Unstaked",
       "WITHDRAW_UNSTAKED": "Withdrawn",
-      "SENDING": "Sending"
+      "SENDING": "Sending",
+      "STAKE_NEURON": "Staked",
+      "TOP_UP_NEURON": "Topped up",
+      "DISBURSE_NEURON": "Disbursed"
     },
     "edit": {
       "title": "Speed up or Cancel",

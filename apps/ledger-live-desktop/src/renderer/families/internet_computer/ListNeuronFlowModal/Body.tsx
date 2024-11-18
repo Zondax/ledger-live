@@ -9,6 +9,7 @@ import { UserRefusedOnDevice } from "@ledgerhq/errors";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import { SyncSkipUnderPriority } from "@ledgerhq/live-common/bridge/react/index";
 import useBridgeTransaction from "@ledgerhq/live-common/bridge/useBridgeTransaction";
+import { reassignOperationType } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { StepId, St } from "./types";
 import { Device } from "@ledgerhq/live-common/hw/actions/types";
 import logger from "~/renderer/logger";
@@ -85,8 +86,16 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
       if (!account) return;
       dispatch(
         updateAccountWithUpdater(account.id, account => {
+          const neuronAddresses = optimisticOperation.extra.neurons?.fullNeurons.map(
+            neuron => neuron.accountIdentifier,
+          );
+          const ops = reassignOperationType(
+            account.operations as InternetComputerOperation[],
+            neuronAddresses ?? [],
+          );
           return {
             ...account,
+            operations: ops,
             neurons: optimisticOperation.extra.neurons,
           };
         }),
