@@ -123,6 +123,9 @@ const iconsComponent = {
   WITHDRAW_UNSTAKED: IconCoins,
   UNKNOWN: IconCheck,
   BURN: IconTrash,
+  TOP_UP_NEURON: IconPlus,
+  DISBURSE_NEURON: IconPlus,
+  STAKE_NEURON: IconDelegate,
 };
 class ConfirmationCheck extends PureComponent<{
   marketColor: string;
