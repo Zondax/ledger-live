@@ -57,11 +57,6 @@ const envDefinitions = {
     parser: boolParser,
     desc: "Show theme debug overlay UI",
   },
-  API_ICP_ENDPOINT: {
-    def: "https://icp-rosetta-api.zondax.dev/",
-    parser: stringParser,
-    desc: "Rosetta API for ICP",
-  },
   API_CASPER_INDEXER_ENDPOINT: {
     parser: stringParser,
     def: "https://casper.coin.ledger.com/indexer",

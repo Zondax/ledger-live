@@ -160,6 +160,7 @@ export function getOperationAmountNumber(op: Operation): BigNumber {
     case "REWARD":
     case "REWARD_PAYOUT":
     case "WITHDRAW":
+    case "DISBURSE_NEURON":
       return op.value;
 
     case "OUT":
@@ -173,6 +174,8 @@ export function getOperationAmountNumber(op: Operation): BigNumber {
     case "OPT_OUT":
     case "SLASH":
     case "LOCK":
+    case "STAKE_NEURON":
+    case "TOP_UP_NEURON":
       return op.value.negated();
 
     case "FREEZE":

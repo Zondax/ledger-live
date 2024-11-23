@@ -36,14 +36,17 @@ export const getAccountShape: GetAccountShape<ICPAccount> = async info => {
   const balance = await fetchBalance(address);
 
   const txns = await fetchTxns(address);
+  const newTxns = initialAccount
+    ? txns.filter(tx => tx.id > BigInt(initialAccount.blockHeight))
+    : txns;
   const result: Partial<ICPAccount> = {
     id: accountId,
     balance,
     spendableBalance: balance,
-    operations: flatMap(txns, mapTxToOps(accountId, address)),
+    operations: flatMap(newTxns, mapTxToOps(accountId, address)),
     blockHeight: blockHeight.toNumber(),
     neurons: initialAccount ? initialAccount.neurons : NeuronsData.empty(),
-    operationsCount: txns.length,
+    operationsCount: newTxns.length,
     xpub: publicKey,
   };
 
@@ -63,6 +66,10 @@ const mapTxToOps = (accountId: string, address: string, fee = ICP_FEES) => {
   return (txInfo: TransactionWithId): InternetComputerOperation[] => {
     const { transaction: txn } = txInfo;
     const ops: InternetComputerOperation[] = [];
+
+    if ("Transfer" in txn.operation === undefined) {
+      return [];
+    }
 
     const timeStamp = txn.timestamp[0]?.timestamp_nanos ?? Date.now();
     let amount, fromAccount, toAccount, hash;
