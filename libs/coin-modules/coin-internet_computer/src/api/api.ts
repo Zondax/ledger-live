@@ -1,5 +1,9 @@
 import { log } from "@ledgerhq/logs";
-import { MAINNET_LEDGER_CANISTER_ID } from "../../consts";
+import {
+  FETCH_TXNS_LIMIT,
+  MAINNET_INDEX_CANISTER_ID,
+  MAINNET_LEDGER_CANISTER_ID,
+} from "../../consts";
 import {
   HttpAgent,
   Actor,
@@ -9,35 +13,29 @@ import {
   lookupResultToBuffer,
 } from "@dfinity/agent";
 import { idlFactory } from "../../idlFactoryLedger";
-import { AccountIdentifier, IndexCanister } from "@dfinity/ledger-icp";
+import { AccountIdentifier, IndexCanister, TransactionWithId } from "@dfinity/ledger-icp";
 import BigNumber from "bignumber.js";
 import { Principal } from "@dfinity/principal";
 
+const ICP_NETWORK_URL = "http://localhost:8080";
 const getAgent = async () => {
-  return await HttpAgent.create({ host: "https://ic0.app/" });
+  return await HttpAgent.create({ host: ICP_NETWORK_URL, shouldFetchRootKey: true });
 };
 
 const getIndexCanister = async () => {
   const canister = IndexCanister.create({
     agent: await getAgent(),
+    canisterId: Principal.from(MAINNET_INDEX_CANISTER_ID),
   });
 
   return canister;
 };
 
-// const getLedgerCanister = async () => {
-//   const canister = LedgerCanister.create({
-//     agent: await HttpAgent.create({ host: "https://ic0.app/" }),
-//   });
-
-//   return canister;
-// };
-
 export const fetchBlockHeight = async (): Promise<BigNumber> => {
   const agent = await getAgent();
   const actor = Actor.createActor(idlFactory, {
     agent,
-    canisterId: MAINNET_LEDGER_CANISTER_ID,
+    canisterId: Principal.from(MAINNET_LEDGER_CANISTER_ID),
   });
 
   const res: any = await actor.query_blocks({ start: 0, length: 1 });
@@ -51,7 +49,7 @@ export const broadcastTxn = async (
   type: "call" | "read_state",
 ) => {
   log("debug", `[ICP] Broadcasting ${type} to ${canisterId}, body: ${payload.toString("hex")}`);
-  const res = await fetch(`https://ic0.app/api/v2/canister/${canisterId}/${type}`, {
+  const res = await fetch(`${ICP_NETWORK_URL}/api/v2/canister/${canisterId}/${type}`, {
     body: payload,
     method: "POST",
     headers: {
@@ -117,29 +115,28 @@ export const fetchBalance = async (address: string): Promise<BigNumber> => {
   const addressObj = AccountIdentifier.fromHex(address);
   log("debug", `[ICP] Fetching balance for ${address}`);
   const data = await canister.accountBalance({ certified: false, accountIdentifier: addressObj });
-  log("debug", `[ICP] Balance: ${data}`);
+  // log("debug", `[ICP] Balance: ${data.toString()}`);
   return BigNumber(data.toString());
 };
 
-export const fetchTxns = async (address: string) => {
+export const fetchTxns = async (
+  address: string,
+  blockHeight?: bigint,
+): Promise<TransactionWithId[]> => {
   const accountIdentifier = AccountIdentifier.fromHex(address);
   const canister = await getIndexCanister();
   const response = await canister.getTransactions({
     certified: false,
     accountIdentifier,
-    maxResults: BigInt(10000),
+    start: blockHeight,
+    maxResults: BigInt(FETCH_TXNS_LIMIT),
   });
 
-  const filteredResponse = response.transactions.filter(
-    (tx: any) => tx.transaction.operation.Transfer !== undefined,
-  );
+  if (response.transactions.length === 0) {
+    return [];
+  }
 
-  return filteredResponse.sort((a, b) => {
-    const timestamp1 = a.transaction.timestamp[0]?.timestamp_nanos;
-    const timestamp2 = b.transaction.timestamp[0]?.timestamp_nanos;
-    if (timestamp1 && timestamp2) {
-      return timestamp1 > timestamp2 ? -1 : 1;
-    }
-    return 1;
-  });
+  const nextTxns = await fetchTxns(address, response.transactions.at(-1)?.id);
+
+  return [...response.transactions, ...nextTxns];
 };
