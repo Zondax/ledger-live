@@ -6388,6 +6388,9 @@
       "getHelp": "Get Help",
       "technicalErrorTitle": "Technical error : ",
       "saveLogs": "Save logs"
+    },
+    "KadenaCrossChainTransfer": {
+      "title": "Completion is required for this transaction involving an account in a different chain."
     }
   },
   "cryptoOrg": {

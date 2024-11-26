@@ -994,6 +994,9 @@
     "ScannedNewImportQrCode": {
       "title": "Update required",
       "description": "To sync your apps, please make sure both are updated to the latest version."
+    },
+    "KadenaCrossChainTransfer": {
+      "title": "Completion is required for this transaction involving an account in a different chain."
     }
   },
   "crash": {
@@ -2524,7 +2527,8 @@
       "autoClaimedRewards": "Auto Claimed Rewards",
       "stakedAmount": "Staked amount",
       "senderChainId": "Sender Chain ID",
-      "receiverChainId": "Receiver Chain ID"
+      "receiverChainId": "Receiver Chain ID",
+      "completeCrossChainTransfer": "Complete transaction"
     },
     "multipleAddresses": "Why multiple addresses?",
     "tokenName": "Token Name",
