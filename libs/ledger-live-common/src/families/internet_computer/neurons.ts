@@ -1,9 +1,11 @@
 import { IDL } from "@dfinity/candid";
 import { ICPNeuron } from "./types";
 import { principalToAccountIdentifier } from "@dfinity/ledger-icp";
+import { fromNullable } from "@dfinity/utils";
 import { Principal } from "@dfinity/principal";
 import { MAINNET_GOVERNANCE_CANISTER_ID } from "./consts";
 import { Neuron } from "@dfinity/nns/dist/candid/governance";
+import { nowInSeconds } from "./utils";
 
 const NeuronId = IDL.Record({ id: IDL.Nat64 });
 const BallotInfo = IDL.Record({
@@ -85,3 +87,31 @@ export class NeuronsData {
     return new NeuronsData(fullNeurons, lastUpdated ?? Date.now());
   }
 }
+
+export enum NeuronState {
+  Unspecified = 0,
+  Locked = 1,
+  Dissolving = 2,
+  Dissolved = 3,
+  Spawning = 4,
+}
+// https://github.com/dfinity/nns-dapp/blob/main/frontend/src/lib/utils/sns-neuron.utils.ts#L46
+export const getNeuronDissolveState = ({ dissolve_state }: ICPNeuron) => {
+  const dissolveState = fromNullable(dissolve_state);
+  if (dissolveState === undefined) {
+    return NeuronState.Dissolved;
+  }
+  if ("DissolveDelaySeconds" in dissolveState) {
+    return dissolveState.DissolveDelaySeconds.toString() === "0"
+      ? // 0 = already dissolved (more info: https://gitlab.com/dfinity-lab/public/ic/-/blob/master/rs/nns/governance/src/governance.rs#L827)
+        NeuronState.Dissolved
+      : NeuronState.Locked;
+  }
+  if ("WhenDissolvedTimestampSeconds" in dissolveState) {
+    // In case `nowInSeconds` ever changes and doesn't return an integer we use Math.floor
+    return dissolveState.WhenDissolvedTimestampSeconds < BigInt(Math.floor(nowInSeconds()))
+      ? NeuronState.Dissolved
+      : NeuronState.Dissolving;
+  }
+  return NeuronState.Unspecified;
+};

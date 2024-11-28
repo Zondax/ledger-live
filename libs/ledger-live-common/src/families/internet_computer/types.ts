@@ -26,7 +26,14 @@ export interface ICPAccountRaw extends AccountRaw {
   };
 }
 
-type ICPTransactionType = "list_neurons" | "increase_stake" | "create_neuron" | "disburse" | "send";
+type ICPTransactionType =
+  | "start_dissolving"
+  | "stop_dissolving"
+  | "list_neurons"
+  | "increase_stake"
+  | "create_neuron"
+  | "disburse"
+  | "send";
 export type Transaction = TransactionCommon & {
   family: FamilyType;
   fees: BigNumber;

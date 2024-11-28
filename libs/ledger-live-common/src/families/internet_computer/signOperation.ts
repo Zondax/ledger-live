@@ -50,10 +50,20 @@ interface TransferRawRequest {
   from_subaccount: [];
 }
 
-interface DisburseRawRequest {
+export interface NeuronCommandRawRequest<T extends DisburseCommand | ConfigureOperationCommand> {
   id: [{ id: bigint }];
-  command: [{ Disburse: { to_account: string[]; amount: [{ e8s: bigint }] } }];
+  command: T[];
   neuron_id_or_subaccount: [];
+}
+
+interface DisburseCommand {
+  Disburse: { to_account: string[]; amount: [{ e8s: bigint }] };
+}
+
+interface ConfigureOperationCommand {
+  Configure: {
+    operation: [{ StartDissolving: object } | { StopDissolving: object }];
+  };
 }
 
 interface ListNeuronsRawRequest {
@@ -91,31 +101,55 @@ const createUnsignedListNeuronsTransaction = (
   return { unsignedTransaction, listNeuronsRawRequest };
 };
 
-const createUnsignedDisburseTransaction = (
+// Generic function to create an unsigned transaction for a neuron command
+const createUnsignedNeuronCommandTransaction = (
   transaction: Transaction,
   account: Account,
-): { unsignedTransaction: UnsignedTransaction; disburseRawRequest: DisburseRawRequest } => {
+): {
+  unsignedTransaction: UnsignedTransaction;
+  neuronCommandRawRequest: NeuronCommandRawRequest<DisburseCommand | ConfigureOperationCommand>;
+} => {
   const { neuronId, amount } = transaction;
-  invariant(neuronId, "[ICP](createUnsignedDisburseTransaction) Neuron ID is required");
+  invariant(neuronId, "[ICP](createUnsignedNeuronCommandTransaction) Neuron ID is required");
 
-  const disburseRawRequest: DisburseRawRequest = {
+  const rawCommand: NeuronCommandRawRequest<DisburseCommand | ConfigureOperationCommand> = {
     id: [{ id: BigInt(neuronId) }],
-    command: [
-      {
-        Disburse: {
-          to_account: [],
-          amount: [{ e8s: BigInt(amount.toString()) }],
-        },
-      },
-    ],
     neuron_id_or_subaccount: [],
+    command: [],
   };
+
+  switch (transaction.type) {
+    case "disburse":
+      rawCommand.command = [
+        {
+          Disburse: {
+            to_account: [],
+            amount: [{ e8s: BigInt(amount.toString()) }],
+          },
+        },
+      ];
+      break;
+    case "start_dissolving":
+      rawCommand.command = [
+        {
+          Configure: { operation: [{ StartDissolving: {} }] },
+        },
+      ];
+      break;
+    case "stop_dissolving":
+      rawCommand.command = [
+        {
+          Configure: { operation: [{ StopDissolving: {} }] },
+        },
+      ];
+      break;
+  }
 
   const disburseIDLMethod = idlFactoryGovernance({ IDL })._fields.find(
     f => f[0] === "manage_neuron",
   );
-  invariant(disburseIDLMethod, "[ICP](createUnsignedDisburseTransaction) Method not found");
-  const args = IDL.encode(disburseIDLMethod[1].argTypes, [disburseRawRequest]);
+  invariant(disburseIDLMethod, "[ICP](createUnsignedNeuronCommandTransaction) Method not found");
+  const args = IDL.encode(disburseIDLMethod[1].argTypes, [rawCommand]);
 
   const canisterID = Principal.from(MAINNET_GOVERNANCE_CANISTER_ID);
   invariant(account.xpub, "[ICP](createUnsignedTransaction) Account xpub is required");
@@ -128,7 +162,7 @@ const createUnsignedDisburseTransaction = (
     ingress_expiry: new Expiry(DEFAULT_INGRESS_EXPIRY_DELTA_IN_MSECS),
   };
 
-  return { unsignedTransaction, disburseRawRequest };
+  return { unsignedTransaction, neuronCommandRawRequest: rawCommand };
 };
 
 const createUnsignedSendTransaction = (
@@ -263,8 +297,15 @@ export const signOperation: AccountBridge<Transaction, ICPAccount>["signOperatio
           let transferRawRequest: TransferRawRequest | undefined;
           if (transaction.type === "list_neurons") {
             ({ unsignedTransaction } = createUnsignedListNeuronsTransaction(account));
-          } else if (transaction.type === "disburse") {
-            ({ unsignedTransaction } = createUnsignedDisburseTransaction(transaction, account));
+          } else if (
+            transaction.type === "disburse" ||
+            transaction.type === "start_dissolving" ||
+            transaction.type === "stop_dissolving"
+          ) {
+            ({ unsignedTransaction } = createUnsignedNeuronCommandTransaction(
+              transaction,
+              account,
+            ));
           } else {
             ({ unsignedTransaction, transferRawRequest } = createUnsignedSendTransaction(
               transaction,
