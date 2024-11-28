@@ -8,7 +8,7 @@ import {
 } from "@ledgerhq/live-common/families/internet_computer/types";
 import { OpenModal } from "~/renderer/actions/modals";
 import { NeuronsData } from "@ledgerhq/live-common/families/internet_computer/neurons";
-export type StepId = "device" | "confirmation";
+export type StepId = "device" | "confirmation" | "manage";
 export type StepProps = {
   transitionTo: (address: string) => void;
   device: Device | undefined | null;
@@ -21,6 +21,8 @@ export type StepProps = {
   error: Error | undefined;
   signed: boolean;
   neurons: NeuronsData;
+  manageNeuronIndex: number;
+  setManageNeuronIndex: (index: number) => void;
   transaction: Transaction | undefined | null;
   onStepChange: ({ id }: St) => void;
   status: TransactionStatus;

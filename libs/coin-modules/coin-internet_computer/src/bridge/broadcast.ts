@@ -34,6 +34,8 @@ export const broadcast: AccountBridge<Transaction, ICPAccount>["broadcast"] = as
   // Logic for different transaction types
   switch (rawDataTyped.methodName) {
     case "list_neurons":
+    case "start_dissolving":
+    case "stop_dissolving":
     case "disburse":
       await broadcastTxn(
         Buffer.from(rawDataTyped.encodedSignedCallBlob, "hex"),

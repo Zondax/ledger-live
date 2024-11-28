@@ -24,21 +24,32 @@ function getDeviceTransactionConfig({
     value: methodToString(transaction.type),
   });
 
-  if (transaction.type === "disburse") {
+  if (
+    transaction.type === "disburse" ||
+    transaction.type === "start_dissolving" ||
+    transaction.type === "stop_dissolving"
+  ) {
     fields.push({
       type: "text",
       label: "Neuron Id",
       value: transaction.neuronId ?? "0",
     });
 
-    fields.push({
-      type: "text",
-      label: "Disburse To",
-      value: "Self",
-    });
+    if (transaction.type === "disburse") {
+      fields.push({
+        type: "text",
+        label: "Disburse To",
+        value: "Self",
+      });
+    }
   }
 
-  if (transaction.type !== "list_neurons") {
+  if (
+    transaction.type === "send" ||
+    transaction.type === "create_neuron" ||
+    transaction.type === "increase_stake" ||
+    transaction.type === "disburse"
+  ) {
     fields.push({
       type: "text",
       label: "Amount (ICP)",

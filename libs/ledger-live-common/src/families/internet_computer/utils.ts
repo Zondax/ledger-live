@@ -38,6 +38,10 @@ export const methodToString = (method: Transaction["type"]): string => {
       return "List Own Neurons";
     case "disburse":
       return "Disburse Neuron";
+    case "start_dissolving":
+      return "Start Dissolving";
+    case "stop_dissolving":
+      return "Stop Dissolving";
     default:
       return "Send ICP";
   }
@@ -109,3 +113,5 @@ export const reassignOperationType = (
     return op;
   });
 };
+
+export const nowInSeconds = (): number => Math.round(Date.now() / 1000);

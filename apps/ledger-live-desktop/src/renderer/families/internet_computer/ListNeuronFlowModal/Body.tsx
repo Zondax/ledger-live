@@ -55,6 +55,7 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
   );
   const [transactionError, setTransactionError] = useState<Error | null>(null);
   const [signed, setSigned] = useState(false);
+  const [manageNeuronIndex, setManageNeuronIndex] = useState<number>(0);
   const {
     account,
     transaction,
@@ -67,10 +68,9 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
     invariant(accountProp, "icp: account");
     const bridge = getAccountBridge(accountProp, undefined);
     const initTx = bridge.createTransaction(accountProp);
-    const transaction = bridge.updateTransaction(initTx, { type: "list_neurons" });
     return {
       account: accountProp,
-      transaction,
+      transaction: initTx,
     };
   });
   const steps = useSteps();
@@ -83,7 +83,7 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
 
   const handleOperationBroadcasted = useCallback(
     (optimisticOperation: InternetComputerOperation) => {
-      if (!account) return;
+      if (!account || !optimisticOperation.extra.neurons) return;
       dispatch(
         updateAccountWithUpdater(account.id, account => {
           const neuronAddresses = optimisticOperation.extra.neurons?.fullNeurons.map(
@@ -134,6 +134,8 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
     onClose,
     error,
     status,
+    manageNeuronIndex,
+    setManageNeuronIndex,
     optimisticOperation,
     openModal,
     setSigned,
