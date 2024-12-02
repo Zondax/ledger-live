@@ -9,6 +9,8 @@ import accountHeaderManageActions from "./AccountHeaderManageActions";
 import operationDetails from "./operationDetails";
 import AccountSubHeader from "./AccountSubHeader";
 import sendAmountFields from "./SendAmountFields";
+import StakeBanner from "./StakeBanner";
+import AccountBalanceSummaryFooter from "./AccountBalanceSummaryFooter";
 
 const family: LLDCoinFamily<ICPAccount, Transaction, TransactionStatus, InternetComputerOperation> =
   {
@@ -16,6 +18,8 @@ const family: LLDCoinFamily<ICPAccount, Transaction, TransactionStatus, Internet
     AccountSubHeader,
     sendAmountFields,
     accountHeaderManageActions,
+    StakeBanner,
+    AccountBalanceSummaryFooter,
   };
 
 export default family;

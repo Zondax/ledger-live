@@ -38,10 +38,14 @@ export const methodToString = (method: Transaction["type"]): string => {
       return "List Own Neurons";
     case "disburse":
       return "Disburse Neuron";
+    case "stake_maturity":
+      return "Stake Maturity";
     case "start_dissolving":
       return "Start Dissolving";
     case "stop_dissolving":
       return "Stop Dissolving";
+    case "spawn_neuron":
+      return "Spawn Neuron";
     default:
       return "Send ICP";
   }

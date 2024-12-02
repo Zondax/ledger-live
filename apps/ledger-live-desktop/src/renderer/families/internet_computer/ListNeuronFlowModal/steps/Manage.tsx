@@ -1,21 +1,18 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import TrackPage from "~/renderer/analytics/TrackPage";
 import Box from "~/renderer/components/Box";
 import FormattedVal from "~/renderer/components/FormattedVal";
-import WarnBox from "~/renderer/components/WarnBox";
 import Button from "~/renderer/components/Button";
 import { useDispatch } from "react-redux";
 import { StepProps } from "../types";
 import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
-import { closeModal, openModal } from "~/renderer/actions/modals";
+// import { closeModal, openModal } from "~/renderer/actions/modals";
 import BigNumber from "bignumber.js";
 import Text from "~/renderer/components/Text";
-import {
-  getNeuronDissolveState,
-  NeuronState,
-} from "@ledgerhq/live-common/families/internet_computer/neurons";
+import { getNeuronDissolveDuration } from "@ledgerhq/live-common/families/internet_computer/neurons";
+import { closeModal } from "~/renderer/actions/modals";
 
 const Container = styled(Box).attrs(() => ({
   alignItems: "center",
@@ -79,19 +76,36 @@ const InfoRow = styled(Box)`
   }
 `;
 
+const Checkbox = styled.input.attrs({ type: "checkbox" })`
+  margin-right: 8px;
+`;
+
+const CheckboxLabel = styled(Text).attrs(() => ({
+  ff: "Inter|Regular",
+  fontSize: 3,
+  color: "palette.text.shade100",
+}))`
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+`;
+
 export default function StepManage({
   account,
   manageNeuronIndex,
   neurons,
   onChangeTransaction,
   transitionTo,
+  setNeedsRefresh,
+  openModal,
 }: StepProps) {
   const currencyId = account.currency.id;
   const dispatch = useDispatch();
   const unit = account.currency.units[0];
   const neuron = neurons.fullNeurons[manageNeuronIndex];
-  const neuronState = getNeuronDissolveState(neuron);
   const neuronId = neuron.id[0]?.id.toString() ?? "";
+
+  const [autoStakeMaturity, setAutoStakeMaturity] = useState(false);
 
   const onClickIncreaseStake = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -100,15 +114,17 @@ export default function StepManage({
     dispatch(
       openModal("MODAL_SEND", {
         stepId: "amount",
+        onConfirmationHandler: () =>
+          dispatch(openModal("MODAL_ICP_LIST_NEURONS", { account, refresh: true })),
         account,
         transaction: {
           ...initTx,
-          neuronAccount: Buffer.from(neuron.account).toString("hex"),
+          neuronAccountIdentifier: neuron.accountIdentifier,
           type: "increase_stake",
         },
       }),
     );
-  }, [account, dispatch, neuron]);
+  }, [account, dispatch, openModal, neuron]);
 
   const onClickDisburseStake = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -120,8 +136,9 @@ export default function StepManage({
         type: "disburse",
       }),
     );
+    setNeedsRefresh(true);
     transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo, neuron]);
+  }, [account, onChangeTransaction, transitionTo, neuron, setNeedsRefresh]);
 
   const onClickStartStopDissolving = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -129,11 +146,38 @@ export default function StepManage({
     onChangeTransaction(
       bridge.updateTransaction(initTx, {
         neuronId: neuron.id[0]?.id.toString(),
-        type: neuronState === NeuronState.Dissolving ? "stop_dissolving" : "start_dissolving",
+        type: neuron.dissolveState === "Dissolving" ? "stop_dissolving" : "start_dissolving",
       }),
     );
+    setNeedsRefresh(true);
     transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo, neuron, neuronState]);
+  }, [account, onChangeTransaction, transitionTo, neuron, setNeedsRefresh]);
+
+  const onClickStakeMaturity = useCallback(() => {
+    const bridge = getAccountBridge(account, undefined);
+    const initTx = bridge.createTransaction(account);
+    onChangeTransaction(
+      bridge.updateTransaction(initTx, {
+        neuronId: neuron.id[0]?.id.toString(),
+        type: "stake_maturity",
+      }),
+    );
+    setNeedsRefresh(true);
+    transitionTo("device");
+  }, [account, onChangeTransaction, transitionTo, neuron, setNeedsRefresh]);
+
+  const onClickSpawnNeuron = useCallback(() => {
+    const bridge = getAccountBridge(account, undefined);
+    const initTx = bridge.createTransaction(account);
+    onChangeTransaction(
+      bridge.updateTransaction(initTx, {
+        neuronId: neuron.id[0]?.id.toString(),
+        type: "spawn_neuron",
+      }),
+    );
+    setNeedsRefresh(true);
+    transitionTo("device");
+  }, [account, onChangeTransaction, transitionTo, neuron, setNeedsRefresh]);
 
   if (neuron) {
     return (
@@ -150,6 +194,9 @@ export default function StepManage({
         <Section>
           <Box mb={2}>
             <Box horizontal alignItems="center" mb={1}>
+              <Text ff="Inter|Regular" fontSize={3} color="palette.text.shade60" mr={2}>
+                Stake:
+              </Text>
               <Text ff="Inter|SemiBold" fontSize={6}>
                 <FormattedVal val={Number(neuron.cached_neuron_stake_e8s)} unit={unit} showCode />
               </Text>
@@ -179,7 +226,11 @@ export default function StepManage({
                 Voting Power:
               </Text>
               <Text ff="Inter|SemiBold" fontSize={4}>
-                None
+                <FormattedVal
+                  val={Number(neuron.votingPower.toString())}
+                  unit={unit}
+                  color="palette.text.shade100"
+                />
               </Text>
             </Box>
           </Box>
@@ -187,7 +238,12 @@ export default function StepManage({
             <Button primary small onClick={onClickIncreaseStake}>
               Increase Stake
             </Button>
-            <Button inverted small onClick={onClickDisburseStake}>
+            <Button
+              disabled={neuron.dissolveState !== "Unlocked"}
+              inverted
+              small
+              onClick={onClickDisburseStake}
+            >
               Disburse Stake
             </Button>
           </ButtonGroup>
@@ -202,7 +258,7 @@ export default function StepManage({
                 State
               </Text>
               <Text ff="Inter|SemiBold" fontSize={4}>
-                {neuronState === NeuronState.Locked ? "Locked" : "Dissolving"}
+                {neuron.dissolveState}
               </Text>
             </InfoRow>
             <InfoRow>
@@ -210,13 +266,13 @@ export default function StepManage({
                 Dissolve Delay
               </Text>
               <Text ff="Inter|SemiBold" fontSize={4}>
-                7 days
+                {neuron.dissolveState !== "Unlocked" ? getNeuronDissolveDuration(neuron) : "-"}
               </Text>
             </InfoRow>
           </InfoGrid>
           <ButtonGroup>
             <Button primary small onClick={onClickStartStopDissolving}>
-              {neuronState === NeuronState.Dissolving ? "Stop Dissolving" : "Start Dissolving"}
+              {neuron.dissolveState === "Dissolving" ? "Stop Dissolving" : "Start Dissolving"}
             </Button>
             <Button primary small onClick={() => console.log("increase dissolve delay")}>
               Increase Delay
@@ -252,11 +308,18 @@ export default function StepManage({
               </Text>
             </InfoRow>
           </InfoGrid>
+          <CheckboxLabel>
+            <Checkbox
+              checked={autoStakeMaturity}
+              onChange={e => setAutoStakeMaturity(e.target.checked)}
+            />
+            Automatically stake new maturity
+          </CheckboxLabel>
           <ButtonGroup>
-            <Button primary small onClick={() => console.log("stake maturity")}>
+            <Button primary small onClick={onClickStakeMaturity}>
               Stake Maturity
             </Button>
-            <Button primary small onClick={() => console.log("spawn neuron")}>
+            <Button primary small onClick={onClickSpawnNeuron}>
               Spawn Neuron
             </Button>
           </ButtonGroup>
@@ -292,13 +355,23 @@ export default function StepManage({
           </ButtonGroup>
         </Section>
 
-        {neuronState !== NeuronState.Dissolving && (
-          <WarnBox>
-            <Text ff="Inter|Medium" fontSize={3}>
-              ℹ️ The dissolve delay must be at least 6 months for the neuron to have voting power
-            </Text>
-          </WarnBox>
-        )}
+        {/* Following Section */}
+        <Section>
+          <SectionTitle>Following</SectionTitle>
+          <InfoGrid>
+            <InfoRow>
+              <SubTitle>DFINITY Foundation</SubTitle>
+              <Text ff="Inter|SemiBold" fontSize={4}>
+                All Except Governance, and SNS & Neurons&apos; Fund
+              </Text>
+            </InfoRow>
+          </InfoGrid>
+          <ButtonGroup>
+            <Button primary small onClick={() => console.log("follow neurons")}>
+              Follow Neurons
+            </Button>
+          </ButtonGroup>
+        </Section>
       </Container>
     );
   }

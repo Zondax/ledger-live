@@ -2,7 +2,7 @@ import type { GetAccountShape } from "@ledgerhq/coin-framework/bridge/jsHelpers"
 import { decodeAccountId, encodeAccountId } from "@ledgerhq/coin-framework/account/index";
 import { fetchBalances, fetchBlockHeight, fetchTxns } from "../../api";
 import flatMap from "lodash/flatMap";
-import { Account } from "@ledgerhq/types-live";
+import { Account, OperationType } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
 import { ICP_FEES } from "../../consts";
 import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
@@ -35,18 +35,27 @@ export const getAccountShape: GetAccountShape<ICPAccount> = async info => {
   const blockHeight = await fetchBlockHeight();
   const balance = await fetchBalance(address);
 
-  const txns = await fetchTxns(address);
-  const newTxns = initialAccount
-    ? txns.filter(tx => tx.id > BigInt(initialAccount.blockHeight))
-    : txns;
+  const txns = await fetchTxns(
+    address,
+    BigInt(blockHeight.toString()),
+    initialAccount ? BigInt(initialAccount.blockHeight) : undefined,
+  );
+  const neurons = initialAccount ? initialAccount.neurons : NeuronsData.empty();
   const result: Partial<ICPAccount> = {
     id: accountId,
     balance,
     spendableBalance: balance,
-    operations: flatMap(newTxns, mapTxToOps(accountId, address)),
+    operations: flatMap(
+      txns,
+      mapTxToOps(
+        accountId,
+        address,
+        neurons.fullNeurons.map(n => n.accountIdentifier),
+      ),
+    ),
     blockHeight: blockHeight.toNumber(),
-    neurons: initialAccount ? initialAccount.neurons : NeuronsData.empty(),
-    operationsCount: newTxns.length,
+    neurons,
+    operationsCount: (initialAccount?.operations.length ?? 0) + txns.length,
     xpub: publicKey,
   };
 
@@ -62,7 +71,12 @@ function reconciliatePublicKey(publicKey?: string, initialAccount?: Account): st
   throw new Error("publicKey wasn't properly restored");
 }
 
-const mapTxToOps = (accountId: string, address: string, fee = ICP_FEES) => {
+const mapTxToOps = (
+  accountId: string,
+  address: string,
+  neuronsAddresses: string[],
+  fee = ICP_FEES,
+) => {
   return (txInfo: TransactionWithId): InternetComputerOperation[] => {
     const { transaction: txn } = txInfo;
     const ops: InternetComputerOperation[] = [];
@@ -100,11 +114,26 @@ const mapTxToOps = (accountId: string, address: string, fee = ICP_FEES) => {
     const isSending = address === fromAccount;
     const isReceiving = address === toAccount;
 
+    let type: OperationType;
+    if (isSending) {
+      type = "OUT";
+    } else {
+      type = "IN";
+    }
+
+    if (neuronsAddresses.includes(fromAccount)) {
+      type = "DISBURSE_NEURON";
+    }
+
+    if (neuronsAddresses.includes(toAccount)) {
+      type = BigNumber(memo ?? "0").gt(0) ? "STAKE_NEURON" : "TOP_UP_NEURON";
+    }
+
     if (isSending) {
       ops.push({
-        id: encodeOperationId(accountId, hash, "OUT"),
+        id: encodeOperationId(accountId, hash, type),
         hash,
-        type: "OUT",
+        type,
         value: value.plus(feeToUse),
         fee: feeToUse,
         blockHeight,
@@ -121,9 +150,9 @@ const mapTxToOps = (accountId: string, address: string, fee = ICP_FEES) => {
 
     if (isReceiving) {
       ops.push({
-        id: encodeOperationId(accountId, hash, "IN"),
+        id: encodeOperationId(accountId, hash, type),
         hash,
-        type: "IN",
+        type,
         value,
         fee: feeToUse,
         blockHeight,

@@ -18,7 +18,7 @@ import BigNumber from "bignumber.js";
 import { Principal } from "@dfinity/principal";
 
 const ICP_NETWORK_URL = "http://localhost:8080";
-const getAgent = async () => {
+export const getAgent = async () => {
   return await HttpAgent.create({ host: ICP_NETWORK_URL, shouldFetchRootKey: true });
 };
 
@@ -121,14 +121,19 @@ export const fetchBalance = async (address: string): Promise<BigNumber> => {
 
 export const fetchTxns = async (
   address: string,
-  blockHeight?: bigint,
+  startBlockHeight: bigint,
+  stopBlockHeight = BigInt(0),
 ): Promise<TransactionWithId[]> => {
+  if (startBlockHeight && startBlockHeight <= stopBlockHeight) {
+    return [];
+  }
+
   const accountIdentifier = AccountIdentifier.fromHex(address);
   const canister = await getIndexCanister();
   const response = await canister.getTransactions({
     certified: false,
     accountIdentifier,
-    start: blockHeight,
+    start: startBlockHeight,
     maxResults: BigInt(FETCH_TXNS_LIMIT),
   });
 
@@ -136,7 +141,11 @@ export const fetchTxns = async (
     return [];
   }
 
-  const nextTxns = await fetchTxns(address, response.transactions.at(-1)?.id);
+  const nextTxns = await fetchTxns(
+    address,
+    response.transactions.at(-1)?.id ?? BigInt(0),
+    stopBlockHeight,
+  );
 
   return [...response.transactions, ...nextTxns];
 };

@@ -31,6 +31,7 @@ export type Data = {
 };
 type OwnProps = {
   account: ICPAccount;
+  refresh: boolean;
   stepId: StepId;
   onClose: () => void;
   onChangeStepId: (a: StepId) => void;
@@ -48,7 +49,15 @@ const mapStateToProps = createStructuredSelector({
 const mapDispatchToProps = {
   openModal,
 };
-function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal, device }: Props) {
+function Body({
+  account: accountProp,
+  refresh,
+  stepId,
+  onChangeStepId,
+  onClose,
+  openModal,
+  device,
+}: Props) {
   const dispatch = useDispatch();
   const [optimisticOperation, setOptimisticOperation] = useState<InternetComputerOperation | null>(
     null,
@@ -56,6 +65,7 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
   const [transactionError, setTransactionError] = useState<Error | null>(null);
   const [signed, setSigned] = useState(false);
   const [manageNeuronIndex, setManageNeuronIndex] = useState<number>(0);
+  const [needsRefresh, setNeedsRefresh] = useState(false);
   const {
     account,
     transaction,
@@ -68,6 +78,9 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
     invariant(accountProp, "icp: account");
     const bridge = getAccountBridge(accountProp, undefined);
     const initTx = bridge.createTransaction(accountProp);
+    if (refresh) {
+      initTx.type = "list_neurons";
+    }
     return {
       account: accountProp,
       transaction: initTx,
@@ -136,6 +149,8 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
     status,
     manageNeuronIndex,
     setManageNeuronIndex,
+    needsRefresh,
+    setNeedsRefresh,
     optimisticOperation,
     openModal,
     setSigned,

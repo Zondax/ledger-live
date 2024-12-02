@@ -50,20 +50,36 @@ interface TransferRawRequest {
   from_subaccount: [];
 }
 
-export interface NeuronCommandRawRequest<T extends DisburseCommand | ConfigureOperationCommand> {
-  id: [{ id: bigint }];
-  command: T[];
-  neuron_id_or_subaccount: [];
-}
-
 interface DisburseCommand {
   Disburse: { to_account: string[]; amount: [{ e8s: bigint }] };
+}
+
+interface StakeMaturityCommand {
+  StakeMaturity: {
+    percentage_to_stake: [number] | [];
+  };
+}
+
+interface SpawnNeuronCommand {
+  Spawn: {
+    percentage_to_spawn: [number] | [];
+    new_controller: [Principal] | [];
+    nonce: [bigint] | [];
+  };
 }
 
 interface ConfigureOperationCommand {
   Configure: {
     operation: [{ StartDissolving: object } | { StopDissolving: object }];
   };
+}
+
+export interface NeuronCommandRawRequest<
+  T extends DisburseCommand | ConfigureOperationCommand | StakeMaturityCommand | SpawnNeuronCommand,
+> {
+  id: [{ id: bigint }];
+  command: T[];
+  neuron_id_or_subaccount: [];
 }
 
 interface ListNeuronsRawRequest {
@@ -107,12 +123,16 @@ const createUnsignedNeuronCommandTransaction = (
   account: Account,
 ): {
   unsignedTransaction: UnsignedTransaction;
-  neuronCommandRawRequest: NeuronCommandRawRequest<DisburseCommand | ConfigureOperationCommand>;
+  neuronCommandRawRequest: NeuronCommandRawRequest<
+    DisburseCommand | ConfigureOperationCommand | StakeMaturityCommand | SpawnNeuronCommand
+  >;
 } => {
   const { neuronId, amount } = transaction;
   invariant(neuronId, "[ICP](createUnsignedNeuronCommandTransaction) Neuron ID is required");
 
-  const rawCommand: NeuronCommandRawRequest<DisburseCommand | ConfigureOperationCommand> = {
+  const rawCommand: NeuronCommandRawRequest<
+    DisburseCommand | ConfigureOperationCommand | StakeMaturityCommand | SpawnNeuronCommand
+  > = {
     id: [{ id: BigInt(neuronId) }],
     neuron_id_or_subaccount: [],
     command: [],
@@ -140,6 +160,20 @@ const createUnsignedNeuronCommandTransaction = (
       rawCommand.command = [
         {
           Configure: { operation: [{ StopDissolving: {} }] },
+        },
+      ];
+      break;
+    case "stake_maturity":
+      rawCommand.command = [
+        {
+          StakeMaturity: { percentage_to_stake: [100] },
+        },
+      ];
+      break;
+    case "spawn_neuron":
+      rawCommand.command = [
+        {
+          Spawn: { percentage_to_spawn: [100], new_controller: [], nonce: [] },
         },
       ];
       break;
@@ -300,7 +334,9 @@ export const signOperation: AccountBridge<Transaction, ICPAccount>["signOperatio
           } else if (
             transaction.type === "disburse" ||
             transaction.type === "start_dissolving" ||
-            transaction.type === "stop_dissolving"
+            transaction.type === "stop_dissolving" ||
+            transaction.type === "stake_maturity" ||
+            transaction.type === "spawn_neuron"
           ) {
             ({ unsignedTransaction } = createUnsignedNeuronCommandTransaction(
               transaction,
