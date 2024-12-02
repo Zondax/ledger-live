@@ -20,3 +20,18 @@ export const ICP_MIN_STAKING_AMOUNT = 1e8;
 
 // Max Memo value on ICP network
 export const MAX_MEMO_VALUE = Number.MAX_SAFE_INTEGER;
+
+// Bonus constants
+export const MAX_DISSOLVE_DELAY_BONUS = 1; // = +100%
+export const MAX_AGE_BONUS = 0.25; // = +25%
+
+// Time constants
+export const SECONDS_IN_MINUTE = 60;
+export const MINUTES_IN_HOUR = 60;
+export const HOURS_IN_DAY = 24;
+export const SECONDS_IN_HOUR = SECONDS_IN_MINUTE * MINUTES_IN_HOUR;
+export const SECONDS_IN_DAY = SECONDS_IN_HOUR * HOURS_IN_DAY;
+export const SECONDS_IN_YEAR = ((4 * 365 + 1) * SECONDS_IN_DAY) / 4;
+export const SECONDS_IN_HALF_YEAR = SECONDS_IN_YEAR / 2;
+export const SECONDS_IN_FOUR_YEARS = SECONDS_IN_YEAR * 4;
+export const SECONDS_IN_EIGHT_YEARS = SECONDS_IN_YEAR * 8;

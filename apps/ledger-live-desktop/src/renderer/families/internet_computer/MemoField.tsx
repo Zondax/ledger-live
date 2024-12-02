@@ -35,6 +35,7 @@ const MemoField = ({
 
   return (
     <MemoTagField
+      disabled={transaction.type === "create_neuron"}
       warning={status.warnings.transaction}
       error={status.errors.transaction}
       value={transaction.memo ?? ""}

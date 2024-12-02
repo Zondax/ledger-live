@@ -27,13 +27,31 @@ function getDeviceTransactionConfig({
   if (
     transaction.type === "disburse" ||
     transaction.type === "start_dissolving" ||
-    transaction.type === "stop_dissolving"
+    transaction.type === "stop_dissolving" ||
+    transaction.type === "stake_maturity" ||
+    transaction.type === "spawn_neuron"
   ) {
     fields.push({
       type: "text",
       label: "Neuron Id",
       value: transaction.neuronId ?? "0",
     });
+
+    if (transaction.type === "stake_maturity") {
+      fields.push({
+        type: "text",
+        label: "Percentage to Stake",
+        value: transaction.percentageToStake ?? "100",
+      });
+    }
+
+    if (transaction.type === "spawn_neuron") {
+      fields.push({
+        type: "text",
+        label: "Controller",
+        value: "self",
+      });
+    }
 
     if (transaction.type === "disburse") {
       fields.push({
@@ -68,7 +86,12 @@ function getDeviceTransactionConfig({
     });
   }
 
-  if (transaction.type !== "list_neurons" && transaction.type !== "disburse") {
+  if (
+    transaction.type !== "list_neurons" &&
+    transaction.type !== "disburse" &&
+    transaction.type !== "spawn_neuron" &&
+    transaction.type !== "stake_maturity"
+  ) {
     fields.push({
       type: "text",
       label: "Memo",

@@ -31,6 +31,7 @@ export const buildOptimisticSendOperation = async (
     date: new Date(),
     extra: {
       memo: transaction.memo,
+      methodName: transaction.type,
     },
   };
 };

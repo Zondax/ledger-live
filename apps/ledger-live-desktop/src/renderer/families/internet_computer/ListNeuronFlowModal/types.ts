@@ -21,6 +21,8 @@ export type StepProps = {
   error: Error | undefined;
   signed: boolean;
   neurons: NeuronsData;
+  needsRefresh: boolean;
+  setNeedsRefresh: (needsRefresh: boolean) => void;
   manageNeuronIndex: number;
   setManageNeuronIndex: (index: number) => void;
   transaction: Transaction | undefined | null;

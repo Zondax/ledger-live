@@ -33,13 +33,17 @@ type ICPTransactionType =
   | "increase_stake"
   | "create_neuron"
   | "disburse"
-  | "send";
+  | "send"
+  | "spawn_neuron"
+  | "stake_maturity";
 export type Transaction = TransactionCommon & {
   family: FamilyType;
   fees: BigNumber;
   type: ICPTransactionType;
   neuronAccountIdentifier?: string;
   neuronId?: string;
+  percentageToStake?: string;
+  percentageToSpawn?: string;
   memo?: string;
 };
 
@@ -60,10 +64,15 @@ export type InternetComputerOperationExtra = {
   memo?: string;
   createdNeuronId?: string;
   neurons?: NeuronsData;
+  methodName?: string;
 };
 
 export interface ICPNeuron extends NNSNeuron {
   accountIdentifier: string;
+  dissolveState: "Unlocked" | "Locked" | "Dissolving" | "Unknown";
+  votingPower: BigNumber;
+  dissolveDelaySeconds: string;
+  whenDissolvedTimestampSeconds: string;
 }
 
 export const ICPOperationTypeListNeuron = "LIST_NEURONS";

@@ -1,29 +1,33 @@
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import { ICPAccount } from "@ledgerhq/live-common/families/internet_computer/types";
+import { TokenAccount } from "@ledgerhq/types-live";
 import { useCallback } from "react";
 // import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { openModal } from "~/renderer/actions/modals";
 import IconCoins from "~/renderer/icons/Coins";
+import IconUpdate from "~/renderer/icons/Update";
 
 type Props = {
-  account: ICPAccount;
+  account: ICPAccount | TokenAccount;
   parentAccount: ICPAccount | undefined | null;
   source?: string;
 };
 
 const AccountHeaderActions = ({ account, parentAccount }: Props) => {
-  // const { t } = useTranslation();
   const dispatch = useDispatch();
-  const onClickManageNeurons = useCallback(() => {
-    if (account.type !== "Account") return;
-    dispatch(
-      openModal("MODAL_ICP_LIST_NEURONS", {
-        account,
-        refresh: false,
-      }),
-    );
-  }, [account, dispatch]);
+  const onClickManageNeurons = useCallback(
+    (refresh: boolean = false) => {
+      if (account.type !== "Account") return;
+      dispatch(
+        openModal("MODAL_ICP_LIST_NEURONS", {
+          account,
+          refresh,
+        }),
+      );
+    },
+    [account, dispatch],
+  );
   const onClickStakeIcp = useCallback(() => {
     if (parentAccount) return;
     const bridge = getAccountBridge(account, undefined);
@@ -32,13 +36,14 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
       openModal("MODAL_SEND", {
         stepId: "amount",
         account,
+        onConfirmationHandler: () => onClickManageNeurons(true),
         transaction: {
           ...initTx,
           type: "create_neuron",
         },
       }),
     );
-  }, [account, dispatch, parentAccount]);
+  }, [account, dispatch, parentAccount, onClickManageNeurons]);
 
   if (parentAccount) return null;
   return [
@@ -56,7 +61,7 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
     },
     {
       key: "manage-neurons",
-      onClick: onClickManageNeurons,
+      onClick: () => onClickManageNeurons(),
       icon: IconCoins,
       label: "Manage Neurons",
       tooltip: "Manage neurons for staking",
@@ -65,6 +70,18 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
         button: "manage_neurons_button",
       },
       accountActionsTestId: "manage-neurons-button-icp",
+    },
+    {
+      key: "sync-neurons",
+      onClick: () => onClickManageNeurons(true),
+      icon: IconUpdate,
+      label: "Sync Neurons",
+      tooltip: "Sync neurons for staking",
+      event: "sync_neurons_dashboard_clicked",
+      eventProperties: {
+        button: "sync_neurons_button",
+      },
+      accountActionsTestId: "sync-neurons-button-icp",
     },
   ];
 };

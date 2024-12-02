@@ -9,7 +9,7 @@ export type Props = {
   refresh?: boolean;
 };
 
-export default function ListNeuronsModal({ refresh }: Props) {
+export default function ListNeuronsModal({ refresh = false }: Props) {
   const [stepId, setStepId] = useState<StepId>(refresh ? "device" : "confirmation");
   const onHide = useCallback(() => {
     setStepId("device");
@@ -25,7 +25,13 @@ export default function ListNeuronsModal({ refresh }: Props) {
       onHide={onHide}
       preventBackdropClick={isModalLocked}
       render={({ onClose, data }) => (
-        <Body account={data.account} stepId={stepId} onClose={onClose} onChangeStepId={onChange} />
+        <Body
+          account={data.account}
+          refresh={refresh}
+          stepId={stepId}
+          onClose={onClose}
+          onChangeStepId={onChange}
+        />
       )}
     />
   );

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { SyncOneAccountOnMount } from "@ledgerhq/live-common/bridge/react/index";
@@ -12,11 +12,8 @@ import ErrorDisplay from "~/renderer/components/ErrorDisplay";
 // import TableContainer from "~/renderer/components/TableContainer";
 import { StepProps } from "../types";
 import Text from "~/renderer/components/Text";
-import {
-  getNeuronDissolveState,
-  NeuronState,
-} from "@ledgerhq/live-common/families/internet_computer/neurons";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
+import { getNeuronDissolveDuration } from "@ledgerhq/live-common/families/internet_computer/neurons";
 
 interface ContainerProps {
   shouldSpace?: boolean;
@@ -59,14 +56,28 @@ export default function StepListNeuron({
   signed,
   neurons,
   setManageNeuronIndex,
+  onChangeTransaction,
   transitionTo,
+  needsRefresh,
+  setNeedsRefresh,
 }: StepProps) {
   const { t } = useTranslation();
   const currencyId = account.currency.id;
   const unit = account.currency.units[0];
 
-  // neuron properties
-  const neuronStates = neurons.fullNeurons.map(neuron => getNeuronDissolveState(neuron));
+  useEffect(() => {
+    if (needsRefresh) {
+      const bridge = getAccountBridge(account, undefined);
+      const initTx = bridge.createTransaction(account);
+      onChangeTransaction(
+        bridge.updateTransaction(initTx, {
+          type: "list_neurons",
+        }),
+      );
+      setNeedsRefresh(false);
+      transitionTo("device");
+    }
+  }, [needsRefresh, transitionTo, account, onChangeTransaction, setNeedsRefresh]);
 
   const onClickManage = useCallback(
     (index: number) => {
@@ -100,7 +111,7 @@ export default function StepListNeuron({
                 <Cell flex={2.5}>Neurons</Cell>
                 <Cell flex={1}>Stake</Cell>
                 <Cell flex={1}>Maturity</Cell>
-                <Cell flex={1.5}>Dissolve Delay</Cell>
+                <Cell flex={1.75}>Dissolve Delay</Cell>
                 <Cell flex={1}>State</Cell>
               </HeaderRow>
               <ScrollableContent>
@@ -138,16 +149,18 @@ export default function StepListNeuron({
                           showCode
                         />
                       </Cell>
-                      <Cell flex={1.5} textAlign="center">
+                      <Cell flex={2} textAlign="center">
                         {/* TODO: get dissolve delay data */}
                         <Text ff="Inter|Regular" fontSize={3}>
-                          7 days
+                          {neuron.dissolveState !== "Unlocked"
+                            ? getNeuronDissolveDuration(neuron)
+                            : "-"}
                         </Text>
                       </Cell>
                       <Cell flex={1}>
                         {/* TODO: get state data */}
                         <Text ff="Inter|Regular" fontSize={3}>
-                          {neuronStates[index] === NeuronState.Locked ? "Locked" : "Dissolving"}
+                          {neuron.dissolveState}
                         </Text>
                       </Cell>
                     </NeuronRow>
@@ -192,7 +205,6 @@ export default function StepListNeuron({
 export function StepListNeuronFooter({
   account,
   onClose,
-  error,
   transitionTo,
   neurons,
   onChangeTransaction,
@@ -220,7 +232,6 @@ export function StepListNeuronFooter({
         </Button>
         <Button
           primary
-          disabled={!!error}
           ml={2}
           event={`Manage Neurons ${currencyName} Flow Step 3 Sync Neurons Clicked`}
           onClick={onClickSync}
