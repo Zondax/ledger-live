@@ -1,6 +1,6 @@
 import type { GetAccountShape } from "@ledgerhq/coin-framework/bridge/jsHelpers";
 import { decodeAccountId, encodeAccountId } from "@ledgerhq/coin-framework/account/index";
-import { fetchBalances, fetchBlockHeight, fetchTxns } from "../../api";
+import { fetchBalance, fetchBlockHeight, fetchTxns } from "../../api";
 import flatMap from "lodash/flatMap";
 import { Account, OperationType } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";

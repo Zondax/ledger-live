@@ -6,7 +6,7 @@ import { ListNeuronsResponse } from "@dfinity/nns/dist/candid/governance";
 import { log } from "@ledgerhq/logs";
 import invariant from "invariant";
 import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "./consts";
-import { idlFactory as idlFactoryGovernance } from "./idlFactoryGovernanceOld";
+import { idlFactory as idlFactoryGovernance } from "@dfinity/nns/dist/candid/old_list_neurons_service.certified.idl";
 import { IDL } from "@dfinity/candid";
 import { derivePrincipalFromPubkey } from "./utils";
 import { NeuronsData } from "./neurons";
@@ -74,6 +74,10 @@ export const broadcast: AccountBridge<Transaction, ICPAccount>["broadcast"] = as
       func => func[0] === rawDataTyped.methodName,
     );
 
+    invariant(
+      listNeuronsIdlFunc,
+      `[ICP](broadcast) Missing listNeuronsIdlFunc with methodName: ${rawDataTyped.methodName}`,
+    );
     const [listNeuronsResponse]: [ListNeuronsResponse] = IDL.decode(
       listNeuronsIdlFunc[1].retTypes,
       reply,

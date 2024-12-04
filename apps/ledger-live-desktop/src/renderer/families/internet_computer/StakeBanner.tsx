@@ -31,6 +31,8 @@ const StakeBanner: React.FC<{ account: ICPAccount }> = ({ account }) => {
       openModal("MODAL_SEND", {
         stepId: "amount",
         account,
+        onConfirmationHandler: () =>
+          dispatch(openModal("MODAL_ICP_LIST_NEURONS", { account, refresh: true })),
         transaction: {
           ...initTx,
           type: "create_neuron",
@@ -42,9 +44,9 @@ const StakeBanner: React.FC<{ account: ICPAccount }> = ({ account }) => {
   if (!stakeAccountBanner?.enabled) return null;
   if (!display) return null;
 
-  const title = hasNeurons ? "Manage your ICP neurons" : "Create an ICP neuron";
+  const title = hasNeurons ? "Manage Staked ICP" : "In case you missed it...";
   const description = hasNeurons
-    ? "Adjust voting power, merge neurons, or modify dissolve delay to maximize your rewards. This is essential to maximize your rewards."
+    ? "Adjust voting power, manage maturity, or modify dissolve delay to maximize your rewards. Regular participation in governance maximizes your rewards."
     : `Stake your ${account.currency.ticker} and earn rewards by participating in governance of the Internet Computer.`;
   const cta = hasNeurons ? "Manage neurons" : "Stake now";
   const linkText = "Learn more...";

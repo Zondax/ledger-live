@@ -33,7 +33,7 @@ const useStakeFlow = () => {
       entryPoint,
     }: Props = {}) => {
       const cryptoCurrencies = filterCurrencies(listCurrencies(true), {
-        currencies: currencies || list,
+        currencies: currencies || (list ? [...list, "internet_computer"] : undefined),
       });
 
       trackPage("Stake", "Drawer - Choose Asset", {
