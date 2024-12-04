@@ -217,7 +217,7 @@ export default function StepManage({
               </Text>
               <CopiableField value={neuron.accountIdentifier}>
                 <Text ff="Inter|SemiBold" fontSize={4}>
-                  {`${neuron.accountIdentifier.slice(0, 8)}...${neuron.accountIdentifier.slice(-8)}`}
+                  {`${neuron.accountIdentifier.slice(0, 12)}...${neuron.accountIdentifier.slice(-12)}`}
                 </Text>
               </CopiableField>
             </Box>
@@ -275,7 +275,7 @@ export default function StepManage({
               {neuron.dissolveState === "Dissolving" ? "Stop Dissolving" : "Start Dissolving"}
             </Button>
             <Button primary small onClick={() => console.log("increase dissolve delay")}>
-              Increase Delay
+              #Increase Delay
             </Button>
           </ButtonGroup>
         </Section>
@@ -332,7 +332,7 @@ export default function StepManage({
             <InfoRow>
               <SubTitle>Date Created</SubTitle>
               <Text ff="Inter|SemiBold" fontSize={4}>
-                {new Date().toLocaleDateString()}
+                {new Date(Number(neuron.created_timestamp_seconds) * 1000).toLocaleDateString()}
               </Text>
             </InfoRow>
             <InfoRow>
@@ -350,7 +350,7 @@ export default function StepManage({
           </InfoGrid>
           <ButtonGroup>
             <Button primary small onClick={() => console.log("split neuron")}>
-              Split Neuron
+              #Split Neuron
             </Button>
           </ButtonGroup>
         </Section>
@@ -368,7 +368,7 @@ export default function StepManage({
           </InfoGrid>
           <ButtonGroup>
             <Button primary small onClick={() => console.log("follow neurons")}>
-              Follow Neurons
+              #Follow Neurons
             </Button>
           </ButtonGroup>
         </Section>

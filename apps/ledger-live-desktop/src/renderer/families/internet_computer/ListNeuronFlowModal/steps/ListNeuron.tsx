@@ -115,56 +115,57 @@ export default function StepListNeuron({
                 <Cell flex={1}>State</Cell>
               </HeaderRow>
               <ScrollableContent>
-                {neurons.fullNeurons
-                  .filter(neuron => neuron.cached_neuron_stake_e8s.toString() !== "0")
-                  .map((neuron, index) => (
-                    <NeuronRow
-                      key={neuron.id[0]?.id}
-                      horizontal
-                      alignItems="center"
-                      onClick={() => onClickManage(index)}
-                    >
-                      <Cell flex={2.5}>
-                        <Text ff="Inter|SemiBold" fontSize={3}>
-                          {neuron.id[0]?.id.toString()}
-                        </Text>
-                      </Cell>
-                      <Cell flex={1}>
-                        <FormattedVal
-                          val={Number(neuron.cached_neuron_stake_e8s)}
-                          unit={unit}
-                          showCode
-                          fontSize={3}
-                        />
-                      </Cell>
-                      <Cell flex={1} textAlign="center">
-                        {/* TODO: get maturity data */}
-                        <FormattedVal
-                          color="palette.text.shade100"
-                          val={
-                            Number(neuron.staked_maturity_e8s_equivalent[0] ?? 0) +
-                            Number(neuron.maturity_e8s_equivalent)
-                          }
-                          unit={unit}
-                          showCode
-                        />
-                      </Cell>
-                      <Cell flex={2} textAlign="center">
-                        {/* TODO: get dissolve delay data */}
-                        <Text ff="Inter|Regular" fontSize={3}>
-                          {neuron.dissolveState !== "Unlocked"
-                            ? getNeuronDissolveDuration(neuron)
-                            : "-"}
-                        </Text>
-                      </Cell>
-                      <Cell flex={1}>
-                        {/* TODO: get state data */}
-                        <Text ff="Inter|Regular" fontSize={3}>
-                          {neuron.dissolveState}
-                        </Text>
-                      </Cell>
-                    </NeuronRow>
-                  ))}
+                {neurons.fullNeurons.map(
+                  (neuron, index) =>
+                    neuron.cached_neuron_stake_e8s.toString() !== "0" && (
+                      <NeuronRow
+                        key={neuron.id[0]?.id}
+                        horizontal
+                        alignItems="center"
+                        onClick={() => onClickManage(index)}
+                      >
+                        <Cell flex={2.5}>
+                          <Text ff="Inter|SemiBold" fontSize={3}>
+                            {neuron.id[0]?.id.toString()}
+                          </Text>
+                        </Cell>
+                        <Cell flex={1}>
+                          <FormattedVal
+                            val={Number(neuron.cached_neuron_stake_e8s)}
+                            unit={unit}
+                            showCode
+                            fontSize={3}
+                          />
+                        </Cell>
+                        <Cell flex={1} textAlign="center">
+                          {/* TODO: get maturity data */}
+                          <FormattedVal
+                            color="palette.text.shade100"
+                            val={
+                              Number(neuron.staked_maturity_e8s_equivalent[0] ?? 0) +
+                              Number(neuron.maturity_e8s_equivalent)
+                            }
+                            unit={unit}
+                            showCode
+                          />
+                        </Cell>
+                        <Cell flex={2} textAlign="center">
+                          {/* TODO: get dissolve delay data */}
+                          <Text ff="Inter|Regular" fontSize={3}>
+                            {neuron.dissolveState !== "Unlocked"
+                              ? getNeuronDissolveDuration(neuron)
+                              : "-"}
+                          </Text>
+                        </Cell>
+                        <Cell flex={1}>
+                          {/* TODO: get state data */}
+                          <Text ff="Inter|Regular" fontSize={3}>
+                            {neuron.dissolveState}
+                          </Text>
+                        </Cell>
+                      </NeuronRow>
+                    ),
+                )}
               </ScrollableContent>
             </TableContainer>
           </Box>

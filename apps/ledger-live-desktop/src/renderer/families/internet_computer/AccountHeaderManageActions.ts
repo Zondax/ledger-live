@@ -30,20 +30,22 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
   );
   const onClickStakeIcp = useCallback(() => {
     if (parentAccount) return;
+    if (account.type !== "Account") return;
     const bridge = getAccountBridge(account, undefined);
     const initTx = bridge.createTransaction(account);
     dispatch(
       openModal("MODAL_SEND", {
         stepId: "amount",
         account,
-        onConfirmationHandler: () => onClickManageNeurons(true),
+        onConfirmationHandler: () =>
+          dispatch(openModal("MODAL_ICP_LIST_NEURONS", { account, refresh: true })),
         transaction: {
           ...initTx,
           type: "create_neuron",
         },
       }),
     );
-  }, [account, dispatch, parentAccount, onClickManageNeurons]);
+  }, [account, dispatch, parentAccount]);
 
   if (parentAccount) return null;
   return [
