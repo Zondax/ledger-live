@@ -7,9 +7,9 @@ import { messageSigner as ton } from "../families/ton/setup";
 
 export default {
   casper,
+  internet_computer,
   bitcoin,
   evm,
   filecoin,
-  internet_computer,
   ton,
 };

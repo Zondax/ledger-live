@@ -7,15 +7,17 @@ import {
 } from "@ledgerhq/errors";
 import BigNumber from "bignumber.js";
 import { AccountBridge } from "@ledgerhq/types-live";
-import { getAddress, validateAddress, validateMemo } from "./bridge/bridgeHelpers/addresses";
-import { Transaction, TransactionStatus } from "./types";
-import { InvalidMemoICP, NotEnoughTransferAmount } from "./errors";
-import { ICP_MIN_STAKING_AMOUNT } from "./consts";
+import { getAddress, validateAddress, validateMemo } from "../bridge/bridgeHelpers/addresses";
+import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "../types";
+import { InvalidMemoICP, NotEnoughTransferAmount } from "../errors";
+import { ICP_MIN_STAKING_AMOUNT } from "../consts";
 
-export const getTransactionStatus: AccountBridge<Transaction>["getTransactionStatus"] = async (
-  account,
-  transaction,
-) => {
+export const getTransactionStatus: AccountBridge<
+  Transaction,
+  ICPAccount,
+  TransactionStatus,
+  ICPAccountRaw
+>["getTransactionStatus"] = async (account, transaction) => {
   const errors: TransactionStatus["errors"] = {};
   const warnings: TransactionStatus["warnings"] = {};
 

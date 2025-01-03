@@ -1,5 +1,8 @@
 import { IDL } from "@dfinity/candid";
-import { Neuron as NNSNeuron } from "@dfinity/nns/dist/candid/governance";
+import {
+  Neuron as NNSNeuron,
+  DissolveState as NNSDissolveState,
+} from "@dfinity/nns/dist/candid/governance";
 import { ICPNeuron } from "./types";
 import { principalToAccountIdentifier } from "@dfinity/ledger-icp";
 import { fromNullable, secondsToDuration } from "@dfinity/utils";
@@ -12,8 +15,7 @@ import {
   SECONDS_IN_FOUR_YEARS,
   SECONDS_IN_HALF_YEAR,
 } from "./consts";
-import { Neuron, DissolveState } from "@dfinity/nns/dist/candid/governance";
-import { nowInSeconds } from "./utils";
+import { nowInSeconds } from "./common-logic/utils";
 import BigNumber from "bignumber.js";
 
 const NeuronId = IDL.Record({ id: IDL.Nat64 });
@@ -73,7 +75,7 @@ export class NeuronsData {
   totalMaturity: BigNumber;
   totalMaturityStaked: BigNumber;
 
-  constructor(neurons: Neuron[], lastUpdated: number) {
+  constructor(neurons: NNSNeuron[], lastUpdated: number) {
     this.fullNeurons = neurons.map(neuron => {
       const dissolveState = fromNullable(neuron.dissolve_state);
       const dissolveDelaySeconds =
@@ -252,7 +254,7 @@ export const votingPower = ({
 };
 
 // https://github.com/dfinity/nns-dapp/blob/main/frontend/src/lib/utils/sns-neuron.utils.ts#L46
-const getNeuronDissolveState = (dissolveState?: DissolveState) => {
+const getNeuronDissolveState = (dissolveState?: NNSDissolveState) => {
   if (dissolveState === undefined) {
     return "Unlocked";
   }

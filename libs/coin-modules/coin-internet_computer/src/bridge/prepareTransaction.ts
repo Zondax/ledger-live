@@ -1,9 +1,9 @@
 import { AccountBridge } from "@ledgerhq/types-live";
-import { Transaction } from "./types";
-import { getAddress, validateAddress } from "./bridge/bridgeHelpers/addresses";
+import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "../types";
+import { getAddress, validateAddress } from "./bridgeHelpers/addresses";
 import { AccountIdentifier, SubAccount } from "@dfinity/ledger-icp";
 import { Principal } from "@dfinity/principal";
-import { MAINNET_GOVERNANCE_CANISTER_ID } from "./consts";
+import { MAINNET_GOVERNANCE_CANISTER_ID } from "../consts";
 import { randomBytes } from "crypto";
 import invariant from "invariant";
 import {
@@ -12,7 +12,7 @@ import {
   uint8ArrayToBigInt,
 } from "@dfinity/utils";
 import { sha256 } from "@noble/hashes/sha256";
-import { derivePrincipalFromPubkey } from "./utils";
+import { derivePrincipalFromPubkey } from "../common-logic/utils";
 
 const getNeuronStakeSubAccountBytes = (nonce: Uint8Array, principal: Principal): Uint8Array => {
   const padding = asciiStringToByteArray("neuron-stake");
@@ -24,10 +24,12 @@ const getNeuronStakeSubAccountBytes = (nonce: Uint8Array, principal: Principal):
   return shaObj.digest();
 };
 
-export const prepareTransaction: AccountBridge<Transaction>["prepareTransaction"] = async (
-  account,
-  transaction,
-) => {
+export const prepareTransaction: AccountBridge<
+  Transaction,
+  ICPAccount,
+  TransactionStatus,
+  ICPAccountRaw
+>["prepareTransaction"] = async (account, transaction) => {
   // log("debug", "[prepareTransaction] start fn");
 
   const { address } = getAddress(account);

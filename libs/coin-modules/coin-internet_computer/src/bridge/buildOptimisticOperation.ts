@@ -1,7 +1,7 @@
 import { OperationType } from "@ledgerhq/types-live";
-import { encodeOperationId } from "../../operation";
-import { ICPAccount, InternetComputerOperation, Transaction } from "./types";
-import { getAddress } from "./bridge/bridgeHelpers/addresses";
+import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
+import { ICPAccount, InternetComputerOperation, Transaction } from "../types";
+import { getAddress } from "../bridge/bridgeHelpers/addresses";
 
 export const buildOptimisticSendOperation = async (
   account: ICPAccount,
