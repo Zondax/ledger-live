@@ -11,7 +11,7 @@ import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 // import { closeModal, openModal } from "~/renderer/actions/modals";
 import BigNumber from "bignumber.js";
 import Text from "~/renderer/components/Text";
-import { getNeuronDissolveDuration } from "@ledgerhq/live-common/families/internet_computer/neurons";
+import { getNeuronDissolveDuration } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { closeModal } from "~/renderer/actions/modals";
 
 const Container = styled(Box).attrs(() => ({

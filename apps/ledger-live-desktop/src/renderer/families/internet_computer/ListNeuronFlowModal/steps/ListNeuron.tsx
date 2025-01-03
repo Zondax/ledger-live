@@ -13,7 +13,7 @@ import ErrorDisplay from "~/renderer/components/ErrorDisplay";
 import { StepProps } from "../types";
 import Text from "~/renderer/components/Text";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
-import { getNeuronDissolveDuration } from "@ledgerhq/live-common/families/internet_computer/neurons";
+import { getNeuronDissolveDuration } from "@ledgerhq/live-common/families/internet_computer/utils";
 
 interface ContainerProps {
   shouldSpace?: boolean;

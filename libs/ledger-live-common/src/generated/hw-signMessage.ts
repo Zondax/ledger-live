@@ -7,11 +7,11 @@ import { messageSigner as solana } from "../families/solana/setup";
 import { messageSigner as ton } from "../families/ton/setup";
 
 export default {
-  internet_computer,
   bitcoin,
   casper,
   evm,
   filecoin,
   solana,
+  internet_computer,
   ton,
 };
