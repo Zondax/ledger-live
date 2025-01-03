@@ -61,6 +61,34 @@ function reconciliatePublicKey(
   throw new Error("publicKey wasn't properly restored");
 }
 
+const decodeTransferPayload = (
+  payload: string,
+): { isCrossChain?: boolean; receiverAccount?: string; receiverChainId?: number } => {
+  // Remove unnecessary characters and split by spaces
+  const cleanedPayload = payload
+    .replace(/^"|"$/g, "")
+    .replace(/\\"/g, '"')
+    .trim()
+    .slice(1, -1)
+    .split(/\s+/);
+
+  // Check if it's a cross-chain transfer
+  if (cleanedPayload[0] === "coin.transfer-crosschain") {
+    const receiverAccount = cleanedPayload[2].replace(/"/g, "");
+    const receiverChainId = parseInt(cleanedPayload[5].replace(/"/g, ""));
+
+    return {
+      isCrossChain: true,
+      receiverAccount,
+      receiverChainId: !isNaN(receiverChainId) ? receiverChainId : undefined,
+    };
+  }
+
+  return {
+    isCrossChain: false,
+  };
+};
+
 const rawTxsToOps = (rawTxs: Transfer[], accountId: string, address: string): KadenaOperation[] => {
   const ops: KadenaOperation[] = [];
   const txs = new Map();
@@ -110,17 +138,32 @@ const rawTxsToOps = (rawTxs: Transfer[], accountId: string, address: string): Ka
         receiverAccount,
         chainId,
         crossChainTransfer,
-        transaction: { result },
+        transaction: { result, cmd },
       } = transaction_op;
       const date = new Date(creationTime);
       const value = new BigNumber(amount);
       const fee = new BigNumber(fee_op?.amount ?? 0);
       const sender =
         senderAccount && senderAccount !== "" ? senderAccount : crossChainTransfer?.senderAccount;
-      const recipient =
+      let recipient =
         receiverAccount && receiverAccount !== ""
           ? receiverAccount
           : crossChainTransfer?.receiverAccount;
+
+      // If crossChainTransfer is not null, the transfer is a cross-chain transfer and it's finished
+      let isCrossChainTransfer: boolean =
+        Boolean(crossChainTransfer) && crossChainTransfer !== null;
+      let isFinished = isCrossChainTransfer ?? undefined;
+      let receiverChainId: number | undefined = crossChainTransfer?.chainId;
+
+      // Decode the transaction.cmd.payload.code if there is no recipient
+      if (!recipient && cmd?.payload?.code) {
+        const decodedPayload = decodeTransferPayload(cmd.payload.code);
+        recipient = decodedPayload.receiverAccount;
+        receiverChainId = decodedPayload.receiverChainId;
+        isCrossChainTransfer = decodedPayload.isCrossChain ?? true;
+        isFinished = false;
+      }
 
       const isSending = senderAccount === address;
       const type = isSending ? "OUT" : "IN";
@@ -139,7 +182,8 @@ const rawTxsToOps = (rawTxs: Transfer[], accountId: string, address: string): Ka
       k_op.date = date;
       k_op.extra = {
         senderChainId: chainId,
-        receiverChainId: crossChainTransfer?.chainId ?? chainId,
+        receiverChainId: isCrossChainTransfer ? receiverChainId : chainId,
+        isFinished,
       };
 
       ops.push(k_op);

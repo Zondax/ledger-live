@@ -17,20 +17,22 @@ export type Transaction = TransactionCommon & {
   gasLimit: BigNumber;
   gasPrice: BigNumber;
   senderChainId: number;
-  receiverChainId: number;
+  receiverChainId?: number;
+  isFinished?: boolean; // Indicates if the transaction is confirmed, used specifically for cross-chain transfers
 };
 
 export type KadenaOperation = Operation<KadenaOperationExtra>;
 
-interface KadenaOperationExtra {
+export interface KadenaOperationExtra {
   senderChainId: number;
-  receiverChainId: number;
+  receiverChainId?: number;
+  isFinished?: boolean; // Indicates if the transaction is confirmed, used specifically for cross-chain transfers
 }
 
 export type TransactionRaw = TransactionCommonRaw & {
   family: FamilyType;
   senderChainId: number;
-  receiverChainId: number;
+  receiverChainId?: number;
   gasLimit: string;
   gasPrice: string;
 };

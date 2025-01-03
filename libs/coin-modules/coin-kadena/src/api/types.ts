@@ -34,6 +34,11 @@ export interface Transaction {
     badResult: string;
     goodResult: string;
   };
+  cmd: {
+    payload: {
+      code: string;
+    };
+  };
 }
 
 export interface Transfer {

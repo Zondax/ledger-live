@@ -22,7 +22,9 @@ function OperationDetailsExtra({ operation }: Props) {
         value={operation.extra.receiverChainId}
       />
 
-      {operation.extra.receiverChainId !== operation.extra.senderChainId ? (
+      {operation.extra.receiverChainId !== operation.extra.senderChainId &&
+      operation.type === "OUT" &&
+      !operation.extra.isFinished ? (
         <Alert
           type="secondary"
           learnMoreKey={"operationDetails.extra.completeCrossChainTransfer"}

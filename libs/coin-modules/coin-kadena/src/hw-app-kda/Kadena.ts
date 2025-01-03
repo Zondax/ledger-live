@@ -31,7 +31,7 @@ export interface TransferTxParams {
 }
 
 export interface TransferCrossChainTxParams extends TransferTxParams {
-  recipient_chainId: number;
+  recipient_chainId?: number;
 }
 
 export interface BuildTransactionResult {

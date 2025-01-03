@@ -121,6 +121,13 @@ export const fetchTransactions = async (address: string): Promise<Transfer[]> =>
                     goodResult
                   }
                 }
+                cmd {
+                  payload {
+                    ... on ExecutionPayload {
+                      code
+                    }
+                  }
+                }
               }
             }
           }
