@@ -8,8 +8,14 @@ import {
 import resolver from "../signer";
 import getAddressWrapper from "@ledgerhq/coin-framework/bridge/getAddressWrapper";
 import { SignerContext } from "@ledgerhq/coin-framework/signer";
-import type { Account, AccountBridge, CurrencyBridge } from "@ledgerhq/types-live";
-import type { Transaction, TransactionStatus, ICPSigner } from "../types";
+import type { AccountBridge, CurrencyBridge } from "@ledgerhq/types-live";
+import type {
+  Transaction,
+  TransactionStatus,
+  ICPSigner,
+  ICPAccount,
+  ICPAccountRaw,
+} from "../types";
 import { getTransactionStatus } from "./getTransactionStatus";
 import { estimateMaxSpendable } from "./estimateMaxSpendable";
 import { prepareTransaction } from "./prepareTransaction";
@@ -17,6 +23,8 @@ import { createTransaction } from "./createTransaction";
 import { getAccountShape } from "./bridgeHelpers/account";
 import { buildSignOperation } from "./signOperation";
 import { broadcast } from "./broadcast";
+import { assignFromAccountRaw } from "./assignFromAccountRaw";
+import { assignToAccountRaw } from "./assignToAccountRaw";
 
 function buildCurrencyBridge(signerContext: SignerContext<ICPSigner>): CurrencyBridge {
   const getAddress = resolver(signerContext);
@@ -33,11 +41,13 @@ function buildCurrencyBridge(signerContext: SignerContext<ICPSigner>): CurrencyB
   };
 }
 
-const sync = makeSync({ getAccountShape });
+const sync = makeSync<Transaction, ICPAccount, TransactionStatus, ICPAccountRaw>({
+  getAccountShape,
+});
 
 function buildAccountBridge(
   signerContext: SignerContext<ICPSigner>,
-): AccountBridge<Transaction, Account, TransactionStatus> {
+): AccountBridge<Transaction, ICPAccount, TransactionStatus, ICPAccountRaw> {
   const getAddress = resolver(signerContext);
 
   const receive = makeAccountBridgeReceive(getAddressWrapper(getAddress));
@@ -47,6 +57,8 @@ function buildAccountBridge(
     estimateMaxSpendable,
     createTransaction,
     updateTransaction,
+    assignFromAccountRaw,
+    assignToAccountRaw,
     getTransactionStatus,
     prepareTransaction,
     sync,

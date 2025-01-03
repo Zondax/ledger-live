@@ -1,6 +1,6 @@
 import { AccountBridge } from "@ledgerhq/types-live";
-import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "./types";
-import { NeuronsData } from "./neurons";
+import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "../types";
+import { NeuronsData } from "../neurons";
 import { log } from "@ledgerhq/logs";
 
 export const assignFromAccountRaw: AccountBridge<

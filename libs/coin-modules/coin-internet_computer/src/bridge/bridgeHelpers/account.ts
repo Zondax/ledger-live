@@ -86,7 +86,10 @@ const mapTxToOps = (
     }
 
     const timeStamp = txn.timestamp[0]?.timestamp_nanos ?? Date.now();
-    let amount, fromAccount, toAccount, hash;
+    let amount = BigNumber(0);
+    let fromAccount = "";
+    let toAccount = "";
+    let hash = "";
     if ("Transfer" in txn.operation) {
       amount = BigNumber(txn.operation.Transfer.amount.e8s.toString());
       fromAccount = txn.operation.Transfer.from;

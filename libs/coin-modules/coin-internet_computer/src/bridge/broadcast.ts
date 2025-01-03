@@ -1,15 +1,21 @@
 import { AccountBridge } from "@ledgerhq/types-live";
-import { broadcastTxn, pollForReadState, getAgent } from "./bridge/bridgeHelpers/api";
+import { broadcastTxn, pollForReadState, getAgent } from "../api";
 import { GovernanceCanister } from "@dfinity/nns";
-import { ICPAccount, InternetComputerOperation, Transaction } from "./types";
+import {
+  ICPAccount,
+  ICPAccountRaw,
+  InternetComputerOperation,
+  Transaction,
+  TransactionStatus,
+} from "../types";
 import { ListNeuronsResponse } from "@dfinity/nns/dist/candid/governance";
 import { log } from "@ledgerhq/logs";
 import invariant from "invariant";
-import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "./consts";
+import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "../consts";
 import { idlFactory as idlFactoryGovernance } from "@dfinity/nns/dist/candid/old_list_neurons_service.certified.idl";
 import { IDL } from "@dfinity/candid";
-import { derivePrincipalFromPubkey } from "./utils";
-import { NeuronsData } from "./neurons";
+import { derivePrincipalFromPubkey } from "../common-logic/utils";
+import { NeuronsData } from "../neurons";
 
 // Interface to structure raw data for broadcasting transactions
 interface BroadcastRawData {
@@ -20,10 +26,12 @@ interface BroadcastRawData {
 }
 
 // Main broadcast function for handling Internet Computer transactions
-export const broadcast: AccountBridge<Transaction, ICPAccount>["broadcast"] = async ({
-  account,
-  signedOperation: { operation, rawData },
-}) => {
+export const broadcast: AccountBridge<
+  Transaction,
+  ICPAccount,
+  TransactionStatus,
+  ICPAccountRaw
+>["broadcast"] = async ({ account, signedOperation: { operation, rawData } }) => {
   log("debug", "[broadcast] Internet Computer transaction broadcast initiated");
 
   // Type assertion and validation for rawData

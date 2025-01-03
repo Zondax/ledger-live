@@ -1,5 +1,5 @@
 import { AccountBridge } from "@ledgerhq/types-live";
-import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "./types";
+import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "../types";
 import { log } from "@ledgerhq/logs";
 
 export const assignToAccountRaw: AccountBridge<

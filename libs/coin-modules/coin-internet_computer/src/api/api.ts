@@ -4,7 +4,7 @@ import {
   MAINNET_INDEX_CANISTER_ID,
   // MAINNET_INDEX_CANISTER_ID,
   MAINNET_LEDGER_CANISTER_ID,
-} from "../../consts";
+} from "../consts";
 import { HttpAgent, Cbor, Certificate, bufFromBufLike, lookupResultToBuffer } from "@dfinity/agent";
 import { idlFactory as ledgerIdlFactory } from "@dfinity/ledger-icp/dist/candid/ledger.idl";
 import { idlFactory as indexIdlFactory } from "@dfinity/ledger-icp/dist/candid/index.idl";
