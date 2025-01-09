@@ -9,7 +9,7 @@ export type Props = {
   refresh?: boolean;
 };
 
-export default function ListNeuronsModal({ refresh = false }: Props) {
+export default function RefreshVotingPowerModal({ refresh = false }: Props) {
   const [stepId, setStepId] = useState<StepId>(refresh ? "device" : "confirmation");
   const onHide = useCallback(() => {
     setStepId("device");
@@ -18,7 +18,7 @@ export default function ListNeuronsModal({ refresh = false }: Props) {
     setStepId(id);
   }, []);
   const isModalLocked = ["device", "confirmation"].includes(stepId);
-  const modalName = "MODAL_ICP_LIST_NEURONS";
+  const modalName = "MODAL_ICP_REFRESH_VOTING_POWER";
   return (
     <Modal
       name={modalName}

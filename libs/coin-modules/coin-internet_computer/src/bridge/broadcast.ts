@@ -12,7 +12,7 @@ import { ListNeuronsResponse } from "@dfinity/nns/dist/candid/governance";
 import { log } from "@ledgerhq/logs";
 import invariant from "invariant";
 import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "../consts";
-import { idlFactory as idlFactoryGovernance } from "@dfinity/nns/dist/candid/old_list_neurons_service.certified.idl";
+import { idlFactory as idlFactoryGovernance } from "@dfinity/nns/dist/candid/governance.idl";
 import { IDL } from "@dfinity/candid";
 import { derivePrincipalFromPubkey } from "../common-logic/utils";
 import { NeuronsData } from "../neurons";
@@ -46,6 +46,7 @@ export const broadcast: AccountBridge<
     case "start_dissolving":
     case "stop_dissolving":
     case "disburse":
+    case "refresh_voting_power":
     case "stake_maturity":
     case "spawn_neuron":
       await broadcastTxn(
@@ -91,7 +92,11 @@ export const broadcast: AccountBridge<
       reply,
     ) as any;
 
-    const neurons = new NeuronsData(listNeuronsResponse.full_neurons, Date.now());
+    const neurons = new NeuronsData(
+      listNeuronsResponse.full_neurons,
+      listNeuronsResponse.neuron_infos,
+      Date.now(),
+    );
     return {
       ...operation,
       extra: {

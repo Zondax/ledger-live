@@ -1,4 +1,4 @@
-import { Neuron as NNSNeuron } from "@dfinity/nns/dist/candid/governance";
+import { NeuronInfo, Neuron as NNSNeuron } from "@dfinity/nns/dist/candid/governance";
 import {
   Account,
   AccountRaw,
@@ -18,7 +18,8 @@ export interface ICPAccount extends Account {
 
 export interface ICPAccountRaw extends AccountRaw {
   neuronsData: {
-    neurons: string;
+    fullNeurons: string;
+    neuronInfos: string;
     lastUpdated: number;
   };
 }
@@ -32,7 +33,9 @@ type ICPTransactionType =
   | "disburse"
   | "send"
   | "spawn_neuron"
-  | "stake_maturity";
+  | "stake_maturity"
+  | "refresh_voting_power";
+
 export type Transaction = TransactionCommon & {
   family: FamilyType;
   fees: BigNumber;
@@ -67,9 +70,10 @@ export type InternetComputerOperationExtra = {
 export interface ICPNeuron extends NNSNeuron {
   accountIdentifier: string;
   dissolveState: "Unlocked" | "Locked" | "Dissolving" | "Unknown";
-  votingPower: BigNumber;
   dissolveDelaySeconds: string;
   whenDissolvedTimestampSeconds: string;
+
+  neuronInfo: NeuronInfo;
 }
 
 export const ICPOperationTypeListNeuron = "LIST_NEURONS";

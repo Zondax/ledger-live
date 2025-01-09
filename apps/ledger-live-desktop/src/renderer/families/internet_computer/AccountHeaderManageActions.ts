@@ -6,7 +6,6 @@ import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { openModal } from "~/renderer/actions/modals";
 import IconCoins from "~/renderer/icons/Coins";
-import IconUpdate from "~/renderer/icons/Update";
 
 type Props = {
   account: ICPAccount | TokenAccount;
@@ -72,18 +71,6 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
         button: "manage_neurons_button",
       },
       accountActionsTestId: "manage-neurons-button-icp",
-    },
-    {
-      key: "sync-neurons",
-      onClick: () => onClickManageNeurons(true),
-      icon: IconUpdate,
-      label: "Sync Neurons",
-      tooltip: "Sync neurons for staking",
-      event: "sync_neurons_dashboard_clicked",
-      eventProperties: {
-        button: "sync_neurons_button",
-      },
-      accountActionsTestId: "sync-neurons-button-icp",
     },
   ];
 };

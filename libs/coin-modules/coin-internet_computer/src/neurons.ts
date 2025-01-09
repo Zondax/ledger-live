@@ -2,6 +2,7 @@ import { IDL } from "@dfinity/candid";
 import {
   Neuron as NNSNeuron,
   DissolveState as NNSDissolveState,
+  NeuronInfo,
 } from "@dfinity/nns/dist/candid/governance";
 import { ICPNeuron } from "./types";
 import { principalToAccountIdentifier } from "@dfinity/ledger-icp";
@@ -17,6 +18,7 @@ import {
 } from "./consts";
 import { nowInSeconds } from "./common-logic/utils";
 import BigNumber from "bignumber.js";
+import invariant from "invariant";
 
 const NeuronId = IDL.Record({ id: IDL.Nat64 });
 const BallotInfo = IDL.Record({
@@ -41,6 +43,7 @@ const KnownNeuronData = IDL.Record({
   name: IDL.Text,
   description: IDL.Opt(IDL.Text),
 });
+
 const Neuron = IDL.Record({
   id: IDL.Opt(NeuronId),
   staked_maturity_e8s_equivalent: IDL.Opt(IDL.Nat64),
@@ -66,17 +69,45 @@ const Neuron = IDL.Record({
 });
 const Neurons = IDL.Vec(Neuron);
 
+// NeuronInfo
+const NeuronInfo = IDL.Record({
+  dissolve_delay_seconds: IDL.Nat64,
+  recent_ballots: IDL.Vec(BallotInfo),
+  voting_power_refreshed_timestamp_seconds: IDL.Opt(IDL.Nat64),
+  potential_voting_power: IDL.Opt(IDL.Nat64),
+  neuron_type: IDL.Opt(IDL.Int32),
+  deciding_voting_power: IDL.Opt(IDL.Nat64),
+  created_timestamp_seconds: IDL.Nat64,
+  state: IDL.Int32,
+  stake_e8s: IDL.Nat64,
+  joined_community_fund_timestamp_seconds: IDL.Opt(IDL.Nat64),
+  retrieved_at_timestamp_seconds: IDL.Nat64,
+  visibility: IDL.Opt(IDL.Int32),
+  known_neuron_data: IDL.Opt(KnownNeuronData),
+  voting_power: IDL.Nat64,
+  age_seconds: IDL.Nat64,
+});
+const NeuronInfos = IDL.Vec(IDL.Tuple(IDL.Nat64, NeuronInfo));
+
 export class NeuronsData {
   fullNeurons: ICPNeuron[];
-  lastUpdated: number;
+  neuronInfos: [bigint, NeuronInfo][];
+  lastUpdatedMSecs: number;
 
   // calculated values
   totalStaked: BigNumber;
   totalMaturity: BigNumber;
   totalMaturityStaked: BigNumber;
 
-  constructor(neurons: NNSNeuron[], lastUpdated: number) {
+  constructor(neurons: NNSNeuron[], neuronInfos: [bigint, NeuronInfo][], lastUpdated: number) {
+    this.neuronInfos = neuronInfos;
     this.fullNeurons = neurons.map(neuron => {
+      const neuronId = fromNullable(neuron.id);
+      invariant(neuronId !== undefined, "Neuron ID is undefined");
+
+      const neuronInfo = neuronInfos.find(info => info[0] === neuronId.id);
+      invariant(neuronInfo !== undefined, "Neuron info is undefined");
+
       const dissolveState = fromNullable(neuron.dissolve_state);
       const dissolveDelaySeconds =
         dissolveState && "DissolveDelaySeconds" in dissolveState
@@ -96,12 +127,14 @@ export class NeuronsData {
         votingPower: neuronVotingPower({ neuron }),
         dissolveDelaySeconds,
         whenDissolvedTimestampSeconds,
+
+        neuronInfo: neuronInfo[1],
       };
     });
     this.totalStaked = BigNumber(0);
     this.totalMaturity = BigNumber(0);
     this.totalMaturityStaked = BigNumber(0);
-    this.lastUpdated = lastUpdated;
+    this.lastUpdatedMSecs = lastUpdated;
 
     this.fullNeurons.forEach(neuron => {
       this.totalStaked = this.totalStaked.plus(
@@ -117,20 +150,24 @@ export class NeuronsData {
   }
 
   serialize() {
-    const encoded = IDL.encode([Neurons], [this.fullNeurons]);
+    const encodedFullNeurons = IDL.encode([Neurons], [this.fullNeurons]);
+    const encodedNeuronInfos = IDL.encode([NeuronInfos], [this.neuronInfos]);
     return {
-      neurons: Buffer.from(encoded).toString("hex"),
+      fullNeurons: Buffer.from(encodedFullNeurons).toString("hex"),
+      neuronInfos: Buffer.from(encodedNeuronInfos).toString("hex"),
     };
   }
 
   public static empty() {
-    return new NeuronsData([], Date.now());
+    return new NeuronsData([], [], Date.now());
   }
 
-  public static deserialize(data: string, lastUpdated?: number) {
-    const encoded = new Uint8Array(Buffer.from(data, "hex"));
-    const [fullNeurons]: any = IDL.decode([Neurons], encoded);
-    return new NeuronsData(fullNeurons, lastUpdated ?? Date.now());
+  public static deserialize(fullNeuronsRaw: string, neuronInfosRaw: string, lastUpdated?: number) {
+    const encodedFullNeurons = new Uint8Array(Buffer.from(fullNeuronsRaw, "hex"));
+    const [fullNeurons]: any = IDL.decode([Neurons], encodedFullNeurons);
+    const encodedNeuronInfos = new Uint8Array(Buffer.from(neuronInfosRaw, "hex"));
+    const [neuronInfos]: any = IDL.decode([NeuronInfos], encodedNeuronInfos);
+    return new NeuronsData(fullNeurons, neuronInfos, lastUpdated ?? Date.now());
   }
 }
 

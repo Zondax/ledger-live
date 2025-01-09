@@ -9,8 +9,7 @@ import { UserRefusedOnDevice } from "@ledgerhq/errors";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import { SyncSkipUnderPriority } from "@ledgerhq/live-common/bridge/react/index";
 import useBridgeTransaction from "@ledgerhq/live-common/bridge/useBridgeTransaction";
-import { reassignOperationType } from "@ledgerhq/live-common/families/internet_computer/utils";
-import { StepId, St } from "./types";
+import { StepId, St, ModalName } from "../common/types";
 import { Device } from "@ledgerhq/live-common/hw/actions/types";
 import logger from "~/renderer/logger";
 // import { updateAccountWithUpdater } from "~/renderer/actions/accounts";
@@ -19,12 +18,13 @@ import { OpenModal, openModal } from "~/renderer/actions/modals";
 import Track from "~/renderer/analytics/Track";
 import Stepper from "~/renderer/components/Stepper";
 import { getCurrentDevice } from "~/renderer/reducers/devices";
-import { useSteps } from "./steps";
+import { useSteps as useStepsListNeurons } from "../ListNeuronFlowModal/steps";
+import { useSteps as useStepsRefreshVotingPower } from "../RefreshVotingPowerFlowModal/steps";
 import {
   ICPAccount,
   InternetComputerOperation,
 } from "@ledgerhq/live-common/families/internet_computer/types";
-import { updateAccountWithUpdater } from "~/renderer/actions/accounts";
+import { refreshNeuronsData } from "../common";
 
 export type Data = {
   account: ICPAccount;
@@ -33,6 +33,7 @@ type OwnProps = {
   account: ICPAccount;
   refresh: boolean;
   stepId: StepId;
+  modalName: ModalName;
   onClose: () => void;
   onChangeStepId: (a: StepId) => void;
 };
@@ -55,6 +56,7 @@ function Body({
   stepId,
   onChangeStepId,
   onClose,
+  modalName,
   openModal,
   device,
 }: Props) {
@@ -86,7 +88,9 @@ function Body({
       transaction: initTx,
     };
   });
-  const steps = useSteps();
+  const listNeuronsSteps = useStepsListNeurons();
+  const refreshVotingPowerSteps = useStepsRefreshVotingPower();
+  const steps = modalName === "MODAL_ICP_LIST_NEURONS" ? listNeuronsSteps : refreshVotingPowerSteps;
   const error = transactionError || bridgeError;
   const handleRetry = useCallback(() => {
     setTransactionError(null);
@@ -96,27 +100,12 @@ function Body({
 
   const handleOperationBroadcasted = useCallback(
     (optimisticOperation: InternetComputerOperation) => {
-      if (!account || !optimisticOperation.extra.neurons) return;
-      dispatch(
-        updateAccountWithUpdater(account.id, account => {
-          const neuronAddresses = optimisticOperation.extra.neurons?.fullNeurons.map(
-            neuron => neuron.accountIdentifier,
-          );
-          const ops = reassignOperationType(
-            account.operations as InternetComputerOperation[],
-            neuronAddresses ?? [],
-          );
-          return {
-            ...account,
-            operations: ops,
-            neurons: optimisticOperation.extra.neurons,
-          };
-        }),
-      );
+      if (!accountProp || !optimisticOperation.extra.neurons) return;
+      refreshNeuronsData(dispatch, accountProp, optimisticOperation);
       setOptimisticOperation(optimisticOperation);
       setTransactionError(null);
     },
-    [account, dispatch],
+    [accountProp, dispatch],
   );
   const handleTransactionError = useCallback((error: Error) => {
     if (!(error instanceof UserRefusedOnDevice)) {
@@ -131,7 +120,7 @@ function Body({
     errorSteps.push(0);
   }
   const stepperProps = {
-    title: "Manage Neurons",
+    title: modalName === "MODAL_ICP_LIST_NEURONS" ? "Manage Neurons" : "Refresh Voting Power",
     device,
     account,
     transaction,
@@ -150,6 +139,7 @@ function Body({
     manageNeuronIndex,
     setManageNeuronIndex,
     needsRefresh,
+    modalName,
     setNeedsRefresh,
     optimisticOperation,
     openModal,

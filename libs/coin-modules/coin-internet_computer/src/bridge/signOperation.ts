@@ -30,7 +30,7 @@ import { hashTransaction } from "./bridgeHelpers/hash";
 import { toNullable } from "@dfinity/utils";
 import { SignerContext } from "@ledgerhq/coin-framework/lib/signer";
 
-interface UnsignedTransaction {
+interface UnsignedTransaction extends Record<string, any> {
   request_type: SubmitRequestType;
   canister_id: Principal;
   method_name: string;
@@ -66,6 +66,10 @@ interface SpawnNeuronCommand {
   };
 }
 
+interface RefreshVotingPowerCommand {
+  RefreshVotingPower: object;
+}
+
 interface ConfigureOperationCommand {
   Configure: {
     operation: [{ StartDissolving: object } | { StopDissolving: object }];
@@ -73,7 +77,12 @@ interface ConfigureOperationCommand {
 }
 
 export interface NeuronCommandRawRequest<
-  T extends DisburseCommand | ConfigureOperationCommand | StakeMaturityCommand | SpawnNeuronCommand,
+  T extends
+    | DisburseCommand
+    | ConfigureOperationCommand
+    | StakeMaturityCommand
+    | SpawnNeuronCommand
+    | RefreshVotingPowerCommand,
 > {
   id: [{ id: bigint }];
   command: T[];
@@ -122,14 +131,22 @@ const createUnsignedNeuronCommandTransaction = (
 ): {
   unsignedTransaction: UnsignedTransaction;
   neuronCommandRawRequest: NeuronCommandRawRequest<
-    DisburseCommand | ConfigureOperationCommand | StakeMaturityCommand | SpawnNeuronCommand
+    | DisburseCommand
+    | ConfigureOperationCommand
+    | StakeMaturityCommand
+    | SpawnNeuronCommand
+    | RefreshVotingPowerCommand
   >;
 } => {
   const { neuronId, amount } = transaction;
   invariant(neuronId, "[ICP](createUnsignedNeuronCommandTransaction) Neuron ID is required");
 
   const rawCommand: NeuronCommandRawRequest<
-    DisburseCommand | ConfigureOperationCommand | StakeMaturityCommand | SpawnNeuronCommand
+    | DisburseCommand
+    | ConfigureOperationCommand
+    | StakeMaturityCommand
+    | SpawnNeuronCommand
+    | RefreshVotingPowerCommand
   > = {
     id: [{ id: BigInt(neuronId) }],
     neuron_id_or_subaccount: [],
@@ -172,6 +189,13 @@ const createUnsignedNeuronCommandTransaction = (
       rawCommand.command = [
         {
           Spawn: { percentage_to_spawn: [100], new_controller: [], nonce: [] },
+        },
+      ];
+      break;
+    case "refresh_voting_power":
+      rawCommand.command = [
+        {
+          RefreshVotingPower: {},
         },
       ];
       break;
@@ -336,7 +360,8 @@ export const buildSignOperation =
           transaction.type === "start_dissolving" ||
           transaction.type === "stop_dissolving" ||
           transaction.type === "stake_maturity" ||
-          transaction.type === "spawn_neuron"
+          transaction.type === "spawn_neuron" ||
+          transaction.type === "refresh_voting_power"
         ) {
           ({ unsignedTransaction } = createUnsignedNeuronCommandTransaction(transaction, account));
         } else {

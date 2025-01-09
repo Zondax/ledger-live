@@ -17,6 +17,12 @@ export const FETCH_TXNS_LIMIT = 100;
 // Max ICP fees
 export const ICP_FEES = 1e4;
 
+// Voting power refresh threshold
+export const VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS = 300;
+
+// Last sync threshold
+export const LAST_SYNC_THRESHOLD_IN_DAYS = 14;
+
 // Min ICP Staking amount
 export const ICP_MIN_STAKING_AMOUNT = 1e8;
 

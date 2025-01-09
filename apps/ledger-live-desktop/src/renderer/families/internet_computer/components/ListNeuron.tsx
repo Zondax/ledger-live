@@ -10,10 +10,15 @@ import BroadcastErrorDisclaimer from "~/renderer/components/BroadcastErrorDiscla
 import Button from "~/renderer/components/Button";
 import ErrorDisplay from "~/renderer/components/ErrorDisplay";
 // import TableContainer from "~/renderer/components/TableContainer";
-import { StepProps } from "../types";
+import { StepProps as ListNeuronStepProps } from "../common/types";
+import { StepProps as RefreshVotingPowerStepProps } from "../common/types";
 import Text from "~/renderer/components/Text";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
-import { getNeuronDissolveDuration } from "@ledgerhq/live-common/families/internet_computer/utils";
+import {
+  getNeuronDissolveDuration,
+  getTimeUntil,
+} from "@ledgerhq/live-common/families/internet_computer/utils";
+import { ICPNeuron, Transaction } from "@ledgerhq/live-common/families/internet_computer/types";
 
 interface ContainerProps {
   shouldSpace?: boolean;
@@ -50,6 +55,8 @@ const Cell = styled(Box).attrs(() => ({
   fontSize: 3,
 }))``;
 
+type StepProps = ListNeuronStepProps | RefreshVotingPowerStepProps;
+
 export default function StepListNeuron({
   account,
   error,
@@ -60,6 +67,7 @@ export default function StepListNeuron({
   transitionTo,
   needsRefresh,
   setNeedsRefresh,
+  modalName,
 }: StepProps) {
   const { t } = useTranslation();
   const currencyId = account.currency.id;
@@ -87,6 +95,23 @@ export default function StepListNeuron({
     },
     [account.type, transitionTo, setManageNeuronIndex],
   );
+
+  const onClickConfirmFollowing = useCallback(
+    (neuron: ICPNeuron) => {
+      if (account.type !== "Account") return;
+      const bridge = getAccountBridge(account, undefined);
+      const initTx: Transaction = bridge.createTransaction(account);
+      onChangeTransaction(
+        bridge.updateTransaction(initTx, {
+          type: "refresh_voting_power",
+          neuronId: neuron.id[0]?.id.toString(),
+        }),
+      );
+      transitionTo("device");
+    },
+    [account, onChangeTransaction, transitionTo],
+  );
+
   // const locale = useSelector(localeSelector);
   // const unit = useAccountUnit(account);
   if (neurons) {
@@ -109,10 +134,20 @@ export default function StepListNeuron({
             <TableContainer>
               <HeaderRow horizontal>
                 <Cell flex={2.5}>Neurons</Cell>
-                <Cell flex={1}>Stake</Cell>
-                <Cell flex={1}>Maturity</Cell>
-                <Cell flex={1.75}>Dissolve Delay</Cell>
-                <Cell flex={1}>State</Cell>
+                {modalName === "MODAL_ICP_LIST_NEURONS" && (
+                  <>
+                    <Cell flex={1}>Stake</Cell>
+                    <Cell flex={1}>Maturity</Cell>
+                    <Cell flex={1.75}>Dissolve Delay</Cell>
+                    <Cell flex={1}>State</Cell>
+                  </>
+                )}
+                {modalName === "MODAL_ICP_REFRESH_VOTING_POWER" && (
+                  <>
+                    <Cell flex={2}>Time Until Reward Loss</Cell>
+                    <Cell flex={1}>Action</Cell>
+                  </>
+                )}
               </HeaderRow>
               <ScrollableContent>
                 {neurons.fullNeurons.map(
@@ -122,47 +157,81 @@ export default function StepListNeuron({
                         key={neuron.id[0]?.id}
                         horizontal
                         alignItems="center"
-                        onClick={() => onClickManage(index)}
+                        onClick={() => {
+                          if (modalName === "MODAL_ICP_LIST_NEURONS") {
+                            onClickManage(index);
+                          }
+                        }}
                       >
                         <Cell flex={2.5}>
                           <Text ff="Inter|SemiBold" fontSize={3}>
                             {neuron.id[0]?.id.toString()}
                           </Text>
                         </Cell>
-                        <Cell flex={1}>
-                          <FormattedVal
-                            val={Number(neuron.cached_neuron_stake_e8s)}
-                            unit={unit}
-                            showCode
-                            fontSize={3}
-                          />
-                        </Cell>
-                        <Cell flex={1} textAlign="center">
-                          {/* TODO: get maturity data */}
-                          <FormattedVal
-                            color="palette.text.shade100"
-                            val={
-                              Number(neuron.staked_maturity_e8s_equivalent[0] ?? 0) +
-                              Number(neuron.maturity_e8s_equivalent)
-                            }
-                            unit={unit}
-                            showCode
-                          />
-                        </Cell>
-                        <Cell flex={2} textAlign="center">
-                          {/* TODO: get dissolve delay data */}
-                          <Text ff="Inter|Regular" fontSize={3}>
-                            {neuron.dissolveState !== "Unlocked"
-                              ? getNeuronDissolveDuration(neuron)
-                              : "-"}
-                          </Text>
-                        </Cell>
-                        <Cell flex={1}>
-                          {/* TODO: get state data */}
-                          <Text ff="Inter|Regular" fontSize={3}>
-                            {neuron.dissolveState}
-                          </Text>
-                        </Cell>
+                        {modalName === "MODAL_ICP_LIST_NEURONS" && (
+                          <>
+                            <Cell flex={1}>
+                              <FormattedVal
+                                val={Number(neuron.cached_neuron_stake_e8s)}
+                                unit={unit}
+                                showCode
+                                fontSize={3}
+                              />
+                            </Cell>
+                            <Cell flex={1} textAlign="center">
+                              {/* TODO: get maturity data */}
+                              <FormattedVal
+                                color="palette.text.shade100"
+                                val={
+                                  Number(neuron.staked_maturity_e8s_equivalent[0] ?? 0) +
+                                  Number(neuron.maturity_e8s_equivalent)
+                                }
+                                unit={unit}
+                                showCode
+                              />
+                            </Cell>
+                            <Cell flex={2} textAlign="center">
+                              {/* TODO: get dissolve delay data */}
+                              <Text ff="Inter|Regular" fontSize={3}>
+                                {neuron.dissolveState !== "Unlocked"
+                                  ? getNeuronDissolveDuration(neuron)
+                                  : "-"}
+                              </Text>
+                            </Cell>
+                            <Cell flex={1}>
+                              {/* TODO: get state data */}
+                              <Text ff="Inter|Regular" fontSize={3}>
+                                {neuron.dissolveState}
+                              </Text>
+                            </Cell>
+                          </>
+                        )}
+                        {modalName === "MODAL_ICP_REFRESH_VOTING_POWER" && (
+                          <>
+                            <Cell flex={2}>
+                              <Text ff="Inter|Regular" fontSize={3}>
+                                {(() => {
+                                  const timeUntil = getTimeUntil(
+                                    Number(
+                                      neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0],
+                                    ),
+                                  );
+                                  return `${timeUntil.days} Days ${timeUntil.minutes} Min`;
+                                })()}
+                              </Text>
+                            </Cell>
+                            <Cell flex={1}>
+                              <Button
+                                primary
+                                // ml={2}
+                                // event={`Manage Neurons ${currencyName} Flow Step 3 Sync Neurons Clicked`}
+                                onClick={() => onClickConfirmFollowing(neuron)}
+                              >
+                                Confirm Following
+                              </Button>
+                            </Cell>
+                          </>
+                        )}
                       </NeuronRow>
                     ),
                 )}
@@ -225,7 +294,7 @@ export function StepListNeuronFooter({
   return (
     <Box width="100%" horizontal alignItems="center" justifyContent="space-between">
       <Box ff="Inter|SemiBold" fontSize={4} color="palette.text.shade60">
-        {`Last Synced: ${new Date(neurons.lastUpdated).toLocaleString()}`}
+        {`Last Synced: ${new Date(neurons.lastUpdatedMSecs).toLocaleString()}`}
       </Box>
       <Box horizontal>
         <Button ml={2} onClick={onClose}>

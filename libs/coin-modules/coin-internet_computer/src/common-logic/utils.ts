@@ -44,6 +44,8 @@ export const methodToString = (method: Transaction["type"]): string => {
       return "Stop Dissolving";
     case "spawn_neuron":
       return "Spawn Neuron";
+    case "refresh_voting_power":
+      return "Refresh Voting Power";
     default:
       return "Send ICP";
   }
@@ -117,3 +119,21 @@ export const reassignOperationType = (
 };
 
 export const nowInSeconds = (): number => Math.round(Date.now() / 1000);
+
+export const getTimeUntil = (
+  futureTimestampInSeconds: number,
+): {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+} => {
+  const now = nowInSeconds();
+  const diff = Math.abs(futureTimestampInSeconds - now);
+  return {
+    days: Math.floor(diff / (24 * 60 * 60)),
+    hours: Math.floor((diff % (24 * 60 * 60)) / (60 * 60)),
+    minutes: Math.floor((diff % (60 * 60)) / 60),
+    seconds: diff % 60,
+  };
+};

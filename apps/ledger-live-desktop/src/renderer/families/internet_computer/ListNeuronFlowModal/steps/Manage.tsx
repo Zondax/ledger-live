@@ -5,7 +5,7 @@ import Box from "~/renderer/components/Box";
 import FormattedVal from "~/renderer/components/FormattedVal";
 import Button from "~/renderer/components/Button";
 import { useDispatch } from "react-redux";
-import { StepProps } from "../types";
+import { StepProps } from "../../common/types";
 import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 // import { closeModal, openModal } from "~/renderer/actions/modals";
@@ -227,12 +227,26 @@ export default function StepManage({
               </Text>
               <Text ff="Inter|SemiBold" fontSize={4}>
                 <FormattedVal
-                  val={Number(neuron.votingPower.toString())}
+                  val={Number(neuron.neuronInfo.voting_power.toString())}
                   unit={unit}
                   color="palette.text.shade100"
                 />
               </Text>
             </Box>
+            {neuron.neuronInfo.voting_power_refreshed_timestamp_seconds.length && (
+              <Box horizontal alignItems="center">
+                <Text ff="Inter|Regular" fontSize={3} color="palette.text.shade60" mr={2}>
+                  Voting Power Refreshes:
+                </Text>
+                <Text ff="Inter|SemiBold" fontSize={4}>
+                  <Text ff="Inter|SemiBold" fontSize={4}>
+                    {new Date(
+                      Number(neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]) * 1000,
+                    ).toDateString()}
+                  </Text>
+                </Text>
+              </Box>
+            )}
           </Box>
           <ButtonGroup>
             <Button primary small onClick={onClickIncreaseStake}>
