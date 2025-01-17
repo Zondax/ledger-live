@@ -52,7 +52,6 @@ const StakeBanner: React.FC<{ account: ICPAccount }> = ({ account }) => {
     dispatch(
       openModal("MODAL_ICP_REFRESH_VOTING_POWER", {
         account,
-        refresh: false,
       }),
     );
     updateBanner();

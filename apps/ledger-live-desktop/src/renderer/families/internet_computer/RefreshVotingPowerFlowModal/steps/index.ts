@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import GenericStepConnectDevice from "~/renderer/modals/Send/steps/GenericStepConnectDevice";
-import StepListNeuron from "../../components/ListNeuron";
-import { StepProps, St } from "../../common/types";
+import StepListNeuron from "./ListNeuron";
+import { StepProps, St } from "../types";
 export function useSteps(): St[] {
   const { t } = useTranslation();
   return useMemo<St[]>(

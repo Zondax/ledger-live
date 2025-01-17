@@ -66,6 +66,11 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
   const stakedBalance = formatCurrencyUnit(unit, neurons.totalStaked, formatConfig);
   const maturityBalance = formatCurrencyUnit(unit, neurons.totalMaturity, formatConfig);
   const maturityStakedBalance = formatCurrencyUnit(unit, neurons.totalMaturityStaked, formatConfig);
+  const maturityLiquidBalance = formatCurrencyUnit(
+    unit,
+    neurons.totalMaturity.minus(neurons.totalMaturityStaked),
+    formatConfig,
+  );
 
   return (
     <Wrapper>
@@ -82,11 +87,24 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
           </AmountValue>
         </BalanceDetail>
       )}
+      {neurons.totalMaturity.gt(0) && (
+        <BalanceDetail>
+          <ToolTip content="Total Maturity">
+            <TitleWrapper>
+              <Title>Total Maturity</Title>
+              <InfoCircle size={13} />
+            </TitleWrapper>
+          </ToolTip>
+          <AmountValue>
+            <Discreet>{maturityBalance}</Discreet>
+          </AmountValue>
+        </BalanceDetail>
+      )}
       {neurons.totalMaturityStaked.gt(0) && (
         <BalanceDetail>
-          <ToolTip content="Maturity staked balance">
+          <ToolTip content="Staked Maturity">
             <TitleWrapper>
-              <Title>Maturity staked balance</Title>
+              <Title>Staked Maturity</Title>
               <InfoCircle size={13} />
             </TitleWrapper>
           </ToolTip>
@@ -97,17 +115,20 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
       )}
       {neurons.totalMaturity.gt(0) && (
         <BalanceDetail>
-          <ToolTip content="Maturity balance">
+          <ToolTip content="Liquid Maturity">
             <TitleWrapper>
-              <Title>Maturity balance</Title>
+              <Title>Liquid Maturity</Title>
               <InfoCircle size={13} />
             </TitleWrapper>
           </ToolTip>
           <AmountValue>
-            <Discreet>{maturityBalance}</Discreet>
+            <Discreet>{maturityLiquidBalance}</Discreet>
           </AmountValue>
         </BalanceDetail>
       )}
+      <Box ff="Inter|SemiBold" margin={"auto"} fontSize={4} color="palette.text.shade60">
+        {`Last Synced: ${new Date(neurons.lastUpdatedMSecs).toLocaleString()}`}
+      </Box>
     </Wrapper>
   );
 };

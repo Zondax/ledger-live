@@ -432,6 +432,7 @@ export const buildSignOperation =
               encodedSignedReadStateBlob,
               requestId,
               methodName: transaction.type,
+              neuronId: transaction.neuronId,
             },
           },
         });

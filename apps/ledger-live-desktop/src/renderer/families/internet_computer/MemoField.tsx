@@ -33,9 +33,12 @@ const MemoField = ({
     [onChange, transaction, bridge],
   );
 
+  if (transaction.type !== "send") {
+    return null;
+  }
+
   return (
     <MemoTagField
-      disabled={transaction.type === "create_neuron"}
       warning={status.warnings.transaction}
       error={status.errors.transaction}
       value={transaction.memo ?? ""}

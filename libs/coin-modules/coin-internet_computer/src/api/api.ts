@@ -15,7 +15,8 @@ import { IDL } from "@dfinity/candid";
 import { fromNullable } from "@dfinity/utils";
 import invariant from "invariant";
 
-const ICP_NETWORK_URL = "https://ic0.app";
+// const ICP_NETWORK_URL = "https://ic0.app";
+const ICP_NETWORK_URL = "http://localhost:8080";
 export const getAgent = async () => {
   return await HttpAgent.create({ host: ICP_NETWORK_URL, shouldFetchRootKey: true });
 };

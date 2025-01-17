@@ -24,7 +24,7 @@ export interface ICPAccountRaw extends AccountRaw {
   };
 }
 
-type ICPTransactionType =
+export type ICPTransactionType =
   | "start_dissolving"
   | "stop_dissolving"
   | "list_neurons"
@@ -69,7 +69,7 @@ export type InternetComputerOperationExtra = {
 
 export interface ICPNeuron extends NNSNeuron {
   accountIdentifier: string;
-  dissolveState: "Unlocked" | "Locked" | "Dissolving" | "Unknown";
+  dissolveState: "Unlocked" | "Locked" | "Dissolving" | "Unknown" | "Spawning";
   dissolveDelaySeconds: string;
   whenDissolvedTimestampSeconds: string;
 

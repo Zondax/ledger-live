@@ -5,7 +5,7 @@ import Box from "~/renderer/components/Box";
 import FormattedVal from "~/renderer/components/FormattedVal";
 import Button from "~/renderer/components/Button";
 import { useDispatch } from "react-redux";
-import { StepProps } from "../../common/types";
+import { StepProps } from "../types";
 import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 // import { closeModal, openModal } from "~/renderer/actions/modals";
@@ -96,7 +96,6 @@ export default function StepManage({
   neurons,
   onChangeTransaction,
   transitionTo,
-  setNeedsRefresh,
   openModal,
 }: StepProps) {
   const currencyId = account.currency.id;
@@ -115,16 +114,24 @@ export default function StepManage({
       openModal("MODAL_SEND", {
         stepId: "amount",
         onConfirmationHandler: () =>
-          dispatch(openModal("MODAL_ICP_LIST_NEURONS", { account, refresh: true })),
+          dispatch(
+            openModal("MODAL_ICP_LIST_NEURONS", {
+              account,
+              refresh: false,
+              lastManageAction: "increase_stake",
+              neuronIndex: manageNeuronIndex,
+            }),
+          ),
         account,
         transaction: {
           ...initTx,
           neuronAccountIdentifier: neuron.accountIdentifier,
+          neuronId: neuron.id[0]?.id.toString(),
           type: "increase_stake",
         },
       }),
     );
-  }, [account, dispatch, openModal, neuron]);
+  }, [account, dispatch, openModal, neuron, manageNeuronIndex]);
 
   const onClickDisburseStake = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -136,9 +143,8 @@ export default function StepManage({
         type: "disburse",
       }),
     );
-    setNeedsRefresh(true);
     transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo, neuron, setNeedsRefresh]);
+  }, [account, onChangeTransaction, transitionTo, neuron]);
 
   const onClickStartStopDissolving = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -149,9 +155,8 @@ export default function StepManage({
         type: neuron.dissolveState === "Dissolving" ? "stop_dissolving" : "start_dissolving",
       }),
     );
-    setNeedsRefresh(true);
     transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo, neuron, setNeedsRefresh]);
+  }, [account, onChangeTransaction, transitionTo, neuron]);
 
   const onClickStakeMaturity = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -162,9 +167,8 @@ export default function StepManage({
         type: "stake_maturity",
       }),
     );
-    setNeedsRefresh(true);
     transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo, neuron, setNeedsRefresh]);
+  }, [account, onChangeTransaction, transitionTo, neuron]);
 
   const onClickSpawnNeuron = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -175,9 +179,8 @@ export default function StepManage({
         type: "spawn_neuron",
       }),
     );
-    setNeedsRefresh(true);
     transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo, neuron, setNeedsRefresh]);
+  }, [account, onChangeTransaction, transitionTo, neuron]);
 
   if (neuron) {
     return (

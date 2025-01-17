@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import GenericStepConnectDevice from "~/renderer/modals/Send/steps/GenericStepConnectDevice";
-import StepListNeuron, { StepListNeuronFooter } from "../../components/ListNeuron";
-import { StepProps, St } from "../../common/types";
+import StepListNeuron, { StepListNeuronFooter } from "./ListNeuron";
+import { StepProps, St } from "../types";
 import StepManage from "./Manage";
+import StepConfirmation from "./Confirmation";
 export function useSteps(): St[] {
   const { t } = useTranslation();
   return useMemo<St[]>(
@@ -28,6 +29,12 @@ export function useSteps(): St[] {
         onBack: ({ transitionTo }: StepProps) => {
           transitionTo("confirmation");
         },
+      },
+      {
+        id: "success",
+        label: "Confirmation",
+        component: StepConfirmation,
+        footer: StepListNeuronFooter,
       },
     ],
     [t],

@@ -37,7 +37,14 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
         stepId: "amount",
         account,
         onConfirmationHandler: () =>
-          dispatch(openModal("MODAL_ICP_LIST_NEURONS", { account, refresh: true })),
+          dispatch(
+            openModal("MODAL_ICP_LIST_NEURONS", {
+              account,
+              refresh: false,
+              lastManageAction: "create_neuron",
+            }),
+          ),
+        disableBacks: ["amount"],
         transaction: {
           ...initTx,
           type: "create_neuron",

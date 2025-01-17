@@ -23,6 +23,7 @@ interface BroadcastRawData {
   encodedSignedReadStateBlob: string;
   requestId: string;
   methodName: Transaction["type"];
+  neuronId?: string;
 }
 
 // Main broadcast function for handling Internet Computer transactions
@@ -106,12 +107,14 @@ export const broadcast: AccountBridge<
     } as InternetComputerOperation;
   }
 
+  // Additional logic post-transaction broadcast
   // Additional step for neuron creation
   if (rawDataTyped.methodName === "create_neuron") {
-    invariant(account.xpub, "[ICP](broadcast) Missing account xpub");
+    invariant(account.xpub, `[ICP](broadcast-${rawDataTyped.methodName}) Missing account xpub`);
 
     const agent = await getAgent();
     const govCanister = GovernanceCanister.create({ agent });
+
     const memo = (operation as InternetComputerOperation).extra.memo;
     invariant(memo, "[ICP](broadcast) Missing memo");
 
@@ -140,6 +143,23 @@ export const broadcast: AccountBridge<
       },
     } as InternetComputerOperation;
   }
+
+  // if (rawDataTyped.methodName === "increase_stake") {
+  //   invariant(account.xpub, `[ICP](broadcast-${rawDataTyped.methodName}) Missing account xpub`);
+
+  //   const agent = await getAgent();
+  //   const govCanister = GovernanceCanister.create({ agent });
+
+  //   invariant(
+  //     rawDataTyped.neuronId,
+  //     `[ICP](broadcast-${rawDataTyped.methodName}) Missing neuronId`,
+  //   );
+
+  //   await govCanister.claimOrRefreshNeuron({
+  //     neuronId: BigInt(rawDataTyped.neuronId),
+  //     by: undefined,
+  //   });
+  // }
 
   return operation;
 };

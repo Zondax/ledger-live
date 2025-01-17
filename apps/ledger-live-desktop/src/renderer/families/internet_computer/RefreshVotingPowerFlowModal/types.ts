@@ -8,10 +8,8 @@ import {
 } from "@ledgerhq/live-common/families/internet_computer/types";
 import { OpenModal } from "~/renderer/actions/modals";
 import { NeuronsData } from "@ledgerhq/live-common/families/internet_computer/utils";
-export type StepId = "device" | "confirmation" | "manage";
-export type ModalName = "MODAL_ICP_LIST_NEURONS" | "MODAL_ICP_REFRESH_VOTING_POWER";
+export type StepId = "device" | "confirmation";
 export type StepProps = {
-  modalName: ModalName;
   transitionTo: (address: string) => void;
   device: Device | undefined | null;
   account: ICPAccount;
@@ -25,8 +23,6 @@ export type StepProps = {
   neurons: NeuronsData;
   needsRefresh: boolean;
   setNeedsRefresh: (needsRefresh: boolean) => void;
-  manageNeuronIndex: number;
-  setManageNeuronIndex: (index: number) => void;
   transaction: Transaction | undefined | null;
   onStepChange: ({ id }: St) => void;
   status: TransactionStatus;
