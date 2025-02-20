@@ -29,7 +29,7 @@ const buildOptimisticOperation = (
     value = value.minus(transaction.fees.accountCreationFee);
   }
 
-  const type: OperationType = "OUT";
+  const type: OperationType = transaction.txType === "stake" ? "REDELEGATE" : "OUT";
 
   const operation: MinaOperation = {
     id: encodeOperationId(account.id, "", type),

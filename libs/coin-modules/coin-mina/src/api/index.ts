@@ -11,6 +11,7 @@ import {
 import { MINA_TOKEN_ID } from "../consts";
 import { isValidAddress } from "../common-logic";
 import { RosettaBlockInfoResponse, RosettaTransaction } from "./rosetta/types";
+import { TxType } from "mina-ledger-js";
 
 export const getAccount = async (address: string): Promise<MinaAPIAccount> => {
   const networkStatus = await fetchNetworkStatus();
@@ -46,19 +47,28 @@ export const getTransactions = async (
 
 export const broadcastTransaction = async (txn: MinaSignedTransaction): Promise<string> => {
   const { nonce, receiverAddress, amount, fee, memo, senderAddress } = txn.transaction;
+  const payment = {
+    to: receiverAddress,
+    from: senderAddress,
+    fee: fee.toFixed(),
+    token: MINA_TOKEN_ID,
+    nonce: nonce.toFixed(),
+    memo: memo ?? null,
+    amount: amount.toFixed(),
+    valid_until: null,
+  };
+  const delegation = {
+    delegator: senderAddress,
+    new_delegate: receiverAddress,
+    fee: fee.toFixed(),
+    nonce: nonce.toFixed(),
+    memo: memo ?? null,
+    valid_until: null,
+  };
   const blob = {
     signature: txn.signature,
-    payment: {
-      to: receiverAddress,
-      from: senderAddress,
-      fee: fee.toFixed(),
-      token: MINA_TOKEN_ID,
-      nonce: nonce.toFixed(),
-      memo: memo ?? null,
-      amount: amount.toFixed(),
-      valid_until: null,
-    },
-    stake_delegation: null,
+    payment: txn.transaction.txType === TxType.DELEGATION ? null : payment,
+    stake_delegation: txn.transaction.txType === TxType.DELEGATION ? delegation : null,
   };
 
   const { data } = await rosettaSubmitTransaction(JSON.stringify(blob));

@@ -3,12 +3,14 @@ import { encodeAccountId } from "@ledgerhq/coin-framework/account/accountId";
 import type { GetAccountShape } from "@ledgerhq/coin-framework/bridge/jsHelpers";
 import { makeSync, mergeOps } from "@ledgerhq/coin-framework/bridge/jsHelpers";
 import { getAccount, getBlockInfo, getTransactions } from "../api";
-import { MinaAccount, MinaOperation } from "../types/common";
+import { getDelegateAccount, getEpochInfo } from "../api/graphql";
+import { MinaAccount, MinaOperation } from "../types";
 import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
 import BigNumber from "bignumber.js";
 import { log } from "@ledgerhq/logs";
 import invariant from "invariant";
 import { RosettaTransaction } from "../api/rosetta/types";
+import { fetchValidators } from "../api/fetchValidators";
 
 export const mapRosettaTxnToOperation = async (
   accountId: string,
@@ -154,6 +156,10 @@ export const getAccountShape: GetAccountShape<MinaAccount> = async info => {
   );
 
   const operations = mergeOps(oldOperations, newOperations.flat());
+  const delegateAccount = await getDelegateAccount(address);
+  const delegateAddress = delegateAccount.data.account?.delegateAccount?.publicKey ?? address;
+  const epochInfo = await getEpochInfo();
+  const validators = await fetchValidators();
 
   const shape: Partial<MinaAccount> = {
     id: accountId,
@@ -161,6 +167,12 @@ export const getAccountShape: GetAccountShape<MinaAccount> = async info => {
     spendableBalance,
     operationsCount: operations.length,
     blockHeight,
+    minaResources: {
+      blockProducers: validators,
+      delegateInfo: validators.find(v => v.public_key === delegateAddress) ?? undefined,
+      stakingActive: address !== delegateAddress,
+      epochInfo: epochInfo.data.daemonStatus.consensusTimeNow,
+    },
   };
 
   return { ...shape, operations };
