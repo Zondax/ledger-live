@@ -16,7 +16,7 @@ export function useSteps(): St[] {
         noScroll: true,
       },
       {
-        id: "confirmation",
+        id: "listNeuron",
         label: "Select neuron",
         component: StepListNeuron,
         footer: StepListNeuronFooter,
@@ -31,10 +31,21 @@ export function useSteps(): St[] {
         },
       },
       {
-        id: "success",
+        id: "manageAction",
+        label: "Manage neuron action",
+        component: GenericStepConnectDevice as React.ComponentType<StepProps>,
+        hideBackButton: true,
+        excludeFromBreadcrumb: true,
+        noScroll: true,
+      },
+      {
+        id: "confirmation",
         label: "Confirmation",
         component: StepConfirmation,
         footer: StepListNeuronFooter,
+        onBack: ({ transitionTo }: StepProps) => {
+          transitionTo("listNeuron");
+        },
       },
     ],
     [t],

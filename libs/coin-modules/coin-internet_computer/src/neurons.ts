@@ -131,6 +131,7 @@ export class NeuronsData {
         neuronInfo: neuronInfo[1],
       };
     });
+
     this.totalStaked = BigNumber(0);
     this.totalMaturity = BigNumber(0);
     this.totalMaturityStaked = BigNumber(0);
@@ -159,7 +160,7 @@ export class NeuronsData {
   }
 
   public static empty() {
-    return new NeuronsData([], [], Date.now());
+    return new NeuronsData([], [], 0);
   }
 
   public static deserialize(fullNeuronsRaw: string, neuronInfosRaw: string, lastUpdated?: number) {

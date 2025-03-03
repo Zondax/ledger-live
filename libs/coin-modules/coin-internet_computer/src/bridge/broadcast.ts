@@ -144,22 +144,23 @@ export const broadcast: AccountBridge<
     } as InternetComputerOperation;
   }
 
-  // if (rawDataTyped.methodName === "increase_stake") {
-  //   invariant(account.xpub, `[ICP](broadcast-${rawDataTyped.methodName}) Missing account xpub`);
+  // Additional step for neuron stake increase
+  if (rawDataTyped.methodName === "increase_stake") {
+    invariant(account.xpub, `[ICP](broadcast-${rawDataTyped.methodName}) Missing account xpub`);
 
-  //   const agent = await getAgent();
-  //   const govCanister = GovernanceCanister.create({ agent });
+    const agent = await getAgent();
+    const govCanister = GovernanceCanister.create({ agent });
 
-  //   invariant(
-  //     rawDataTyped.neuronId,
-  //     `[ICP](broadcast-${rawDataTyped.methodName}) Missing neuronId`,
-  //   );
+    invariant(
+      rawDataTyped.neuronId,
+      `[ICP](broadcast-${rawDataTyped.methodName}) Missing neuronId`,
+    );
 
-  //   await govCanister.claimOrRefreshNeuron({
-  //     neuronId: BigInt(rawDataTyped.neuronId),
-  //     by: undefined,
-  //   });
-  // }
+    await govCanister.claimOrRefreshNeuron({
+      neuronId: BigInt(rawDataTyped.neuronId),
+      by: undefined,
+    });
+  }
 
   return operation;
 };

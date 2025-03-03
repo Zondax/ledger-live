@@ -9,9 +9,10 @@ import {
 } from "@ledgerhq/live-common/families/internet_computer/types";
 import { OpenModal } from "~/renderer/actions/modals";
 import { NeuronsData } from "@ledgerhq/live-common/families/internet_computer/utils";
-export type StepId = "device" | "confirmation" | "manage" | "success";
+export type StepId = "device" | "listNeuron" | "confirmation" | "manage" | "manageAction";
 export type StepProps = {
   lastManageAction?: ICPTransactionType;
+  setLastManageAction: (a: ICPTransactionType) => void;
   transitionTo: (address: string) => void;
   device: Device | undefined | null;
   account: ICPAccount;

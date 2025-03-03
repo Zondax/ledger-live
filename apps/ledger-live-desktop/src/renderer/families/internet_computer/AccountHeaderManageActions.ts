@@ -42,6 +42,7 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
               account,
               refresh: false,
               lastManageAction: "create_neuron",
+              stepId: "confirmation",
             }),
           ),
         disableBacks: ["amount"],

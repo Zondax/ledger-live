@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import styled from "styled-components";
 import TrackPage from "~/renderer/analytics/TrackPage";
 import Box from "~/renderer/components/Box";
@@ -11,8 +11,18 @@ import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 // import { closeModal, openModal } from "~/renderer/actions/modals";
 import BigNumber from "bignumber.js";
 import Text from "~/renderer/components/Text";
-import { getNeuronDissolveDuration } from "@ledgerhq/live-common/families/internet_computer/utils";
+import { Divider } from "@ledgerhq/react-ui";
+import {
+  getNeuronDissolveDuration,
+  getTimeUntil,
+} from "@ledgerhq/live-common/families/internet_computer/utils";
 import { closeModal } from "~/renderer/actions/modals";
+import {
+  ManageModalElementWithIcon,
+  ManageModalElement,
+  ManageModalSection,
+} from "../../components/ManageModalComponents";
+import { ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/types";
 
 const Container = styled(Box).attrs(() => ({
   alignItems: "center",
@@ -27,67 +37,7 @@ const Section = styled(Box)`
   background: ${p => p.theme.colors.palette.background.paper};
   border-radius: 12px;
   padding: 16px;
-  margin-bottom: 16px;
   width: 100%;
-`;
-
-const SectionTitle = styled(Text).attrs(() => ({
-  ff: "Inter|SemiBold",
-  fontSize: 5,
-  color: "palette.text.shade100",
-}))`
-  margin-bottom: 16px;
-`;
-
-const SubTitle = styled(Text).attrs(() => ({
-  ff: "Inter|Medium",
-  fontSize: 3,
-  color: "palette.text.shade60",
-}))`
-  margin-bottom: 8px;
-`;
-
-const ButtonGroup = styled(Box)`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-  justify-content: flex-start;
-  flex-direction: row;
-`;
-
-const InfoGrid = styled(Box)`
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  margin-bottom: 8px;
-`;
-
-const InfoRow = styled(Box)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background: ${p => p.theme.colors.palette.background.default};
-  border-radius: 4px;
-
-  > *:first-child {
-    color: ${p => p.theme.colors.palette.text.shade60};
-  }
-`;
-
-const Checkbox = styled.input.attrs({ type: "checkbox" })`
-  margin-right: 8px;
-`;
-
-const CheckboxLabel = styled(Text).attrs(() => ({
-  ff: "Inter|Regular",
-  fontSize: 3,
-  color: "palette.text.shade100",
-}))`
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
 `;
 
 export default function StepManage({
@@ -97,14 +47,16 @@ export default function StepManage({
   onChangeTransaction,
   transitionTo,
   openModal,
+  setLastManageAction,
 }: StepProps) {
   const currencyId = account.currency.id;
   const dispatch = useDispatch();
   const unit = account.currency.units[0];
   const neuron = neurons.fullNeurons[manageNeuronIndex];
   const neuronId = neuron.id[0]?.id.toString() ?? "";
-
-  const [autoStakeMaturity, setAutoStakeMaturity] = useState(false);
+  const timeUntilActive = getTimeUntil(
+    Number(neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]),
+  );
 
   const onClickIncreaseStake = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -117,9 +69,9 @@ export default function StepManage({
           dispatch(
             openModal("MODAL_ICP_LIST_NEURONS", {
               account,
-              refresh: false,
               lastManageAction: "increase_stake",
               neuronIndex: manageNeuronIndex,
+              stepId: "confirmation",
             }),
           ),
         account,
@@ -143,20 +95,39 @@ export default function StepManage({
         type: "disburse",
       }),
     );
-    transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo, neuron]);
+    setLastManageAction("disburse");
+    transitionTo("manageAction");
+  }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
+
+  const onClickConfirmFollowing = useCallback(
+    (neuron: ICPNeuron) => {
+      if (account.type !== "Account") return;
+      const bridge = getAccountBridge(account, undefined);
+      const initTx = bridge.createTransaction(account);
+      onChangeTransaction(
+        bridge.updateTransaction(initTx, {
+          type: "refresh_voting_power",
+          neuronId: neuron.id[0]?.id.toString(),
+        }),
+      );
+      transitionTo("device");
+    },
+    [account, onChangeTransaction, transitionTo],
+  );
 
   const onClickStartStopDissolving = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
     const initTx = bridge.createTransaction(account);
+    const action = neuron.dissolveState === "Dissolving" ? "stop_dissolving" : "start_dissolving";
     onChangeTransaction(
       bridge.updateTransaction(initTx, {
         neuronId: neuron.id[0]?.id.toString(),
-        type: neuron.dissolveState === "Dissolving" ? "stop_dissolving" : "start_dissolving",
+        type: action,
       }),
     );
-    transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo, neuron]);
+    setLastManageAction(action);
+    transitionTo("manageAction");
+  }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
 
   const onClickStakeMaturity = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -167,8 +138,9 @@ export default function StepManage({
         type: "stake_maturity",
       }),
     );
-    transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo, neuron]);
+    setLastManageAction("stake_maturity");
+    transitionTo("manageAction");
+  }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
 
   const onClickSpawnNeuron = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -179,8 +151,9 @@ export default function StepManage({
         type: "spawn_neuron",
       }),
     );
-    transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo, neuron]);
+    setLastManageAction("spawn_neuron");
+    transitionTo("manageAction");
+  }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
 
   if (neuron) {
     return (
@@ -195,12 +168,9 @@ export default function StepManage({
 
         {/* Header Section */}
         <Section>
-          <Box mb={2}>
-            <Box horizontal alignItems="center" mb={1}>
-              <Text ff="Inter|Regular" fontSize={3} color="palette.text.shade60" mr={2}>
-                Stake:
-              </Text>
-              <Text ff="Inter|SemiBold" fontSize={6}>
+          <Box style={{ alignItems: "center" }}>
+            <Box horizontal alignItems="center" mb={2}>
+              <Text ff="Inter|SemiBold" fontSize={8}>
                 <FormattedVal val={Number(neuron.cached_neuron_stake_e8s)} unit={unit} showCode />
               </Text>
             </Box>
@@ -216,16 +186,6 @@ export default function StepManage({
             </Box>
             <Box horizontal alignItems="center">
               <Text ff="Inter|Regular" fontSize={3} color="palette.text.shade60" mr={2}>
-                Neuron Account:
-              </Text>
-              <CopiableField value={neuron.accountIdentifier}>
-                <Text ff="Inter|SemiBold" fontSize={4}>
-                  {`${neuron.accountIdentifier.slice(0, 12)}...${neuron.accountIdentifier.slice(-12)}`}
-                </Text>
-              </CopiableField>
-            </Box>
-            <Box horizontal alignItems="center" mt={2}>
-              <Text ff="Inter|Regular" fontSize={3} color="palette.text.shade60" mr={2}>
                 Voting Power:
               </Text>
               <Text ff="Inter|SemiBold" fontSize={4}>
@@ -236,144 +196,165 @@ export default function StepManage({
                 />
               </Text>
             </Box>
-            {neuron.neuronInfo.voting_power_refreshed_timestamp_seconds.length && (
-              <Box horizontal alignItems="center">
-                <Text ff="Inter|Regular" fontSize={3} color="palette.text.shade60" mr={2}>
-                  Voting Power Refreshes:
-                </Text>
-                <Text ff="Inter|SemiBold" fontSize={4}>
-                  <Text ff="Inter|SemiBold" fontSize={4}>
-                    {new Date(
-                      Number(neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]) * 1000,
-                    ).toDateString()}
-                  </Text>
-                </Text>
-              </Box>
-            )}
           </Box>
-          <ButtonGroup>
-            <Button primary small onClick={onClickIncreaseStake}>
-              Increase Stake
-            </Button>
-            <Button
-              disabled={neuron.dissolveState !== "Unlocked"}
-              inverted
-              small
-              onClick={onClickDisburseStake}
-            >
-              Disburse Stake
-            </Button>
-          </ButtonGroup>
         </Section>
 
-        {/* Dissolve Status Section */}
-        <Section>
-          <SectionTitle>Dissolve Status</SectionTitle>
-          <InfoGrid>
-            <InfoRow>
-              <Text ff="Inter|Medium" fontSize={3}>
-                State
-              </Text>
-              <Text ff="Inter|SemiBold" fontSize={4}>
-                {neuron.dissolveState}
-              </Text>
-            </InfoRow>
-            <InfoRow>
-              <Text ff="Inter|Medium" fontSize={3}>
-                Dissolve Delay
-              </Text>
-              <Text ff="Inter|SemiBold" fontSize={4}>
-                {neuron.dissolveState !== "Unlocked" ? getNeuronDissolveDuration(neuron) : "-"}
-              </Text>
-            </InfoRow>
-          </InfoGrid>
-          <ButtonGroup>
-            <Button primary small onClick={onClickStartStopDissolving}>
-              {neuron.dissolveState === "Dissolving" ? "Stop Dissolving" : "Start Dissolving"}
-            </Button>
-            <Button primary small onClick={() => console.log("increase dissolve delay")}>
-              #Increase Delay
-            </Button>
-          </ButtonGroup>
-        </Section>
+        <Divider my={6} width={"100%"} />
+
+        {/* Voting Power Section */}
+        <ManageModalSection
+          title="Voting Power"
+          value={
+            <FormattedVal
+              color="palette.text.shade100"
+              val={Number(neuron.neuronInfo.voting_power.toString())}
+              unit={unit}
+            />
+          }
+        >
+          <ManageModalElementWithIcon
+            label="ICP Staked"
+            action={[
+              {
+                label: "Increase Stake",
+                onClick: onClickIncreaseStake,
+              },
+            ]}
+            value={
+              <FormattedVal
+                color="palette.text.shade100"
+                val={Number(neuron.cached_neuron_stake_e8s.toString())}
+                unit={unit}
+                showCode
+              />
+            }
+          />
+          <ManageModalElementWithIcon
+            // TODO: add age bonus
+            label={"Age bonus: +0%"}
+            valueTooltip="Your neuron can be locked, unlocked or dissolving. In a locked state, it is accruing age bonus, while its dissolve delay stays constant. If the neuron is in a dissolving state, its age bonus is set to 0, while dissolve delay decreases with time. After dissolve delay reaches 0, the neuron is unlocked, and ICP held in it can be sent to any ICP account."
+            action={[
+              {
+                label:
+                  neuron.dissolveState === "Unlocked"
+                    ? "Disburse"
+                    : neuron.dissolveState === "Dissolving"
+                      ? "Stop Dissolving"
+                      : "Start Dissolving",
+                onClick:
+                  neuron.dissolveState === "Unlocked"
+                    ? onClickDisburseStake
+                    : onClickStartStopDissolving,
+              },
+            ]}
+            value={neuron.dissolveState}
+          />
+          <ManageModalElementWithIcon
+            // TODO: add dissolve delay bonus
+            label={"Dissolve delay bonus: +100%"}
+            valueTooltip="Dissolve delay is the minimum amount of time you have to wait for the neuron to unlock, and ICP to be available again. If your neuron is dissolving, your ICP will be available in 7 years, 365 days."
+            action={[
+              {
+                label: "Increase Delay",
+                onClick: () => console.log("increase dissolve delay"),
+              },
+            ]}
+            value={`Dissolve Delay: ${getNeuronDissolveDuration(neuron)}`}
+          />
+          <ManageModalElementWithIcon
+            label={`${timeUntilActive.days} days, ${timeUntilActive.hours} hours to confirm following`}
+            valueTooltip="ICP neurons that are inactive for 6 months start missing voting rewards. To avoid missing rewards, vote manually, edit, or confirm your following."
+            action={[
+              {
+                label: "Confirm Following",
+                onClick: () => onClickConfirmFollowing(neuron),
+              },
+            ]}
+            // TODO: get correct status
+            value={"Active neuron"}
+          />
+        </ManageModalSection>
+
+        <Divider my={6} width={"100%"} />
 
         {/* Maturity Section */}
-        <Section>
-          <SectionTitle>Maturity</SectionTitle>
-          <SubTitle>Earn rewards by voting on proposals and/or following active neurons.</SubTitle>
-          <InfoGrid>
-            <InfoRow>
-              <SubTitle>Staked</SubTitle>
-              <Text ff="Inter|SemiBold" fontSize={4}>
-                <FormattedVal
-                  color="palette.text.shade100"
-                  val={Number(neuron.staked_maturity_e8s_equivalent)}
-                  unit={unit}
-                  showCode
-                />
-              </Text>
-            </InfoRow>
-            <InfoRow>
-              <SubTitle>Available</SubTitle>
-              <Text ff="Inter|SemiBold" fontSize={4}>
-                <FormattedVal
-                  color="palette.text.shade100"
-                  val={Number(neuron.maturity_e8s_equivalent)}
-                  unit={unit}
-                  showCode
-                />
-              </Text>
-            </InfoRow>
-          </InfoGrid>
-          <CheckboxLabel>
-            <Checkbox
-              checked={autoStakeMaturity}
-              onChange={e => setAutoStakeMaturity(e.target.checked)}
+        <ManageModalSection
+          title="Maturity"
+          description="Earn rewards by voting on proposals and/or following active neurons."
+          value={
+            <FormattedVal
+              color="palette.text.shade100"
+              val={
+                Number(neuron.staked_maturity_e8s_equivalent) +
+                Number(neuron.maturity_e8s_equivalent)
+              }
+              unit={unit}
+              showCode
             />
-            Automatically stake new maturity
-          </CheckboxLabel>
-          <ButtonGroup>
-            <Button primary small onClick={onClickStakeMaturity}>
-              Stake Maturity
-            </Button>
-            <Button primary small onClick={onClickSpawnNeuron}>
-              Spawn Neuron
-            </Button>
-          </ButtonGroup>
-        </Section>
+          }
+        >
+          <ManageModalElementWithIcon
+            label="Staked"
+            labelTooltip="Staked maturity contributes to the neuron's voting power, but cannot be spawned into a new neuron."
+            value={
+              <FormattedVal
+                color="palette.text.shade100"
+                val={Number(neuron.staked_maturity_e8s_equivalent)}
+                unit={unit}
+                showCode
+              />
+            }
+          />
+          <ManageModalElementWithIcon
+            label="Available"
+            labelTooltip="Available maturity can be staked, or burned to spawn a neuron containing an amount of ICP that is subject to a non-deterministic process, called maturity modulation."
+            action={[
+              {
+                label: "Stake",
+                onClick: onClickStakeMaturity,
+              },
+              {
+                label: "Spawn Neuron",
+                onClick: onClickSpawnNeuron,
+              },
+            ]}
+            value={
+              <FormattedVal
+                color="palette.text.shade100"
+                val={Number(neuron.maturity_e8s_equivalent)}
+                unit={unit}
+                showCode
+              />
+            }
+          />
+        </ManageModalSection>
+
+        <Divider />
+
+        <Divider my={6} width={"100%"} />
 
         {/* Advanced Details Section */}
-        <Section>
-          <SectionTitle>Advanced Details & Settings</SectionTitle>
-          <InfoGrid>
-            <InfoRow>
-              <SubTitle>Date Created</SubTitle>
-              <Text ff="Inter|SemiBold" fontSize={4}>
-                {new Date(Number(neuron.created_timestamp_seconds) * 1000).toLocaleDateString()}
-              </Text>
-            </InfoRow>
-            <InfoRow>
-              <SubTitle>Dissolve Date</SubTitle>
-              <Text ff="Inter|SemiBold" fontSize={4}>
-                {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
-              </Text>
-            </InfoRow>
-            <InfoRow>
-              <SubTitle>Last Maturity Distribution</SubTitle>
-              <Text ff="Inter|SemiBold" fontSize={4}>
-                Never
-              </Text>
-            </InfoRow>
-          </InfoGrid>
-          <ButtonGroup>
-            <Button primary small onClick={() => console.log("split neuron")}>
-              #Split Neuron
-            </Button>
-          </ButtonGroup>
-        </Section>
+        <ManageModalSection title="Advanced Details & Settings">
+          <ManageModalElement label="Neuron ID" value={neuronId} />
+          <ManageModalElement
+            label="Date Created"
+            value={new Date(Number(neuron.created_timestamp_seconds) * 1000).toLocaleString(
+              "en-US",
+              {
+                dateStyle: "medium",
+                timeStyle: "short",
+              },
+            )}
+          />
+          <ManageModalElement
+            label="Dissolve Date"
+            value={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+          />
+          <ManageModalElement label="Last Maturity Distribution" value="Never" />
+        </ManageModalSection>
 
         {/* Following Section */}
-        <Section>
+        {/* <Section>
           <SectionTitle>Following</SectionTitle>
           <InfoGrid>
             <InfoRow>
@@ -388,7 +369,7 @@ export default function StepManage({
               #Follow Neurons
             </Button>
           </ButtonGroup>
-        </Section>
+        </Section> */}
       </Container>
     );
   }

@@ -7,6 +7,7 @@ import Box from "~/renderer/components/Box";
 import BroadcastErrorDisclaimer from "~/renderer/components/BroadcastErrorDisclaimer";
 import ErrorDisplay from "~/renderer/components/ErrorDisplay";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
+import WarnBox from "~/renderer/components/WarnBox";
 import List from "../../components/List";
 import { StepProps } from "../types";
 import Button from "~/renderer/components/Button";
@@ -76,6 +77,12 @@ export default function StepListNeuron({
           priority={10}
           accountId={account.id}
         />
+        {neurons.fullNeurons.length > 0 ? (
+          <WarnBox>
+            Select a neuron from the list below to manage its stake, maturity, and dissolve delay
+            settings.
+          </WarnBox>
+        ) : null}
         <List
           neurons={neurons}
           modalName="MODAL_ICP_LIST_NEURONS"
@@ -115,23 +122,31 @@ export function StepListNeuronFooter({
   transitionTo,
   neurons,
   onChangeTransaction,
+  setLastManageAction,
+  error,
 }: StepProps) {
   const { t } = useTranslation();
   const currencyName = account.currency.name;
   const onClickSync = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
     const initTx = bridge.createTransaction(account);
+    setLastManageAction("list_neurons");
     onChangeTransaction(
       bridge.updateTransaction(initTx, {
         type: "list_neurons",
       }),
     );
     transitionTo("device");
-  }, [account, onChangeTransaction, transitionTo]);
+  }, [account, onChangeTransaction, transitionTo, setLastManageAction]);
+
+  const onRetry = useCallback(() => {
+    transitionTo("listNeuron");
+  }, [transitionTo]);
+
   return (
     <Box width="100%" horizontal alignItems="center" justifyContent="space-between">
       <Box ff="Inter|SemiBold" fontSize={4} color="palette.text.shade60">
-        {`Last Synced: ${new Date(neurons.lastUpdatedMSecs).toLocaleString()}`}
+        {`Last Synced: ${neurons.lastUpdatedMSecs ? new Date(neurons.lastUpdatedMSecs).toLocaleString() : "Never"}`}
       </Box>
       <Box horizontal>
         <Button ml={2} onClick={onClose}>
@@ -141,9 +156,9 @@ export function StepListNeuronFooter({
           primary
           ml={2}
           event={`Manage Neurons ${currencyName} Flow Step 3 Sync Neurons Clicked`}
-          onClick={onClickSync}
+          onClick={error ? onRetry : onClickSync}
         >
-          {"Sync"}
+          {error ? "Retry" : "Sync"}
         </Button>
       </Box>
     </Box>

@@ -14,7 +14,9 @@ export const refreshNeuronsData = (
 ) => {
   dispatch(
     updateAccountWithUpdater(account.id, account => {
-      account = addPendingOperation(account, optimisticOperation);
+      if (optimisticOperation.type !== "NONE") {
+        account = addPendingOperation(account, optimisticOperation);
+      }
       if (optimisticOperation.extra.neurons) {
         const neuronAddresses = optimisticOperation.extra.neurons?.fullNeurons.map(
           neuron => neuron.accountIdentifier,

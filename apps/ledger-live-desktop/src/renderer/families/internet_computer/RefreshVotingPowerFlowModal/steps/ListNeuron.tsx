@@ -51,6 +51,7 @@ export default function StepListNeuron({
     }
   }, [needsRefresh, transitionTo, account, onChangeTransaction, setNeedsRefresh]);
 
+  // TODO: duplicate code from Manage.tsx
   const onClickConfirmFollowing = useCallback(
     (neuron: ICPNeuron) => {
       if (account.type !== "Account") return;

@@ -59,7 +59,7 @@ export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
   // Check Last Time Neurons Sync (Priority 2)
   const lastSync = account.neurons.lastUpdatedMSecs;
   const { days, minutes } = getTimeUntil(lastSync);
-  if (days > LAST_SYNC_THRESHOLD_IN_DAYS) {
+  if (lastSync && days > LAST_SYNC_THRESHOLD_IN_DAYS) {
     return {
       state: "sync_neurons",
       data: {

@@ -6620,6 +6620,9 @@
     },
     "AmountTooSmall": {
       "title": "Minimum required amount for this transaction is {{amount}}"
+    },
+    "NotEnoughTransferAmount": {
+      "title": "The minimum amount to stake is 1 ICP."
     }
   },
   "cryptoOrg": {

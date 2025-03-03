@@ -12,18 +12,19 @@ export type Props = {
   refresh?: boolean;
   neuronIndex?: number;
   lastManageAction?: ICPTransactionType;
+  stepId?: StepId;
 };
 
 export default function ListNeuronsModal({
   refresh = false,
-  lastManageAction,
+  lastManageAction: initLastManageAction,
   neuronIndex = 0,
+  stepId: initStepId = "listNeuron",
 }: Props) {
-  const [stepId, setStepId] = useState<StepId>(refresh ? "device" : "confirmation");
-
-  if (lastManageAction && stepId !== "success") {
-    setStepId("success");
-  }
+  const [stepId, setStepId] = useState<StepId>(refresh ? "device" : initStepId);
+  const [lastManageAction, setLastManageAction] = useState<ICPTransactionType | undefined>(
+    initLastManageAction,
+  );
 
   const onHide = useCallback(() => {
     setStepId("device");
@@ -33,13 +34,20 @@ export default function ListNeuronsModal({
   }, []);
   const isModalLocked = ["device", "confirmation"].includes(stepId);
   const modalName = "MODAL_ICP_LIST_NEURONS";
+  let width: number | undefined;
+  if (stepId === "manage") {
+    width = 800;
+  } else if (stepId === "listNeuron") {
+    width = 575;
+  }
+
   return (
     <Modal
       name={modalName}
       centered
       onHide={onHide}
       preventBackdropClick={isModalLocked}
-      width={stepId === "manage" || stepId === "confirmation" ? 800 : undefined}
+      width={width}
       render={({ onClose, data }) => (
         <Body
           account={data.account}
@@ -49,6 +57,7 @@ export default function ListNeuronsModal({
           onChangeStepId={onChange}
           neuronIndex={neuronIndex}
           lastManageAction={lastManageAction}
+          setLastManageAction={setLastManageAction}
         />
       )}
     />

@@ -64,71 +64,80 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
     locale,
   };
   const stakedBalance = formatCurrencyUnit(unit, neurons.totalStaked, formatConfig);
-  const maturityBalance = formatCurrencyUnit(unit, neurons.totalMaturity, formatConfig);
-  const maturityStakedBalance = formatCurrencyUnit(unit, neurons.totalMaturityStaked, formatConfig);
-  const maturityLiquidBalance = formatCurrencyUnit(
+  const maturityBalance = formatCurrencyUnit(
     unit,
-    neurons.totalMaturity.minus(neurons.totalMaturityStaked),
+    neurons.totalMaturity.plus(neurons.totalMaturityStaked),
     formatConfig,
   );
+  const maturityStakedBalance = formatCurrencyUnit(unit, neurons.totalMaturityStaked, formatConfig);
+  const maturityLiquidBalance = formatCurrencyUnit(unit, neurons.totalMaturity, formatConfig);
 
   return (
     <Wrapper>
-      {neurons.totalStaked.gt(0) && (
-        <BalanceDetail>
-          <ToolTip content="Staked balance">
-            <TitleWrapper>
-              <Title>Staked balance</Title>
-              <InfoCircle size={13} />
-            </TitleWrapper>
-          </ToolTip>
-          <AmountValue>
-            <Discreet>{stakedBalance}</Discreet>
-          </AmountValue>
-        </BalanceDetail>
-      )}
-      {neurons.totalMaturity.gt(0) && (
-        <BalanceDetail>
-          <ToolTip content="Total Maturity">
-            <TitleWrapper>
-              <Title>Total Maturity</Title>
-              <InfoCircle size={13} />
-            </TitleWrapper>
-          </ToolTip>
-          <AmountValue>
-            <Discreet>{maturityBalance}</Discreet>
-          </AmountValue>
-        </BalanceDetail>
-      )}
-      {neurons.totalMaturityStaked.gt(0) && (
-        <BalanceDetail>
-          <ToolTip content="Staked Maturity">
-            <TitleWrapper>
-              <Title>Staked Maturity</Title>
-              <InfoCircle size={13} />
-            </TitleWrapper>
-          </ToolTip>
-          <AmountValue>
-            <Discreet>{maturityStakedBalance}</Discreet>
-          </AmountValue>
-        </BalanceDetail>
-      )}
-      {neurons.totalMaturity.gt(0) && (
-        <BalanceDetail>
-          <ToolTip content="Liquid Maturity">
-            <TitleWrapper>
-              <Title>Liquid Maturity</Title>
-              <InfoCircle size={13} />
-            </TitleWrapper>
-          </ToolTip>
-          <AmountValue>
-            <Discreet>{maturityLiquidBalance}</Discreet>
-          </AmountValue>
-        </BalanceDetail>
-      )}
-      <Box ff="Inter|SemiBold" margin={"auto"} fontSize={4} color="palette.text.shade60">
-        {`Last Synced: ${new Date(neurons.lastUpdatedMSecs).toLocaleString()}`}
+      <Box style={{ display: "flex", flexDirection: "row", gap: 30 }}>
+        {neurons.totalStaked.gt(0) && (
+          <BalanceDetail>
+            <ToolTip content="The total amount of ICP tokens currently staked in neurons. Staked ICP earns voting rewards and can be used for governance.">
+              <TitleWrapper>
+                <Title>Staked balance</Title>
+                <InfoCircle size={13} />
+              </TitleWrapper>
+            </ToolTip>
+            <AmountValue>
+              <Discreet>{stakedBalance}</Discreet>
+            </AmountValue>
+          </BalanceDetail>
+        )}
+        {neurons.totalMaturity.gt(0) && (
+          <BalanceDetail>
+            <ToolTip content="The total accumulated rewards from staking, including both staked and liquid maturity. These rewards can be either staked again or claimed as liquid ICP.">
+              <TitleWrapper>
+                <Title>Total Maturity</Title>
+                <InfoCircle size={13} />
+              </TitleWrapper>
+            </ToolTip>
+            <AmountValue>
+              <Discreet>{maturityBalance}</Discreet>
+            </AmountValue>
+          </BalanceDetail>
+        )}
+        {neurons.totalMaturityStaked.gt(0) && (
+          <BalanceDetail>
+            <ToolTip content="The portion of maturity rewards that has been automatically re-staked into neurons, continuing to earn additional rewards.">
+              <TitleWrapper>
+                <Title>Staked Maturity</Title>
+                <InfoCircle size={13} />
+              </TitleWrapper>
+            </ToolTip>
+            <AmountValue>
+              <Discreet>{maturityStakedBalance}</Discreet>
+            </AmountValue>
+          </BalanceDetail>
+        )}
+        {neurons.totalMaturity.gt(0) && (
+          <BalanceDetail>
+            <ToolTip content="The portion of maturity rewards that is available to be claimed as liquid ICP tokens or can be staked into neurons.">
+              <TitleWrapper>
+                <Title>Liquid Maturity</Title>
+                <InfoCircle size={13} />
+              </TitleWrapper>
+            </ToolTip>
+            <AmountValue>
+              <Discreet>{maturityLiquidBalance}</Discreet>
+            </AmountValue>
+          </BalanceDetail>
+        )}
       </Box>
+      {neurons.fullNeurons.length > 0 && (
+        <Box
+          ff="Inter|SemiBold"
+          margin={"auto 0 auto auto"}
+          fontSize={4}
+          color="palette.text.shade60"
+        >
+          {`Last Synced: ${new Date(neurons.lastUpdatedMSecs).toLocaleString()}`}
+        </Box>
+      )}
     </Wrapper>
   );
 };

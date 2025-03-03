@@ -6,6 +6,7 @@ import { StepProps } from "../types";
 import TrackPage from "~/renderer/analytics/TrackPage";
 import { SyncOneAccountOnMount } from "@ledgerhq/live-common/bridge/react/index";
 import { colors } from "~/renderer/styles/theme";
+import ErrorDisplay from "~/renderer/components/ErrorDisplay";
 
 const Container = styled(Box).attrs(() => ({
   alignItems: "center",
@@ -25,7 +26,12 @@ const ActionText = styled(Text)`
   letter-spacing: 0.1em;
 `;
 
-export default function StepConfirmation({ account, lastManageAction }: StepProps) {
+export default function StepConfirmation({
+  account,
+  lastManageAction,
+  transitionTo,
+  error,
+}: StepProps) {
   const currencyId = account.currency.id;
   const getActionText = useCallback(() => {
     if (lastManageAction === "increase_stake") {
@@ -33,6 +39,15 @@ export default function StepConfirmation({ account, lastManageAction }: StepProp
     }
     return lastManageAction?.replace(/_/g, " ").toLowerCase();
   }, [lastManageAction]);
+
+  if (error) {
+    return <ErrorDisplay error={error} />;
+  }
+
+  if (!lastManageAction || lastManageAction === "list_neurons") {
+    transitionTo("listNeuron");
+    return null;
+  }
 
   return (
     <Container>

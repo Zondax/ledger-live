@@ -37,6 +37,7 @@ type OwnProps = {
   onChangeStepId: (a: StepId) => void;
   neuronIndex?: number;
   lastManageAction?: ICPTransactionType;
+  setLastManageAction: (a: ICPTransactionType) => void;
 };
 type StateProps = {
   t: TFunction;
@@ -56,6 +57,7 @@ function Body({
   refresh,
   stepId,
   lastManageAction,
+  setLastManageAction,
   neuronIndex,
   onChangeStepId,
   onClose,
@@ -84,6 +86,7 @@ function Body({
     const initTx = bridge.createTransaction(accountProp);
     if (refresh) {
       initTx.type = "list_neurons";
+      setLastManageAction("list_neurons");
     }
     return {
       account: accountProp,
@@ -107,12 +110,16 @@ function Body({
     },
     [accountProp, dispatch],
   );
-  const handleTransactionError = useCallback((error: Error) => {
-    if (!(error instanceof UserRefusedOnDevice)) {
-      logger.critical(error);
-    }
-    setTransactionError(error);
-  }, []);
+  const handleTransactionError = useCallback(
+    (error: Error) => {
+      if (!(error instanceof UserRefusedOnDevice)) {
+        logger.critical(error);
+      }
+      setTransactionError(error);
+      onChangeStepId("confirmation");
+    },
+    [onChangeStepId],
+  );
   const errorSteps = [];
   if (transactionError) {
     errorSteps.push(2);
@@ -144,6 +151,7 @@ function Body({
     openModal,
     setSigned,
     lastManageAction,
+    setLastManageAction,
     onChangeTransaction: setTransaction,
     onUpdateTransaction: updateTransaction,
     onOperationBroadcasted: handleOperationBroadcasted,
