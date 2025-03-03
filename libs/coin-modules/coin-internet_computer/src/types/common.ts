@@ -72,6 +72,9 @@ export interface ICPNeuron extends NNSNeuron {
   dissolveState: "Unlocked" | "Locked" | "Dissolving" | "Unknown" | "Spawning";
   dissolveDelaySeconds: string;
   whenDissolvedTimestampSeconds: string;
+  modFollowees: {
+    [neuronId: string]: string[];
+  };
 
   neuronInfo: NeuronInfo;
 }

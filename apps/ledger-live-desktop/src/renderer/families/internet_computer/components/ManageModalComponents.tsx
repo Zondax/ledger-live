@@ -4,8 +4,8 @@ import Text from "~/renderer/components/Text";
 import Button from "~/renderer/components/Button";
 import Box from "~/renderer/components/Box";
 import IconInfo from "~/renderer/icons/InfoCircle";
-import IconArrowRight from "~/renderer/icons/ArrowRight";
 import Tooltip from "~/renderer/components/Tooltip";
+import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
 
 const Section = styled(Box)`
   width: 100%;
@@ -96,6 +96,9 @@ type ManageModalElementProps = {
   label: string;
   labelTooltip?: string;
   value?: React.ReactNode;
+  copiableValue?: boolean;
+  copiableLabel?: boolean;
+  ellipsis?: boolean;
   valueTooltip?: string;
 };
 
@@ -103,13 +106,24 @@ export function ManageModalElement({
   label,
   labelTooltip,
   value,
+  ellipsis,
+  copiableValue,
+  copiableLabel,
   valueTooltip,
 }: ManageModalElementProps) {
   return (
     <Element>
       <Box style={{ flexDirection: "row", alignItems: "center", gap: "8px" }}>
         <Text ff="Inter|Regular" fontSize={4} color="palette.text.shade100">
-          {label}
+          {copiableLabel ? (
+            <CopiableField value={label}>
+              <Text ff="Inter|Regular" fontSize={4}>
+                {label}
+              </Text>
+            </CopiableField>
+          ) : (
+            label
+          )}
         </Text>
         {labelTooltip && (
           <Tooltip content={labelTooltip}>
@@ -121,7 +135,17 @@ export function ManageModalElement({
       </Box>
       <Box>
         <Text ff="Inter|SemiBold" fontSize={4} color="palette.text.shade100">
-          {value}
+          {copiableValue ? (
+            <CopiableField value={value as string}>
+              <Text ff="Inter|SemiBold" fontSize={4}>
+                {ellipsis
+                  ? (value as string).slice(0, 10) + "..." + (value as string).slice(-10)
+                  : value}
+              </Text>
+            </CopiableField>
+          ) : (
+            value
+          )}
         </Text>
         {valueTooltip && (
           <Tooltip content={valueTooltip}>
@@ -135,6 +159,26 @@ export function ManageModalElement({
   );
 }
 
+type ManageModalActionElementProps = {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+};
+
+export function ManageModalActionElement({
+  label,
+  onClick,
+  disabled,
+}: ManageModalActionElementProps) {
+  return (
+    <Box style={{ flexDirection: "row", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+      <Button key={label} primary onClick={onClick} disabled={disabled}>
+        {label}
+      </Button>
+    </Box>
+  );
+}
+
 type ManageModalElementWithIconProps = {
   label: string;
   labelTooltip?: string;
@@ -144,34 +188,39 @@ type ManageModalElementWithIconProps = {
     label: string;
     onClick: () => void;
     disabled?: boolean;
+    danger?: boolean;
   }[];
   icon?: React.ReactNode;
+  copiableLabel?: boolean;
 };
 
-export function ManageModalElementWithIcon({
+export function ManageModalElementWithAction({
   label,
   labelTooltip,
   value,
   valueTooltip,
+  copiableLabel,
   action,
-  icon = <IconArrowRight size={14} />,
+  icon,
 }: ManageModalElementWithIconProps) {
   return (
     <Element>
       <Box style={{ flexDirection: "row", gap: 8 }}>
-        <Box
-          height={54}
-          width={54}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "#131415",
-            borderRadius: "4px",
-          }}
-        >
-          {icon}
-        </Box>
+        {icon && (
+          <Box
+            height={54}
+            width={54}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#131415",
+              borderRadius: "4px",
+            }}
+          >
+            {icon}
+          </Box>
+        )}
         <Box style={{ gap: 8 }}>
           <Box style={{ flexDirection: "row", alignItems: "center", gap: "8px" }}>
             {value && (
@@ -189,9 +238,17 @@ export function ManageModalElementWithIcon({
           </Box>
           <Box>
             <Box style={{ flexDirection: "row", alignItems: "center", gap: "8px" }}>
-              <Text ff="Inter|Regular" fontSize={4} color="palette.text.shade100">
-                {label}
-              </Text>
+              {copiableLabel ? (
+                <CopiableField value={label}>
+                  <Text ff="Inter|Regular" fontSize={4} color="palette.text.shade100">
+                    {label}
+                  </Text>
+                </CopiableField>
+              ) : (
+                <Text ff="Inter|Regular" fontSize={4} color="palette.text.shade100">
+                  {label}
+                </Text>
+              )}
               {labelTooltip && (
                 <Tooltip content={labelTooltip}>
                   <StyledIconInfo size={14} />
@@ -204,7 +261,13 @@ export function ManageModalElementWithIcon({
       <Box style={{ flexDirection: "row", gap: 8 }}>
         {action &&
           action.map(action => (
-            <Button key={action.label} primary onClick={action.onClick} disabled={action.disabled}>
+            <Button
+              key={action.label}
+              primary
+              onClick={action.onClick}
+              disabled={action.disabled}
+              danger={action.danger}
+            >
               {action.label}
             </Button>
           ))}

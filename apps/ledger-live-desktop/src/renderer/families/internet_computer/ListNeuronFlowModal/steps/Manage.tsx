@@ -3,7 +3,6 @@ import styled from "styled-components";
 import TrackPage from "~/renderer/analytics/TrackPage";
 import Box from "~/renderer/components/Box";
 import FormattedVal from "~/renderer/components/FormattedVal";
-import Button from "~/renderer/components/Button";
 import { useDispatch } from "react-redux";
 import { StepProps } from "../types";
 import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
@@ -18,9 +17,10 @@ import {
 } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { closeModal } from "~/renderer/actions/modals";
 import {
-  ManageModalElementWithIcon,
+  ManageModalElementWithAction,
   ManageModalElement,
   ManageModalSection,
+  ManageModalActionElement,
 } from "../../components/ManageModalComponents";
 import { ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/types";
 
@@ -212,7 +212,7 @@ export default function StepManage({
             />
           }
         >
-          <ManageModalElementWithIcon
+          <ManageModalElementWithAction
             label="ICP Staked"
             action={[
               {
@@ -229,7 +229,7 @@ export default function StepManage({
               />
             }
           />
-          <ManageModalElementWithIcon
+          <ManageModalElementWithAction
             // TODO: add age bonus
             label={"Age bonus: +0%"}
             valueTooltip="Your neuron can be locked, unlocked or dissolving. In a locked state, it is accruing age bonus, while its dissolve delay stays constant. If the neuron is in a dissolving state, its age bonus is set to 0, while dissolve delay decreases with time. After dissolve delay reaches 0, the neuron is unlocked, and ICP held in it can be sent to any ICP account."
@@ -249,7 +249,7 @@ export default function StepManage({
             ]}
             value={neuron.dissolveState}
           />
-          <ManageModalElementWithIcon
+          <ManageModalElementWithAction
             // TODO: add dissolve delay bonus
             label={"Dissolve delay bonus: +100%"}
             valueTooltip="Dissolve delay is the minimum amount of time you have to wait for the neuron to unlock, and ICP to be available again. If your neuron is dissolving, your ICP will be available in 7 years, 365 days."
@@ -261,7 +261,7 @@ export default function StepManage({
             ]}
             value={`Dissolve Delay: ${getNeuronDissolveDuration(neuron)}`}
           />
-          <ManageModalElementWithIcon
+          <ManageModalElementWithAction
             label={`${timeUntilActive.days} days, ${timeUntilActive.hours} hours to confirm following`}
             valueTooltip="ICP neurons that are inactive for 6 months start missing voting rewards. To avoid missing rewards, vote manually, edit, or confirm your following."
             action={[
@@ -293,7 +293,7 @@ export default function StepManage({
             />
           }
         >
-          <ManageModalElementWithIcon
+          <ManageModalElementWithAction
             label="Staked"
             labelTooltip="Staked maturity contributes to the neuron's voting power, but cannot be spawned into a new neuron."
             value={
@@ -305,7 +305,7 @@ export default function StepManage({
               />
             }
           />
-          <ManageModalElementWithIcon
+          <ManageModalElementWithAction
             label="Available"
             labelTooltip="Available maturity can be staked, or burned to spawn a neuron containing an amount of ICP that is subject to a non-deterministic process, called maturity modulation."
             action={[
@@ -333,6 +333,23 @@ export default function StepManage({
 
         <Divider my={6} width={"100%"} />
 
+        {/* HotKeys Section */}
+        <ManageModalSection title="HotKeys">
+          {neuron.hot_keys.map((val, index) => {
+            return (
+              <ManageModalElementWithAction
+                key={index}
+                label={val.toString()}
+                copiableLabel
+                action={[{ label: "Remove", onClick: () => console.log("remove"), danger: true }]}
+              />
+            );
+          })}
+        </ManageModalSection>
+
+        <Divider />
+        <Divider my={6} width={"100%"} />
+
         {/* Advanced Details Section */}
         <ManageModalSection title="Advanced Details & Settings">
           <ManageModalElement label="Neuron ID" value={neuronId} />
@@ -348,12 +365,57 @@ export default function StepManage({
           />
           <ManageModalElement
             label="Dissolve Date"
-            value={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+            value={new Date(Number(neuron.whenDissolvedTimestampSeconds) * 1000).toLocaleString(
+              "en-US",
+              {
+                dateStyle: "medium",
+                timeStyle: "short",
+              },
+            )}
           />
-          <ManageModalElement label="Last Maturity Distribution" value="Never" />
+          <ManageModalElement
+            label="Neuron Account"
+            value={neuron.accountIdentifier}
+            copiableValue
+            ellipsis
+          />
+
+          <ManageModalActionElement
+            label="Split Neuron"
+            onClick={() => console.log("split neuron")}
+          />
+
+          <ManageModalActionElement
+            label={`${neuron.auto_stake_maturity[0] ? "Stop" : "Start"} Automatic Stake Maturity`}
+            onClick={() => console.log("start automatic stake maturity")}
+          />
         </ManageModalSection>
 
+        <Divider />
+        <Divider my={6} width={"100%"} />
+
         {/* Following Section */}
+        <ManageModalSection
+          title="Following"
+          titleTooltip="Following allows you to delegate your votes to another neuron holder. You still earn rewards if you delegate your voting rights. You can change your following at any time."
+        >
+          {Object.entries(neuron.modFollowees).map(([neuronId, topics]) => {
+            return (
+              <ManageModalElement
+                key={`followees-${neuronId}`}
+                value={`${topics.join(", ")}`}
+                copiableLabel
+                label={neuronId}
+              />
+            );
+          })}
+          <ManageModalActionElement
+            label="Follow Neurons"
+            onClick={() => console.log("follow neurons")}
+          />
+        </ManageModalSection>
+
+        {/* <Section>
         {/* <Section>
           <SectionTitle>Following</SectionTitle>
           <InfoGrid>

@@ -2,11 +2,14 @@ import React, { useCallback } from "react";
 import styled from "styled-components";
 import { Box, Text, Flex } from "@ledgerhq/react-ui";
 import CheckCircle from "~/renderer/icons/CheckCircle";
-import { StepProps } from "../types";
 import TrackPage from "~/renderer/analytics/TrackPage";
 import { SyncOneAccountOnMount } from "@ledgerhq/live-common/bridge/react/index";
 import { colors } from "~/renderer/styles/theme";
 import ErrorDisplay from "~/renderer/components/ErrorDisplay";
+import {
+  ICPAccount,
+  ICPTransactionType,
+} from "@ledgerhq/live-common/families/internet_computer/types";
 
 const Container = styled(Box).attrs(() => ({
   alignItems: "center",
@@ -26,12 +29,19 @@ const ActionText = styled(Text)`
   letter-spacing: 0.1em;
 `;
 
+type Props = {
+  lastManageAction: ICPTransactionType;
+  account: ICPAccount;
+  transitionTo: (step: string) => void;
+  error: Error | null;
+};
+
 export default function StepConfirmation({
   account,
   lastManageAction,
   transitionTo,
   error,
-}: StepProps) {
+}: Props) {
   const currencyId = account.currency.id;
   const getActionText = useCallback(() => {
     if (lastManageAction === "increase_stake") {

@@ -4,7 +4,7 @@ import GenericStepConnectDevice from "~/renderer/modals/Send/steps/GenericStepCo
 import StepListNeuron, { StepListNeuronFooter } from "./ListNeuron";
 import { StepProps, St } from "../types";
 import StepManage from "./Manage";
-import StepConfirmation from "./Confirmation";
+import StepConfirmation from "../../components/Confirmation";
 export function useSteps(): St[] {
   const { t } = useTranslation();
   return useMemo<St[]>(
@@ -34,14 +34,13 @@ export function useSteps(): St[] {
         id: "manageAction",
         label: "Manage neuron action",
         component: GenericStepConnectDevice as React.ComponentType<StepProps>,
-        hideBackButton: true,
         excludeFromBreadcrumb: true,
         noScroll: true,
       },
       {
         id: "confirmation",
         label: "Confirmation",
-        component: StepConfirmation,
+        component: StepConfirmation as React.ComponentType<StepProps>,
         footer: StepListNeuronFooter,
         onBack: ({ transitionTo }: StepProps) => {
           transitionTo("listNeuron");

@@ -32,6 +32,7 @@ export default function StepListNeuron({
   transitionTo,
   needsRefresh,
   setNeedsRefresh,
+  setLastManageAction,
 }: StepProps) {
   const { t } = useTranslation();
   const currencyId = account.currency.id;
@@ -63,9 +64,10 @@ export default function StepListNeuron({
           neuronId: neuron.id[0]?.id.toString(),
         }),
       );
+      setLastManageAction("refresh_voting_power");
       transitionTo("device");
     },
-    [account, onChangeTransaction, transitionTo],
+    [account, onChangeTransaction, transitionTo, setLastManageAction],
   );
 
   if (neurons) {
@@ -84,7 +86,14 @@ export default function StepListNeuron({
           accountId={account.id}
         />
         <List
-          neurons={neurons}
+          neurons={{
+            fullNeurons: neurons.fullNeurons.sort(
+              (a, b) =>
+                Number(b.neuronInfo.voting_power_refreshed_timestamp_seconds[0]) -
+                Number(a.neuronInfo.voting_power_refreshed_timestamp_seconds[0]),
+            ),
+            lastUpdatedMSecs: neurons.lastUpdatedMSecs,
+          }}
           modalName="MODAL_ICP_REFRESH_VOTING_POWER"
           unit={unit}
           onClickConfirmFollowing={onClickConfirmFollowing}

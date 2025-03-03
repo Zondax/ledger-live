@@ -6,6 +6,7 @@ import {
   SECONDS_IN_HALF_YEAR,
   VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS,
 } from "../consts";
+import { Topic } from "@dfinity/nns";
 
 const votingPowerNeedsRefresh = (
   account: ICPAccount,
@@ -100,4 +101,30 @@ export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
   return {
     state: "sync_neurons",
   };
+};
+
+// TODO: getNeuronFollowees
+export const getTopicTitle = (topic: Topic): string => {
+  const mapper: Record<Topic, string> = {
+    [Topic.Unspecified]: "UNSPECIFIED",
+    [Topic.NeuronManagement]: "NEURON MANAGEMENT",
+    [Topic.ExchangeRate]: "EXCHANGE RATE",
+    [Topic.NetworkEconomics]: "NETWORK ECONOMICS",
+    [Topic.Governance]: "GOVERNANCE",
+    [Topic.NodeAdmin]: "NODE ADMIN",
+    [Topic.ParticipantManagement]: "PARTICIPANT MANAGEMENT",
+    [Topic.SubnetManagement]: "SUBNET MANAGEMENT",
+    [Topic.NetworkCanisterManagement]: "NETWORK CANISTER MANAGEMENT",
+    [Topic.Kyc]: "KYC",
+    [Topic.NodeProviderRewards]: "NODE PROVIDER REWARDS",
+    [Topic.SnsDecentralizationSale]: "SNS DECENTRALIZATION SALE",
+    [Topic.IcOsVersionDeployment]: "IC OS VERSION DEPLOYMENT",
+    [Topic.IcOsVersionElection]: "IC OS VERSION ELECTION",
+    [Topic.SnsAndCommunityFund]: "SNS AND COMMUNITY FUND",
+    [Topic.ApiBoundaryNodeManagement]: "API BOUNDARY NODE MANAGEMENT",
+    [Topic.SubnetRental]: "SUBNET RENTAL",
+    [Topic.ProtocolCanisterManagement]: "PROTOCOL CANISTER MANAGEMENT",
+    [Topic.ServiceNervousSystemManagement]: "SERVICE NOSTRUM SYSTEM MANAGEMENT",
+  };
+  return mapper[topic] ?? `UNKNOWN TOPIC: ${topic.toString().toUpperCase}`;
 };

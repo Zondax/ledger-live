@@ -5,12 +5,15 @@ import {
   TransactionStatus,
   ICPAccount,
   InternetComputerOperation,
+  ICPTransactionType,
 } from "@ledgerhq/live-common/families/internet_computer/types";
 import { OpenModal } from "~/renderer/actions/modals";
 import { NeuronsData } from "@ledgerhq/live-common/families/internet_computer/utils";
-export type StepId = "device" | "confirmation";
+export type StepId = "device" | "confirmation" | "listNeuron";
 export type StepProps = {
   transitionTo: (address: string) => void;
+  lastManageAction?: ICPTransactionType;
+  setLastManageAction: (a: ICPTransactionType) => void;
   device: Device | undefined | null;
   account: ICPAccount;
   parentAccount: never;

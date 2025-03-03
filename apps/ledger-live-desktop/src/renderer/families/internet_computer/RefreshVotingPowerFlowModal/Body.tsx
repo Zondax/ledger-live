@@ -21,6 +21,7 @@ import { getCurrentDevice } from "~/renderer/reducers/devices";
 import { useSteps } from "./steps";
 import {
   ICPAccount,
+  ICPTransactionType,
   InternetComputerOperation,
 } from "@ledgerhq/live-common/families/internet_computer/types";
 import { refreshNeuronsData } from "../common";
@@ -53,6 +54,10 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
     null,
   );
   const [transactionError, setTransactionError] = useState<Error | null>(null);
+  const [lastManageAction, setLastManageAction] = useState<ICPTransactionType | undefined>(
+    undefined,
+  );
+
   const [signed, setSigned] = useState(false);
   const [manageNeuronIndex, setManageNeuronIndex] = useState<number>(0);
   const [needsRefresh, setNeedsRefresh] = useState(false);
@@ -110,7 +115,9 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
     signed,
     stepId,
     steps,
-    neurons: optimisticOperation ? optimisticOperation.extra.neurons : accountProp.neurons,
+    neurons: optimisticOperation
+      ? optimisticOperation.extra.neurons ?? accountProp.neurons
+      : accountProp.neurons,
     errorSteps,
     disabledSteps: [],
     hideBreadcrumb: !!error && ["amount"].includes(stepId),
@@ -119,6 +126,8 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
     onClose,
     error,
     status,
+    lastManageAction,
+    setLastManageAction,
     manageNeuronIndex,
     setManageNeuronIndex,
     needsRefresh,

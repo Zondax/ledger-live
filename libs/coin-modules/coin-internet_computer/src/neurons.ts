@@ -19,6 +19,7 @@ import {
 import { nowInSeconds } from "./common-logic/utils";
 import BigNumber from "bignumber.js";
 import invariant from "invariant";
+import { getTopicTitle } from "./common-logic";
 
 const NeuronId = IDL.Record({ id: IDL.Nat64 });
 const BallotInfo = IDL.Record({
@@ -119,6 +120,17 @@ export class NeuronsData {
           : "0";
       return {
         ...neuron,
+        modFollowees: neuron.followees.reduce(
+          (acc, followee) => {
+            const topic = getTopicTitle(followee[0]);
+            followee[1].followees.forEach(followee => {
+              acc[followee.id.toString()] = acc[followee.id.toString()] ?? [];
+              acc[followee.id.toString()].push(topic);
+            });
+            return acc;
+          },
+          {} as Record<string, string[]>,
+        ),
         accountIdentifier: principalToAccountIdentifier(
           Principal.from(MAINNET_GOVERNANCE_CANISTER_ID),
           Uint8Array.from(neuron.account),
