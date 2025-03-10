@@ -140,7 +140,7 @@ export function StepListNeuronFooter({
   }, [account, onChangeTransaction, transitionTo, setLastManageAction]);
 
   const onRetry = useCallback(() => {
-    transitionTo("listNeuron");
+    transitionTo("manage");
   }, [transitionTo]);
 
   return (

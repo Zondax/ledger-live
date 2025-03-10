@@ -34,24 +34,43 @@ export type ICPTransactionType =
   | "send"
   | "spawn_neuron"
   | "stake_maturity"
-  | "refresh_voting_power";
+  | "refresh_voting_power"
+  | "increase_dissolve_delay"
+  | "auto_stake_maturity"
+  | "spawn_neuron_from_maturity"
+  | "set_auto_stake_maturity"
+  | "set_dissolve_delay"
+  | "remove_hot_key"
+  | "split_neuron";
 
 export type Transaction = TransactionCommon & {
   family: FamilyType;
   fees: BigNumber;
+  memo?: string;
   type: ICPTransactionType;
   neuronAccountIdentifier?: string;
   neuronId?: string;
   percentageToStake?: string;
   percentageToSpawn?: string;
-  memo?: string;
+  dissolveDelay?: string;
+  additionalDissolveDelay?: string;
+  autoStakeMaturity?: boolean;
+  hotKeyToRemove?: string;
 };
 
 export type TransactionRaw = TransactionCommonRaw & {
   family: FamilyType;
-  type: ICPTransactionType;
   fees: string;
   memo?: string;
+  type: ICPTransactionType;
+  neuronAccountIdentifier?: string;
+  neuronId?: string;
+  percentageToStake?: string;
+  percentageToSpawn?: string;
+  dissolveDelay?: string;
+  additionalDissolveDelay?: string;
+  autoStakeMaturity?: boolean;
+  hotKeyToRemove?: string;
 };
 
 export type TransactionStatus = TransactionStatusCommon;

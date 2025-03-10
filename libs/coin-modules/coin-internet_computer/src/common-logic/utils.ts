@@ -46,6 +46,16 @@ export const methodToString = (method: Transaction["type"]): string => {
       return "Spawn Neuron";
     case "refresh_voting_power":
       return "Refresh Voting Power";
+    case "auto_stake_maturity":
+      return "Set Auto Stake Maturity";
+    case "increase_dissolve_delay":
+      return "Increase Dissolve Delay";
+    case "set_dissolve_delay":
+      return "Set Dissolve Delay";
+    case "split_neuron":
+      return "Split Neuron";
+    case "remove_hot_key":
+      return "Remove HotKey";
     default:
       return "Send ICP";
   }
@@ -122,14 +132,18 @@ export const nowInSeconds = (): number => Math.round(Date.now() / 1000);
 
 export const getTimeUntil = (
   futureTimestampInSeconds: number,
+  diffFromNow: boolean = true,
 ): {
   days: number;
   hours: number;
   minutes: number;
   seconds: number;
 } => {
-  const now = nowInSeconds();
-  const diff = Math.abs(futureTimestampInSeconds - now);
+  let diff = futureTimestampInSeconds;
+  if (diffFromNow) {
+    const now = nowInSeconds();
+    diff = Math.abs(futureTimestampInSeconds - now);
+  }
   return {
     days: Math.floor(diff / (24 * 60 * 60)),
     hours: Math.floor((diff % (24 * 60 * 60)) / (60 * 60)),

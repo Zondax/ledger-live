@@ -5,7 +5,7 @@ import { formatCurrencyUnit } from "@ledgerhq/coin-framework/currencies/index";
 import type { CommonDeviceTransactionField } from "@ledgerhq/coin-framework/transaction/common";
 
 import { Transaction, TransactionStatus } from "../types";
-import { methodToString } from "../common-logic/utils";
+import { getTimeUntil, methodToString } from "../common-logic/utils";
 
 const currency = getCryptoCurrencyById("internet_computer");
 
@@ -24,13 +24,7 @@ function getDeviceTransactionConfig({
     value: methodToString(transaction.type),
   });
 
-  if (
-    transaction.type === "disburse" ||
-    transaction.type === "start_dissolving" ||
-    transaction.type === "stop_dissolving" ||
-    transaction.type === "stake_maturity" ||
-    transaction.type === "spawn_neuron"
-  ) {
+  if (transaction.neuronId) {
     fields.push({
       type: "text",
       label: "Neuron Id",
@@ -42,6 +36,22 @@ function getDeviceTransactionConfig({
         type: "text",
         label: "Percentage to Stake",
         value: transaction.percentageToStake ?? "100",
+      });
+    }
+
+    if (transaction.type === "remove_hot_key") {
+      fields.push({
+        type: "text",
+        label: "Principal",
+        value: transaction.hotKeyToRemove ?? "",
+      });
+    }
+
+    if (transaction.type === "auto_stake_maturity") {
+      fields.push({
+        type: "text",
+        label: "Auto Stake",
+        value: transaction.autoStakeMaturity ? "true" : "false",
       });
     }
 
@@ -60,14 +70,18 @@ function getDeviceTransactionConfig({
         value: "Self",
       });
     }
+
+    if (transaction.type === "increase_dissolve_delay") {
+      const additionalDelay = getTimeUntil(Number(transaction.additionalDissolveDelay));
+      fields.push({
+        type: "text",
+        label: "Additional Delay",
+        value: `${additionalDelay.days}d ${additionalDelay.hours}h ${additionalDelay.minutes}m ${additionalDelay.seconds}s`,
+      });
+    }
   }
 
-  if (
-    transaction.type === "send" ||
-    transaction.type === "create_neuron" ||
-    transaction.type === "increase_stake" ||
-    transaction.type === "disburse"
-  ) {
+  if (transaction.amount.gt(0)) {
     fields.push({
       type: "text",
       label: "Amount (ICP)",
@@ -86,16 +100,11 @@ function getDeviceTransactionConfig({
     });
   }
 
-  if (
-    transaction.type !== "list_neurons" &&
-    transaction.type !== "disburse" &&
-    transaction.type !== "spawn_neuron" &&
-    transaction.type !== "stake_maturity"
-  ) {
+  if (transaction.memo && transaction.memo !== "0") {
     fields.push({
       type: "text",
       label: "Memo",
-      value: transaction.memo ?? "0",
+      value: transaction.memo,
     });
   }
   log("debug", `Transaction config ${JSON.stringify(fields)}`);

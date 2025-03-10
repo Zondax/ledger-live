@@ -70,9 +70,56 @@ interface RefreshVotingPowerCommand {
   RefreshVotingPower: object;
 }
 
+interface SplitNeuronCommand {
+  Split: {
+    memo: bigint;
+    amount_e8s: bigint;
+  };
+}
+
+// Neuron configuration commands
+interface IncreaseDissolveDelayConfig {
+  IncreaseDissolveDelay: {
+    additional_dissolve_delay_seconds: number;
+  };
+}
+
+interface SetDissolveDelayConfig {
+  SetDissolveTimestamp: {
+    dissolve_timestamp_seconds: bigint;
+  };
+}
+
+interface StartDissolvingConfig {
+  StartDissolving: object;
+}
+
+interface StopDissolvingConfig {
+  StopDissolving: object;
+}
+
+interface RemoveHotKeyConfig {
+  RemoveHotKey: {
+    hot_key_to_remove: [Principal];
+  };
+}
+
+interface ChangeAutoStakeMaturityConfig {
+  ChangeAutoStakeMaturity: {
+    requested_setting_for_auto_stake_maturity: boolean;
+  };
+}
+
 interface ConfigureOperationCommand {
   Configure: {
-    operation: [{ StartDissolving: object } | { StopDissolving: object }];
+    operation: [
+      | StartDissolvingConfig
+      | StopDissolvingConfig
+      | IncreaseDissolveDelayConfig
+      | SetDissolveDelayConfig
+      | ChangeAutoStakeMaturityConfig
+      | RemoveHotKeyConfig,
+    ];
   };
 }
 
@@ -82,7 +129,8 @@ export interface NeuronCommandRawRequest<
     | ConfigureOperationCommand
     | StakeMaturityCommand
     | SpawnNeuronCommand
-    | RefreshVotingPowerCommand,
+    | RefreshVotingPowerCommand
+    | SplitNeuronCommand,
 > {
   id: [{ id: bigint }];
   command: T[];
@@ -124,6 +172,22 @@ const createUnsignedListNeuronsTransaction = (
   return { unsignedTransaction, listNeuronsRawRequest };
 };
 
+const createCommandConfigOperation = (
+  op:
+    | StartDissolvingConfig
+    | StopDissolvingConfig
+    | IncreaseDissolveDelayConfig
+    | SetDissolveDelayConfig
+    | ChangeAutoStakeMaturityConfig
+    | RemoveHotKeyConfig,
+): ConfigureOperationCommand => {
+  return {
+    Configure: {
+      operation: [op],
+    },
+  };
+};
+
 // Generic function to create an unsigned transaction for a neuron command
 const createUnsignedNeuronCommandTransaction = (
   transaction: Transaction,
@@ -136,9 +200,17 @@ const createUnsignedNeuronCommandTransaction = (
     | StakeMaturityCommand
     | SpawnNeuronCommand
     | RefreshVotingPowerCommand
+    | SplitNeuronCommand
   >;
 } => {
-  const { neuronId, amount } = transaction;
+  const {
+    neuronId,
+    amount,
+    dissolveDelay,
+    additionalDissolveDelay,
+    autoStakeMaturity,
+    hotKeyToRemove,
+  } = transaction;
   invariant(neuronId, "[ICP](createUnsignedNeuronCommandTransaction) Neuron ID is required");
 
   const rawCommand: NeuronCommandRawRequest<
@@ -147,6 +219,7 @@ const createUnsignedNeuronCommandTransaction = (
     | StakeMaturityCommand
     | SpawnNeuronCommand
     | RefreshVotingPowerCommand
+    | SplitNeuronCommand
   > = {
     id: [{ id: BigInt(neuronId) }],
     neuron_id_or_subaccount: [],
@@ -165,18 +238,10 @@ const createUnsignedNeuronCommandTransaction = (
       ];
       break;
     case "start_dissolving":
-      rawCommand.command = [
-        {
-          Configure: { operation: [{ StartDissolving: {} }] },
-        },
-      ];
+      rawCommand.command = [createCommandConfigOperation({ StartDissolving: {} })];
       break;
     case "stop_dissolving":
-      rawCommand.command = [
-        {
-          Configure: { operation: [{ StopDissolving: {} }] },
-        },
-      ];
+      rawCommand.command = [createCommandConfigOperation({ StopDissolving: {} })];
       break;
     case "stake_maturity":
       rawCommand.command = [
@@ -197,6 +262,64 @@ const createUnsignedNeuronCommandTransaction = (
         {
           RefreshVotingPower: {},
         },
+      ];
+      break;
+    case "increase_dissolve_delay":
+      invariant(
+        additionalDissolveDelay,
+        "[ICP](createUnsignedNeuronCommandTransaction) Additional dissolve delay is required",
+      );
+      rawCommand.command = [
+        createCommandConfigOperation({
+          IncreaseDissolveDelay: {
+            additional_dissolve_delay_seconds: Number(additionalDissolveDelay),
+          },
+        }),
+      ];
+      break;
+    case "set_dissolve_delay":
+      invariant(
+        dissolveDelay,
+        "[ICP](createUnsignedNeuronCommandTransaction) Dissolve delay is required",
+      );
+      rawCommand.command = [
+        createCommandConfigOperation({
+          SetDissolveTimestamp: { dissolve_timestamp_seconds: BigInt(dissolveDelay) },
+        }),
+      ];
+      break;
+    case "auto_stake_maturity":
+      invariant(
+        autoStakeMaturity !== undefined,
+        "[ICP](createUnsignedNeuronCommandTransaction) Auto stake maturity is required",
+      );
+      rawCommand.command = [
+        createCommandConfigOperation({
+          ChangeAutoStakeMaturity: {
+            requested_setting_for_auto_stake_maturity: autoStakeMaturity,
+          },
+        }),
+      ];
+      break;
+    case "split_neuron":
+      rawCommand.command = [
+        {
+          Split: {
+            memo: BigInt(transaction.memo ?? 0),
+            amount_e8s: BigInt(amount.toString()),
+          },
+        },
+      ];
+      break;
+    case "remove_hot_key":
+      invariant(
+        hotKeyToRemove,
+        "[ICP](createUnsignedNeuronCommandTransaction) Hot key to remove is required",
+      );
+      rawCommand.command = [
+        createCommandConfigOperation({
+          RemoveHotKey: { hot_key_to_remove: [Principal.fromText(hotKeyToRemove)] },
+        }),
       ];
       break;
   }
@@ -361,7 +484,12 @@ export const buildSignOperation =
           transaction.type === "stop_dissolving" ||
           transaction.type === "stake_maturity" ||
           transaction.type === "spawn_neuron" ||
-          transaction.type === "refresh_voting_power"
+          transaction.type === "increase_dissolve_delay" ||
+          transaction.type === "set_dissolve_delay" ||
+          transaction.type === "refresh_voting_power" ||
+          transaction.type === "auto_stake_maturity" ||
+          transaction.type === "remove_hot_key" ||
+          transaction.type === "split_neuron"
         ) {
           ({ unsignedTransaction } = createUnsignedNeuronCommandTransaction(transaction, account));
         } else {

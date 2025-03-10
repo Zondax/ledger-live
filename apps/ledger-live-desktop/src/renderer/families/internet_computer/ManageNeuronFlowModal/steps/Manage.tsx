@@ -142,6 +142,71 @@ export default function StepManage({
     transitionTo("manageAction");
   }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
 
+  const onClickAutoStakeMaturity = useCallback(
+    (enabled: boolean) => {
+      const bridge = getAccountBridge(account, undefined);
+      const initTx = bridge.createTransaction(account);
+      onChangeTransaction(
+        bridge.updateTransaction(initTx, {
+          neuronId: neuron.id[0]?.id.toString(),
+          type: "auto_stake_maturity",
+          autoStakeMaturity: enabled,
+        }),
+      );
+      setLastManageAction("auto_stake_maturity");
+      transitionTo("manageAction");
+    },
+    [account, onChangeTransaction, transitionTo, neuron, setLastManageAction],
+  );
+
+  const onClickIncreaseDissolveDelay = useCallback(() => {
+    const bridge = getAccountBridge(account, undefined);
+    const initTx = bridge.createTransaction(account);
+    const action = "increase_dissolve_delay";
+    onChangeTransaction(
+      bridge.updateTransaction(initTx, {
+        neuronId: neuron.id[0]?.id.toString(),
+        type: action,
+        additionalDissolveDelay: "10000",
+      }),
+    );
+    setLastManageAction(action);
+    transitionTo("manageAction");
+  }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
+
+  const onClickSplitNeuron = useCallback(() => {
+    const bridge = getAccountBridge(account, undefined);
+    const initTx = bridge.createTransaction(account);
+    const action = "split_neuron";
+    onChangeTransaction(
+      bridge.updateTransaction(initTx, {
+        type: action,
+        neuronId: neuron.id[0]?.id.toString(),
+        amount: BigNumber(neuron.cached_neuron_stake_e8s.toString()).div(2).integerValue(),
+      }),
+    );
+    setLastManageAction(action);
+    transitionTo("manageAction");
+  }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
+
+  const onClickRemoveHotKey = useCallback(
+    (hotKey: string) => {
+      const bridge = getAccountBridge(account, undefined);
+      const initTx = bridge.createTransaction(account);
+      const action = "remove_hot_key";
+      onChangeTransaction(
+        bridge.updateTransaction(initTx, {
+          type: action,
+          neuronId: neuron.id[0]?.id.toString(),
+          hotKeyToRemove: hotKey,
+        }),
+      );
+      setLastManageAction(action);
+      transitionTo("manageAction");
+    },
+    [account, onChangeTransaction, transitionTo, neuron, setLastManageAction],
+  );
+
   const onClickSpawnNeuron = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
     const initTx = bridge.createTransaction(account);
@@ -256,7 +321,7 @@ export default function StepManage({
             action={[
               {
                 label: `${neuron.dissolveState !== "Unlocked" ? "Increase" : "Set"} Dissolve Delay`,
-                onClick: () => console.log("increase/set dissolve delay"),
+                onClick: onClickIncreaseDissolveDelay,
               },
             ]}
             value={`Dissolve Delay: ${getNeuronDissolveDuration(neuron)}`}
@@ -343,10 +408,17 @@ export default function StepManage({
                 key={index}
                 label={val.toString()}
                 copiableLabel
-                action={[{ label: "Remove", onClick: () => console.log("remove"), danger: true }]}
+                action={[
+                  {
+                    label: "Remove",
+                    onClick: () => onClickRemoveHotKey(val.toString()),
+                    danger: true,
+                  },
+                ]}
               />
             );
           })}
+          {neuron.hot_keys.length === 0 && <ManageModalElement label="No HotKeys Found" />}
         </ManageModalSection>
 
         <Divider />
@@ -382,14 +454,11 @@ export default function StepManage({
             ellipsis
           />
 
-          <ManageModalActionElement
-            label="Split Neuron"
-            onClick={() => console.log("split neuron")}
-          />
+          <ManageModalActionElement label="Split Neuron" onClick={onClickSplitNeuron} />
 
           <ManageModalActionElement
             label={`${neuron.auto_stake_maturity[0] ? "Stop" : "Start"} Automatic Stake Maturity`}
-            onClick={() => console.log("start automatic stake maturity")}
+            onClick={() => onClickAutoStakeMaturity(!neuron.auto_stake_maturity[0])}
           />
         </ManageModalSection>
 

@@ -50,6 +50,11 @@ export const broadcast: AccountBridge<
     case "refresh_voting_power":
     case "stake_maturity":
     case "spawn_neuron":
+    case "increase_dissolve_delay":
+    case "set_dissolve_delay":
+    case "split_neuron":
+    case "remove_hot_key":
+    case "auto_stake_maturity":
       await broadcastTxn(
         Buffer.from(rawDataTyped.encodedSignedCallBlob, "hex"),
         MAINNET_GOVERNANCE_CANISTER_ID,
