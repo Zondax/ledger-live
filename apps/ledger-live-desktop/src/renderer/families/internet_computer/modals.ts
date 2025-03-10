@@ -1,7 +1,7 @@
 import { MakeModalsType } from "~/renderer/modals/types";
 import MODAL_ICP_LIST_NEURONS, {
   Props as MODAL_ICP_LIST_NEURONS_PROPS,
-} from "./ListNeuronFlowModal";
+} from "./ManageNeuronFlowModal";
 import MODAL_ICP_REFRESH_VOTING_POWER, {
   Props as MODAL_ICP_REFRESH_VOTING_POWER_PROPS,
 } from "./RefreshVotingPowerFlowModal";

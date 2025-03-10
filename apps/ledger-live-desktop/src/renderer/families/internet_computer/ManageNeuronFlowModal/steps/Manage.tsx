@@ -255,8 +255,8 @@ export default function StepManage({
             valueTooltip="Dissolve delay is the minimum amount of time you have to wait for the neuron to unlock, and ICP to be available again. If your neuron is dissolving, your ICP will be available in 7 years, 365 days."
             action={[
               {
-                label: "Increase Delay",
-                onClick: () => console.log("increase dissolve delay"),
+                label: `${neuron.dissolveState !== "Unlocked" ? "Increase" : "Set"} Dissolve Delay`,
+                onClick: () => console.log("increase/set dissolve delay"),
               },
             ]}
             value={`Dissolve Delay: ${getNeuronDissolveDuration(neuron)}`}
@@ -312,10 +312,12 @@ export default function StepManage({
               {
                 label: "Stake",
                 onClick: onClickStakeMaturity,
+                disabled: neuron.maturity_e8s_equivalent === BigInt(0),
               },
               {
                 label: "Spawn Neuron",
                 onClick: onClickSpawnNeuron,
+                disabled: neuron.maturity_e8s_equivalent < BigInt(1 * 10 ** unit.magnitude),
               },
             ]}
             value={
@@ -414,24 +416,6 @@ export default function StepManage({
             onClick={() => console.log("follow neurons")}
           />
         </ManageModalSection>
-
-        {/* <Section>
-        {/* <Section>
-          <SectionTitle>Following</SectionTitle>
-          <InfoGrid>
-            <InfoRow>
-              <SubTitle>DFINITY Foundation</SubTitle>
-              <Text ff="Inter|SemiBold" fontSize={4}>
-                All Except Governance, and SNS & Neurons&apos; Fund
-              </Text>
-            </InfoRow>
-          </InfoGrid>
-          <ButtonGroup>
-            <Button primary small onClick={() => console.log("follow neurons")}>
-              #Follow Neurons
-            </Button>
-          </ButtonGroup>
-        </Section> */}
       </Container>
     );
   }
