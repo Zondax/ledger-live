@@ -7098,5 +7098,19 @@
       "magiceden": "Magic Eden",
       "opensea": "OpenSea"
     }
+  },
+  "internetComputer": {
+    "manageNeuron": {
+      "followTopic": {
+        "0": {
+          "title": "All Except Governance, and SNS & Neurons' Fund",
+          "description": "Follow neurons on all proposal topics except the governance topic, and SNS & Neurons' Fund."
+        },
+        "4": {
+          "description": "All proposals that administer governance, for example to freeze malicious canisters that are harming the network.",
+          "title": "Governance"
+        }
+      }
+    }
   }
 }

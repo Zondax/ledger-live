@@ -71,6 +71,7 @@ function Body({
   const [transactionError, setTransactionError] = useState<Error | null>(null);
   const [signed, setSigned] = useState(false);
   const [manageNeuronIndex, setManageNeuronIndex] = useState<number>(neuronIndex ?? 0);
+  const [followTopic, setFollowTopic] = useState<string>("");
   const [needsRefresh, setNeedsRefresh] = useState(false);
   const {
     account,
@@ -157,6 +158,8 @@ function Body({
     onOperationBroadcasted: handleOperationBroadcasted,
     onTransactionError: handleTransactionError,
     bridgePending,
+    followTopic,
+    setFollowTopic,
   };
   return (
     <Stepper {...stepperProps}>

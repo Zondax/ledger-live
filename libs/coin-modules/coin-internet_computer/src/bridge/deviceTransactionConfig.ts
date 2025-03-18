@@ -6,6 +6,7 @@ import type { CommonDeviceTransactionField } from "@ledgerhq/coin-framework/tran
 
 import { Transaction, TransactionStatus } from "../types";
 import { getTimeUntil, methodToString } from "../common-logic/utils";
+import { getTopicTitle } from "../common-logic";
 
 const currency = getCryptoCurrencyById("internet_computer");
 
@@ -30,6 +31,22 @@ function getDeviceTransactionConfig({
       label: "Neuron Id",
       value: transaction.neuronId ?? "0",
     });
+
+    if (transaction.followTopic) {
+      fields.push({
+        type: "text",
+        label: "Topic",
+        value: getTopicTitle(transaction.followTopic as any),
+      });
+    }
+
+    if (transaction.followeesIds) {
+      fields.push({
+        type: "text",
+        label: "Followees",
+        value: transaction.followeesIds.join(", "),
+      });
+    }
 
     if (transaction.type === "stake_maturity") {
       fields.push({

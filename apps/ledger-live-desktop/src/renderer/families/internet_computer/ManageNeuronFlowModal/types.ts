@@ -9,7 +9,14 @@ import {
 } from "@ledgerhq/live-common/families/internet_computer/types";
 import { OpenModal } from "~/renderer/actions/modals";
 import { NeuronsData } from "@ledgerhq/live-common/families/internet_computer/utils";
-export type StepId = "device" | "listNeuron" | "confirmation" | "manage" | "manageAction";
+export type StepId =
+  | "device"
+  | "listNeuron"
+  | "confirmation"
+  | "manage"
+  | "manageAction"
+  | "followTopic"
+  | "selectFollowees";
 export type StepProps = {
   lastManageAction?: ICPTransactionType;
   setLastManageAction: (a: ICPTransactionType) => void;
@@ -38,5 +45,7 @@ export type StepProps = {
   setSigned: (signed: boolean) => void;
   bridgePending: boolean;
   validatorAddress: string;
+  followTopic: string;
+  setFollowTopic: (topic: string) => void;
 };
 export type St = Step<StepId, StepProps>;

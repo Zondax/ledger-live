@@ -5,6 +5,8 @@ import StepListNeuron, { StepListNeuronFooter } from "./ListNeuron";
 import { StepProps, St } from "../types";
 import StepManage from "./Manage";
 import StepConfirmation from "../../components/Confirmation";
+import { StepSelectFollowees } from "./SelectFollowees";
+import { StepFollowSelectTopics } from "./FollowSelectTopics";
 export function useSteps(): St[] {
   const { t } = useTranslation();
   return useMemo<St[]>(
@@ -34,6 +36,26 @@ export function useSteps(): St[] {
         id: "manageAction",
         label: "Manage neuron action",
         component: GenericStepConnectDevice as React.ComponentType<StepProps>,
+        excludeFromBreadcrumb: true,
+        noScroll: true,
+      },
+      {
+        id: "followTopic",
+        label: "Follow topics",
+        component: StepFollowSelectTopics,
+        onBack: ({ transitionTo }: StepProps) => {
+          transitionTo("manage");
+        },
+        excludeFromBreadcrumb: true,
+        noScroll: true,
+      },
+      {
+        id: "selectFollowees",
+        label: "Select followees",
+        component: StepSelectFollowees,
+        onBack: ({ transitionTo }: StepProps) => {
+          transitionTo("followTopic");
+        },
         excludeFromBreadcrumb: true,
         noScroll: true,
       },

@@ -41,6 +41,7 @@ export type ICPTransactionType =
   | "set_auto_stake_maturity"
   | "set_dissolve_delay"
   | "remove_hot_key"
+  | "follow"
   | "split_neuron";
 
 export type Transaction = TransactionCommon & {
@@ -56,6 +57,8 @@ export type Transaction = TransactionCommon & {
   additionalDissolveDelay?: string;
   autoStakeMaturity?: boolean;
   hotKeyToRemove?: string;
+  followTopic?: string;
+  followeesIds?: string[];
 };
 
 export type TransactionRaw = TransactionCommonRaw & {
@@ -71,6 +74,8 @@ export type TransactionRaw = TransactionCommonRaw & {
   additionalDissolveDelay?: string;
   autoStakeMaturity?: boolean;
   hotKeyToRemove?: string;
+  followTopic?: string;
+  followeesIds?: string[];
 };
 
 export type TransactionStatus = TransactionStatusCommon;

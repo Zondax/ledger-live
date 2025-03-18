@@ -1,3 +1,5 @@
+import { Topic } from "@dfinity/nns";
+
 // ICP Rosetta ids
 export const ICP_BLK_NAME_ROSETTA = "Internet Computer";
 export const ICP_NET_ID_ROSETTA = "00000000000000020101";
@@ -44,3 +46,24 @@ export const SECONDS_IN_YEAR = ((4 * 365 + 1) * SECONDS_IN_DAY) / 4;
 export const SECONDS_IN_HALF_YEAR = SECONDS_IN_YEAR / 2;
 export const SECONDS_IN_FOUR_YEARS = SECONDS_IN_YEAR * 4;
 export const SECONDS_IN_EIGHT_YEARS = SECONDS_IN_YEAR * 8;
+
+// NeuronIds
+export const KNOWN_NEURON_IDS: Record<string, string> = {
+  "27": "DFINITY Foundation",
+  "12093733865587997066": "Aviate Labs",
+};
+
+// Topics name same as 'getTopicTitle' in ../common-logic/neuron.ts
+export const KNOWN_TOPICS = {
+  [Topic.Governance]: "GOVERNANCE",
+  [Topic.NodeAdmin]: "NODE ADMIN",
+  [Topic.NeuronManagement]: "NEURON MANAGEMENT",
+  [Topic.ExchangeRate]: "EXCHANGE RATE",
+  [Topic.NetworkEconomics]: "NETWORK ECONOMICS",
+  [Topic.ParticipantManagement]: "PARTICIPANT MANAGEMENT",
+  [Topic.SubnetManagement]: "SUBNET MANAGEMENT",
+  [Topic.NetworkCanisterManagement]: "NETWORK CANISTER MANAGEMENT",
+  [Topic.Kyc]: "KYC",
+  [Topic.NodeProviderRewards]: "NODE PROVIDER REWARDS",
+  [Topic.Unspecified]: "UNSPECIFIED",
+};

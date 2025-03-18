@@ -55,6 +55,7 @@ export const broadcast: AccountBridge<
     case "split_neuron":
     case "remove_hot_key":
     case "auto_stake_maturity":
+    case "follow":
       await broadcastTxn(
         Buffer.from(rawDataTyped.encodedSignedCallBlob, "hex"),
         MAINNET_GOVERNANCE_CANISTER_ID,

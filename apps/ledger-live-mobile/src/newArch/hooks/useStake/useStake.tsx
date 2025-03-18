@@ -69,6 +69,7 @@ export function useStake() {
     [redirects],
   );
 
+  enabledCurrencies.push("internet_computer");
   const getCanStakeUsingLedgerLive = useCallback(
     (currencyId: string) => (!currencyId ? false : enabledCurrencies.includes(currencyId)),
     [enabledCurrencies],

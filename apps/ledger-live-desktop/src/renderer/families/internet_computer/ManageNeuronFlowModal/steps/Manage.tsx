@@ -174,6 +174,10 @@ export default function StepManage({
     transitionTo("manageAction");
   }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
 
+  const onClickFollow = useCallback(() => {
+    transitionTo("followTopic");
+  }, [transitionTo]);
+
   const onClickSplitNeuron = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
     const initTx = bridge.createTransaction(account);
@@ -480,10 +484,7 @@ export default function StepManage({
               />
             );
           })}
-          <ManageModalActionElement
-            label="Follow Neurons"
-            onClick={() => console.log("follow neurons")}
-          />
+          <ManageModalActionElement label="Follow Neurons" onClick={onClickFollow} />
         </ManageModalSection>
       </Container>
     );

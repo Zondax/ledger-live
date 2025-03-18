@@ -77,6 +77,13 @@ interface SplitNeuronCommand {
   };
 }
 
+interface ManageNeuronFollowRequestCommand {
+  Follow: {
+    topic: number;
+    followees: { id: bigint }[];
+  };
+}
+
 // Neuron configuration commands
 interface IncreaseDissolveDelayConfig {
   IncreaseDissolveDelay: {
@@ -130,7 +137,8 @@ export interface NeuronCommandRawRequest<
     | StakeMaturityCommand
     | SpawnNeuronCommand
     | RefreshVotingPowerCommand
-    | SplitNeuronCommand,
+    | SplitNeuronCommand
+    | ManageNeuronFollowRequestCommand,
 > {
   id: [{ id: bigint }];
   command: T[];
@@ -201,6 +209,7 @@ const createUnsignedNeuronCommandTransaction = (
     | SpawnNeuronCommand
     | RefreshVotingPowerCommand
     | SplitNeuronCommand
+    | ManageNeuronFollowRequestCommand
   >;
 } => {
   const {
@@ -210,6 +219,8 @@ const createUnsignedNeuronCommandTransaction = (
     additionalDissolveDelay,
     autoStakeMaturity,
     hotKeyToRemove,
+    followTopic,
+    followeesIds,
   } = transaction;
   invariant(neuronId, "[ICP](createUnsignedNeuronCommandTransaction) Neuron ID is required");
 
@@ -220,6 +231,7 @@ const createUnsignedNeuronCommandTransaction = (
     | SpawnNeuronCommand
     | RefreshVotingPowerCommand
     | SplitNeuronCommand
+    | ManageNeuronFollowRequestCommand
   > = {
     id: [{ id: BigInt(neuronId) }],
     neuron_id_or_subaccount: [],
@@ -320,6 +332,24 @@ const createUnsignedNeuronCommandTransaction = (
         createCommandConfigOperation({
           RemoveHotKey: { hot_key_to_remove: [Principal.fromText(hotKeyToRemove)] },
         }),
+      ];
+      break;
+    case "follow":
+      invariant(
+        followTopic,
+        "[ICP](createUnsignedNeuronCommandTransaction) Follow topic is required",
+      );
+      invariant(
+        followeesIds,
+        "[ICP](createUnsignedNeuronCommandTransaction) Followees IDs are required",
+      );
+      rawCommand.command = [
+        {
+          Follow: {
+            topic: parseInt(followTopic, 10),
+            followees: followeesIds.map(id => ({ id: BigInt(id) })),
+          },
+        },
       ];
       break;
   }
@@ -489,7 +519,8 @@ export const buildSignOperation =
           transaction.type === "refresh_voting_power" ||
           transaction.type === "auto_stake_maturity" ||
           transaction.type === "remove_hot_key" ||
-          transaction.type === "split_neuron"
+          transaction.type === "split_neuron" ||
+          transaction.type === "follow"
         ) {
           ({ unsignedTransaction } = createUnsignedNeuronCommandTransaction(transaction, account));
         } else {

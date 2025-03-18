@@ -38,7 +38,7 @@ export default function ListNeuronsModal({
   if (stepId === "manage") {
     width = 800;
   } else if (stepId === "listNeuron") {
-    width = 575;
+    width = 600;
   }
 
   return (

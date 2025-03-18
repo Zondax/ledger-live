@@ -56,6 +56,8 @@ export const methodToString = (method: Transaction["type"]): string => {
       return "Split Neuron";
     case "remove_hot_key":
       return "Remove HotKey";
+    case "follow":
+      return "Follow";
     default:
       return "Send ICP";
   }
