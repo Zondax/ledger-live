@@ -9,6 +9,8 @@ import {
 } from "@ledgerhq/live-common/families/internet_computer/types";
 import { OpenModal } from "~/renderer/actions/modals";
 import { NeuronsData } from "@ledgerhq/live-common/families/internet_computer/utils";
+import { KNOWN_TOPICS } from "@ledgerhq/live-common/families/internet_computer/consts";
+
 export type StepId =
   | "device"
   | "listNeuron"
@@ -16,7 +18,8 @@ export type StepId =
   | "manage"
   | "manageAction"
   | "followTopic"
-  | "selectFollowees";
+  | "selectFollowees"
+  | "setDissolveDelay";
 export type StepProps = {
   lastManageAction?: ICPTransactionType;
   setLastManageAction: (a: ICPTransactionType) => void;
@@ -45,7 +48,7 @@ export type StepProps = {
   setSigned: (signed: boolean) => void;
   bridgePending: boolean;
   validatorAddress: string;
-  followTopic: string;
-  setFollowTopic: (topic: string) => void;
+  followTopic: keyof typeof KNOWN_TOPICS;
+  setFollowTopic: (topic: keyof typeof KNOWN_TOPICS) => void;
 };
 export type St = Step<StepId, StepProps>;

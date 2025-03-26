@@ -3,7 +3,12 @@ import { Account, AccountBridge, DeviceId } from "@ledgerhq/types-live";
 import { getAddress } from "./bridgeHelpers/addresses";
 import { buildOptimisticSendOperation as buildOptimisticOperation } from "./buildOptimisticOperation";
 import { ICPAccount, ICPAccountRaw, ICPSigner, Transaction, TransactionStatus } from "../types";
-import { derivePrincipalFromPubkey, getPath, pubkeyToDer } from "../common-logic/utils";
+import {
+  derivePrincipalFromPubkey,
+  getPath,
+  nowInSeconds,
+  pubkeyToDer,
+} from "../common-logic/utils";
 import { log } from "@ledgerhq/logs";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { idlFactory as idlFactoryLedger } from "@dfinity/ledger-icp/dist/candid/ledger.idl";
@@ -296,7 +301,9 @@ const createUnsignedNeuronCommandTransaction = (
       );
       rawCommand.command = [
         createCommandConfigOperation({
-          SetDissolveTimestamp: { dissolve_timestamp_seconds: BigInt(dissolveDelay) },
+          SetDissolveTimestamp: {
+            dissolve_timestamp_seconds: BigInt(dissolveDelay) + BigInt(nowInSeconds()),
+          },
         }),
       ];
       break;
@@ -336,7 +343,7 @@ const createUnsignedNeuronCommandTransaction = (
       break;
     case "follow":
       invariant(
-        followTopic,
+        followTopic !== undefined,
         "[ICP](createUnsignedNeuronCommandTransaction) Follow topic is required",
       );
       invariant(
@@ -346,7 +353,7 @@ const createUnsignedNeuronCommandTransaction = (
       rawCommand.command = [
         {
           Follow: {
-            topic: parseInt(followTopic, 10),
+            topic: followTopic,
             followees: followeesIds.map(id => ({ id: BigInt(id) })),
           },
         },

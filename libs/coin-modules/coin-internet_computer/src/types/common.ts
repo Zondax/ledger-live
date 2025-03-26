@@ -10,6 +10,7 @@ import {
 } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
 import { NeuronsData } from "../neurons";
+import { KNOWN_TOPICS } from "../consts";
 
 type FamilyType = "internet_computer";
 export interface ICPAccount extends Account {
@@ -57,7 +58,7 @@ export type Transaction = TransactionCommon & {
   additionalDissolveDelay?: string;
   autoStakeMaturity?: boolean;
   hotKeyToRemove?: string;
-  followTopic?: string;
+  followTopic?: keyof typeof KNOWN_TOPICS;
   followeesIds?: string[];
 };
 
@@ -74,7 +75,7 @@ export type TransactionRaw = TransactionCommonRaw & {
   additionalDissolveDelay?: string;
   autoStakeMaturity?: boolean;
   hotKeyToRemove?: string;
-  followTopic?: string;
+  followTopic?: keyof typeof KNOWN_TOPICS;
   followeesIds?: string[];
 };
 
@@ -97,7 +98,7 @@ export interface ICPNeuron extends NNSNeuron {
   dissolveDelaySeconds: string;
   whenDissolvedTimestampSeconds: string;
   modFollowees: {
-    [neuronId: string]: string[];
+    [neuronId: string]: (keyof typeof KNOWN_TOPICS)[];
   };
 
   neuronInfo: NeuronInfo;

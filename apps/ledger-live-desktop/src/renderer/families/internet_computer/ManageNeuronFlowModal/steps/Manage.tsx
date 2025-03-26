@@ -13,7 +13,8 @@ import Text from "~/renderer/components/Text";
 import { Divider } from "@ledgerhq/react-ui";
 import {
   getNeuronDissolveDuration,
-  getTimeUntil,
+  nowInSeconds,
+  secondsToDurationString,
 } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { closeModal } from "~/renderer/actions/modals";
 import {
@@ -23,6 +24,10 @@ import {
   ManageModalActionElement,
 } from "../../components/ManageModalComponents";
 import { ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/types";
+import {
+  KNOWN_TOPICS,
+  KNOWN_NEURON_IDS,
+} from "@ledgerhq/live-common/families/internet_computer/consts";
 
 const Container = styled(Box).attrs(() => ({
   alignItems: "center",
@@ -54,9 +59,6 @@ export default function StepManage({
   const unit = account.currency.units[0];
   const neuron = neurons.fullNeurons[manageNeuronIndex];
   const neuronId = neuron.id[0]?.id.toString() ?? "";
-  const timeUntilActive = getTimeUntil(
-    Number(neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]),
-  );
 
   const onClickIncreaseStake = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -158,21 +160,6 @@ export default function StepManage({
     },
     [account, onChangeTransaction, transitionTo, neuron, setLastManageAction],
   );
-
-  const onClickIncreaseDissolveDelay = useCallback(() => {
-    const bridge = getAccountBridge(account, undefined);
-    const initTx = bridge.createTransaction(account);
-    const action = "increase_dissolve_delay";
-    onChangeTransaction(
-      bridge.updateTransaction(initTx, {
-        neuronId: neuron.id[0]?.id.toString(),
-        type: action,
-        additionalDissolveDelay: "10000",
-      }),
-    );
-    setLastManageAction(action);
-    transitionTo("manageAction");
-  }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
 
   const onClickFollow = useCallback(() => {
     transitionTo("followTopic");
@@ -299,7 +286,7 @@ export default function StepManage({
             }
           />
           <ManageModalElementWithAction
-            // TODO: add age bonus
+            // TODO: add age bonus, need helper methods ageMultiplier
             label={"Age bonus: +0%"}
             valueTooltip="Your neuron can be locked, unlocked or dissolving. In a locked state, it is accruing age bonus, while its dissolve delay stays constant. If the neuron is in a dissolving state, its age bonus is set to 0, while dissolve delay decreases with time. After dissolve delay reaches 0, the neuron is unlocked, and ICP held in it can be sent to any ICP account."
             action={[
@@ -319,19 +306,26 @@ export default function StepManage({
             value={neuron.dissolveState}
           />
           <ManageModalElementWithAction
-            // TODO: add dissolve delay bonus
-            label={"Dissolve delay bonus: +100%"}
+            // TODO: add dissolve delay bonus, need helper methods dissolveDelayMultiplier, bonusMultiplier
+            label={"Dissolve delay bonus: +0%"}
             valueTooltip="Dissolve delay is the minimum amount of time you have to wait for the neuron to unlock, and ICP to be available again. If your neuron is dissolving, your ICP will be available in 7 years, 365 days."
             action={[
               {
                 label: `${neuron.dissolveState !== "Unlocked" ? "Increase" : "Set"} Dissolve Delay`,
-                onClick: onClickIncreaseDissolveDelay,
+                onClick: () => transitionTo("setDissolveDelay"),
               },
             ]}
-            value={`Dissolve Delay: ${getNeuronDissolveDuration(neuron)}`}
+            value={`Dissolve Delay: ${neuron.dissolveState === "Unlocked" ? "0" : getNeuronDissolveDuration(neuron)}`}
           />
           <ManageModalElementWithAction
-            label={`${timeUntilActive.days} days, ${timeUntilActive.hours} hours to confirm following`}
+            label={`${secondsToDurationString(
+              BigNumber(
+                neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]?.toString() ?? "0",
+              )
+                .minus(nowInSeconds())
+                .abs()
+                .toString(),
+            )} to confirm following`}
             valueTooltip="ICP neurons that are inactive for 6 months start missing voting rewards. To avoid missing rewards, vote manually, edit, or confirm your following."
             action={[
               {
@@ -430,7 +424,7 @@ export default function StepManage({
 
         {/* Advanced Details Section */}
         <ManageModalSection title="Advanced Details & Settings">
-          <ManageModalElement label="Neuron ID" value={neuronId} />
+          <ManageModalElement label="Neuron ID" copiableValue value={neuronId} />
           <ManageModalElement
             label="Date Created"
             value={new Date(Number(neuron.created_timestamp_seconds) * 1000).toLocaleString(
@@ -478,9 +472,9 @@ export default function StepManage({
             return (
               <ManageModalElement
                 key={`followees-${neuronId}`}
-                value={`${topics.join(", ")}`}
+                value={`${topics.map(topic => KNOWN_TOPICS[topic] ?? topic).join(", ")}`}
                 copiableLabel
-                label={neuronId}
+                label={KNOWN_NEURON_IDS[neuronId] ?? neuronId}
               />
             );
           })}

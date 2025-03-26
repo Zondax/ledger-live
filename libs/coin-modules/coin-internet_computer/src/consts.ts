@@ -47,6 +47,10 @@ export const SECONDS_IN_HALF_YEAR = SECONDS_IN_YEAR / 2;
 export const SECONDS_IN_FOUR_YEARS = SECONDS_IN_YEAR * 4;
 export const SECONDS_IN_EIGHT_YEARS = SECONDS_IN_YEAR * 8;
 
+// Dissolve delay constants
+export const MIN_DISSOLVE_DELAY = SECONDS_IN_HALF_YEAR;
+export const MAX_DISSOLVE_DELAY = SECONDS_IN_EIGHT_YEARS;
+
 // NeuronIds
 export const KNOWN_NEURON_IDS: Record<string, string> = {
   "27": "DFINITY Foundation",
@@ -66,4 +70,12 @@ export const KNOWN_TOPICS = {
   [Topic.Kyc]: "KYC",
   [Topic.NodeProviderRewards]: "NODE PROVIDER REWARDS",
   [Topic.Unspecified]: "UNSPECIFIED",
+  [Topic.SnsDecentralizationSale]: "SNS DECENTRALIZATION SALE", // Deprecated
+  [Topic.IcOsVersionDeployment]: "IC OS VERSION DEPLOYMENT",
+  [Topic.IcOsVersionElection]: "IC OS VERSION ELECTION",
+  [Topic.SnsAndCommunityFund]: "SNS AND COMMUNITY FUND",
+  [Topic.ApiBoundaryNodeManagement]: "API BOUNDARY NODE MANAGEMENT",
+  [Topic.SubnetRental]: "SUBNET RENTAL",
+  [Topic.ProtocolCanisterManagement]: "PROTOCOL CANISTER MANAGEMENT",
+  [Topic.ServiceNervousSystemManagement]: "SERVICE NOUS SYSTEM MANAGEMENT",
 };

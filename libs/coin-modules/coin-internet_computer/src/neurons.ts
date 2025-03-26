@@ -19,7 +19,6 @@ import {
 import { nowInSeconds } from "./common-logic/utils";
 import BigNumber from "bignumber.js";
 import invariant from "invariant";
-import { getTopicTitle } from "./common-logic";
 
 const NeuronId = IDL.Record({ id: IDL.Nat64 });
 const BallotInfo = IDL.Record({
@@ -122,14 +121,14 @@ export class NeuronsData {
         ...neuron,
         modFollowees: neuron.followees.reduce(
           (acc, followee) => {
-            const topic = getTopicTitle(followee[0]);
+            const topic = followee[0];
             followee[1].followees.forEach(followee => {
               acc[followee.id.toString()] = acc[followee.id.toString()] ?? [];
               acc[followee.id.toString()].push(topic);
             });
             return acc;
           },
-          {} as Record<string, string[]>,
+          {} as Record<string, number[]>,
         ),
         accountIdentifier: principalToAccountIdentifier(
           Principal.from(MAINNET_GOVERNANCE_CANISTER_ID),
@@ -323,14 +322,26 @@ const getNeuronDissolveState = (dissolveState?: NNSDissolveState) => {
   return "Unknown";
 };
 
-export const getNeuronDissolveDuration = (neuron: ICPNeuron) => {
+export const getNeuronDissolveDurationSeconds = (neuron: ICPNeuron) => {
+  const seconds =
+    neuron.dissolveDelaySeconds === "0"
+      ? BigInt(
+          BigNumber(neuron.whenDissolvedTimestampSeconds).minus(nowInSeconds()).abs().toString(),
+        )
+      : BigInt(neuron.dissolveDelaySeconds);
+
+  return seconds;
+};
+
+export const secondsToDurationString = (seconds: string) => {
   return secondsToDuration({
-    seconds: BigInt(
-      neuron.dissolveDelaySeconds === "0"
-        ? BigInt(
-            BigNumber(neuron.whenDissolvedTimestampSeconds).minus(nowInSeconds()).abs().toString(),
-          )
-        : BigInt(neuron.dissolveDelaySeconds),
-    ),
+    seconds: BigInt(parseInt(seconds)),
+  });
+};
+
+export const getNeuronDissolveDuration = (neuron: ICPNeuron) => {
+  const seconds = getNeuronDissolveDurationSeconds(neuron);
+  return secondsToDuration({
+    seconds,
   });
 };

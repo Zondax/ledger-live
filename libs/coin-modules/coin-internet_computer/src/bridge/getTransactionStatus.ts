@@ -9,8 +9,16 @@ import BigNumber from "bignumber.js";
 import { AccountBridge } from "@ledgerhq/types-live";
 import { getAddress, validateAddress, validateMemo } from "../bridge/bridgeHelpers/addresses";
 import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "../types";
-import { InvalidMemoICP, NotEnoughTransferAmount } from "../errors";
-import { ICP_MIN_STAKING_AMOUNT } from "../consts";
+import {
+  DissolveDelayGTMax,
+  DissolveDelayLTCurrent,
+  DissolveDelayLTMin,
+  InvalidMemoICP,
+  NeuronNotFound,
+  NotEnoughTransferAmount,
+} from "../errors";
+import { ICP_MIN_STAKING_AMOUNT, MAX_DISSOLVE_DELAY, MIN_DISSOLVE_DELAY } from "../consts";
+import { getNeuronDissolveDurationSeconds } from "../neurons";
 
 export const getTransactionStatus: AccountBridge<
   Transaction,
@@ -23,8 +31,28 @@ export const getTransactionStatus: AccountBridge<
 
   const { balance } = account;
   const { address } = getAddress(account);
-  const { recipient, useAllAmount } = transaction;
+  const { recipient, useAllAmount, type, neuronId, dissolveDelay: dissolveDelayStr } = transaction;
   let { amount } = transaction;
+
+  if (type === "set_dissolve_delay" && !!dissolveDelayStr) {
+    const dissolveDelay = new BigNumber(dissolveDelayStr);
+    const neuron = account.neurons.fullNeurons.find(
+      neuron => neuron.id[0]?.id.toString() === neuronId,
+    );
+    if (!neuron) {
+      errors.neuron = new NeuronNotFound();
+    } else {
+      const currentDissolveDelay = BigNumber(getNeuronDissolveDurationSeconds(neuron).toString());
+      if (BigNumber(dissolveDelay).lt(currentDissolveDelay)) {
+        errors.dissolveDelay = new DissolveDelayLTCurrent();
+      }
+    }
+    if (dissolveDelay.lt(MIN_DISSOLVE_DELAY)) {
+      errors.dissolveDelay = new DissolveDelayLTMin();
+    } else if (dissolveDelay.gt(MAX_DISSOLVE_DELAY)) {
+      errors.dissolveDelay = new DissolveDelayGTMax();
+    }
+  }
 
   if (!recipient) {
     errors.recipient = new RecipientRequired();

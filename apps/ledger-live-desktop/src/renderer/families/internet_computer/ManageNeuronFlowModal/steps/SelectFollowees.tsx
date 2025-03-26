@@ -1,5 +1,8 @@
 import React, { useCallback, useState } from "react";
-import { KNOWN_NEURON_IDS } from "@ledgerhq/live-common/families/internet_computer/consts";
+import {
+  KNOWN_NEURON_IDS,
+  KNOWN_TOPICS,
+} from "@ledgerhq/live-common/families/internet_computer/consts";
 import Input, { InputError } from "~/renderer/components/Input";
 import Label from "~/renderer/components/Label";
 import Text from "~/renderer/components/Text";
@@ -22,19 +25,31 @@ export function StepSelectFollowees({
 }: StepProps) {
   const [error, setError] = useState<InputError>(null);
   const [followNeuronId, setFollowNeuronId] = useState<string>("");
-  const [followees, setFollowees] = useState<string[]>([]);
   const neuron = neurons.fullNeurons[manageNeuronIndex];
+  const [followees, setFollowees] = useState<string[]>([
+    ...(Object.entries(neuron.modFollowees)
+      .map(([key, value]) => {
+        if (value.includes(followTopic)) {
+          return key;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(Boolean) as string[]),
+  ]);
 
   const onChangeFollowNeuronId = useCallback(
     (value: string) => {
       setFollowNeuronId(value);
       if (value && /[^0-9]/.test(value)) {
         setError(new Error("Invalid neuron ID, please enter a valid neuron ID"));
+      } else if (followees.includes(value)) {
+        setError(new Error("Neuron ID already in followees"));
       } else {
         setError(null);
       }
     },
-    [setFollowNeuronId],
+    [setFollowNeuronId, followees],
   );
 
   const onClickFollowNeuron = useCallback(() => {
@@ -62,13 +77,16 @@ export function StepSelectFollowees({
 
   const onClickAddFollowee = useCallback(
     (neuronId?: string) => {
+      const newFollowees = [...followees];
       if (neuronId?.length) {
-        setFollowees(prev => [...prev, neuronId]);
+        newFollowees.push(neuronId);
       } else if (followNeuronId.length) {
-        setFollowees(prev => [...prev, followNeuronId]);
+        newFollowees.push(followNeuronId);
       }
+      setFollowees(newFollowees);
+      setFollowNeuronId("");
     },
-    [followNeuronId],
+    [followNeuronId, followees],
   );
 
   const onClickRemoveFollowee = useCallback((followee: string) => {
@@ -77,6 +95,11 @@ export function StepSelectFollowees({
 
   return (
     <Box>
+      <Box mb={4}>
+        <Text ff="Inter|SemiBold" fontSize={16}>
+          Topic: {KNOWN_TOPICS[followTopic]}
+        </Text>
+      </Box>
       <Box style={{ gap: 5 }}>
         <Label>Followee&apos;s Neuron Id</Label>
         <Box style={{ gap: 5, justifyContent: "flex-end" }}>
@@ -111,7 +134,7 @@ export function StepSelectFollowees({
                 <Text ff="Inter|Regular" fontSize={14}>
                   {value}
                 </Text>
-                <CopiableField value={value}>
+                <CopiableField value={key}>
                   <Text ff="Inter|Regular" fontSize={14}>
                     {key}
                   </Text>

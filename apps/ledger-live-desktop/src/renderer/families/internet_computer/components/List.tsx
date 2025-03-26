@@ -8,9 +8,11 @@ import Button from "~/renderer/components/Button";
 import { ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/types";
 import {
   getNeuronDissolveDuration,
-  getTimeUntil,
+  secondsToDurationString,
+  nowInSeconds,
 } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { Unit } from "@ledgerhq/types-cryptoassets";
+import BigNumber from "bignumber.js";
 
 const TableWrapper = styled.div`
   max-height: 500px;
@@ -156,14 +158,15 @@ export function List({
                       <>
                         <Td>
                           <Text ff="Inter|Regular" fontSize={3}>
-                            {(() => {
-                              const timeUntil = getTimeUntil(
-                                Number(
-                                  neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0],
-                                ),
-                              );
-                              return `${timeUntil.days} Days ${timeUntil.minutes} Min`;
-                            })()}
+                            {secondsToDurationString(
+                              BigNumber(
+                                neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]?.toString() ??
+                                  "0",
+                              )
+                                .minus(nowInSeconds())
+                                .abs()
+                                .toString(),
+                            )}
                           </Text>
                         </Td>
                         <Td>

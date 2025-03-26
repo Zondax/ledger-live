@@ -11,7 +11,7 @@ import Button from "~/renderer/components/Button";
 export function StepFollowSelectTopics({ setFollowTopic, transitionTo }: StepProps) {
   const { t } = useTranslation();
   const onClickSelectTopic = useCallback(
-    (topic: string) => {
+    (topic: keyof typeof KNOWN_TOPICS) => {
       setFollowTopic(topic);
       transitionTo("selectFollowees");
     },
@@ -62,7 +62,7 @@ export function StepFollowSelectTopics({ setFollowTopic, transitionTo }: StepPro
                   <Button
                     primary
                     style={{ margin: "auto" }}
-                    onClick={() => onClickSelectTopic(key)}
+                    onClick={() => onClickSelectTopic(parseInt(key) as keyof typeof KNOWN_TOPICS)}
                   >
                     Add Followee
                   </Button>

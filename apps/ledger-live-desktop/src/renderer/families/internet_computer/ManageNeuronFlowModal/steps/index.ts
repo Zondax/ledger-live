@@ -7,6 +7,7 @@ import StepManage from "./Manage";
 import StepConfirmation from "../../components/Confirmation";
 import { StepSelectFollowees } from "./SelectFollowees";
 import { StepFollowSelectTopics } from "./FollowSelectTopics";
+import { SetDissolveDelay } from "./SetDissolveDelay";
 export function useSteps(): St[] {
   const { t } = useTranslation();
   return useMemo<St[]>(
@@ -22,7 +23,7 @@ export function useSteps(): St[] {
         label: "Select neuron",
         component: StepListNeuron,
         footer: StepListNeuronFooter,
-        noScroll: true,
+        noScroll: false,
       },
       {
         id: "manage",
@@ -40,6 +41,16 @@ export function useSteps(): St[] {
         noScroll: true,
       },
       {
+        id: "setDissolveDelay",
+        label: "Set dissolve delay",
+        component: SetDissolveDelay,
+        onBack: ({ transitionTo }: StepProps) => {
+          transitionTo("manage");
+        },
+        excludeFromBreadcrumb: true,
+        noScroll: false,
+      },
+      {
         id: "followTopic",
         label: "Follow topics",
         component: StepFollowSelectTopics,
@@ -47,7 +58,7 @@ export function useSteps(): St[] {
           transitionTo("manage");
         },
         excludeFromBreadcrumb: true,
-        noScroll: true,
+        noScroll: false,
       },
       {
         id: "selectFollowees",

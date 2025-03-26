@@ -1,12 +1,14 @@
-import { ICPAccount } from "../types";
+import { ICPAccount, ICPNeuron } from "../types";
 import { fromNullable } from "@dfinity/utils";
 import { getTimeUntil } from "./utils";
 import {
   LAST_SYNC_THRESHOLD_IN_DAYS,
+  MIN_DISSOLVE_DELAY,
   SECONDS_IN_HALF_YEAR,
+  SECONDS_IN_HOUR,
   VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS,
 } from "../consts";
-import { Topic } from "@dfinity/nns";
+import { getNeuronDissolveDurationSeconds } from "../neurons";
 
 const votingPowerNeedsRefresh = (
   account: ICPAccount,
@@ -103,28 +105,7 @@ export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
   };
 };
 
-// TODO: getNeuronFollowees
-export const getTopicTitle = (topic: Topic): string => {
-  const mapper: Record<Topic, string> = {
-    [Topic.Unspecified]: "Default",
-    [Topic.NeuronManagement]: "Neuron Management",
-    [Topic.ExchangeRate]: "Exchange Rate",
-    [Topic.NetworkEconomics]: "Network Economics",
-    [Topic.Governance]: "Governance",
-    [Topic.NodeAdmin]: "Node Admin",
-    [Topic.ParticipantManagement]: "Participant Management",
-    [Topic.SubnetManagement]: "Subnet Management",
-    [Topic.NetworkCanisterManagement]: "Network Canister Management",
-    [Topic.Kyc]: "KYC",
-    [Topic.NodeProviderRewards]: "Node Provider Rewards",
-    [Topic.SnsDecentralizationSale]: "SNS Decentralization Sale",
-    [Topic.IcOsVersionDeployment]: "IC OS Version Deployment",
-    [Topic.IcOsVersionElection]: "IC OS Version Election",
-    [Topic.SnsAndCommunityFund]: "SNS and Community Fund",
-    [Topic.ApiBoundaryNodeManagement]: "API Boundary Node Management",
-    [Topic.SubnetRental]: "Subnet Rental",
-    [Topic.ProtocolCanisterManagement]: "Protocol Canister Management",
-    [Topic.ServiceNervousSystemManagement]: "Service Nervous System Management",
-  };
-  return mapper[topic] ?? `UNKNOWN TOPIC: ${topic.toString().toUpperCase}`;
+export const getMinDissolveDelay = (neuron: ICPNeuron) => {
+  const currentDissolveDelay = getNeuronDissolveDurationSeconds(neuron);
+  return Math.max(MIN_DISSOLVE_DELAY, Number(currentDissolveDelay) + SECONDS_IN_HOUR);
 };

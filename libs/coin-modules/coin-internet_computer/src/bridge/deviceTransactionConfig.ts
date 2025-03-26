@@ -5,8 +5,9 @@ import { formatCurrencyUnit } from "@ledgerhq/coin-framework/currencies/index";
 import type { CommonDeviceTransactionField } from "@ledgerhq/coin-framework/transaction/common";
 
 import { Transaction, TransactionStatus } from "../types";
-import { getTimeUntil, methodToString } from "../common-logic/utils";
-import { getTopicTitle } from "../common-logic";
+import { methodToString, nowInSeconds } from "../common-logic/utils";
+import { KNOWN_TOPICS } from "../consts";
+import BigNumber from "bignumber.js";
 
 const currency = getCryptoCurrencyById("internet_computer");
 
@@ -32,11 +33,11 @@ function getDeviceTransactionConfig({
       value: transaction.neuronId ?? "0",
     });
 
-    if (transaction.followTopic) {
+    if (transaction.followTopic !== undefined) {
       fields.push({
         type: "text",
         label: "Topic",
-        value: getTopicTitle(transaction.followTopic as any),
+        value: KNOWN_TOPICS[transaction.followTopic],
       });
     }
 
@@ -88,12 +89,20 @@ function getDeviceTransactionConfig({
       });
     }
 
-    if (transaction.type === "increase_dissolve_delay") {
-      const additionalDelay = getTimeUntil(Number(transaction.additionalDissolveDelay));
+    if (transaction.type === "set_dissolve_delay") {
+      const dissolveDelayStr = new Date(
+        BigNumber(transaction.dissolveDelay ?? "0")
+          .plus(nowInSeconds())
+          .times(1000)
+          .toNumber(),
+      )
+        .toISOString()
+        .split("T")[0];
+
       fields.push({
         type: "text",
-        label: "Additional Delay",
-        value: `${additionalDelay.days}d ${additionalDelay.hours}h ${additionalDelay.minutes}m ${additionalDelay.seconds}s`,
+        label: "Dissolve Date",
+        value: dissolveDelayStr,
       });
     }
   }

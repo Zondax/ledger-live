@@ -59,11 +59,14 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
 
   const formatConfig = {
     alwaysShowSign: false,
-    showCode: true,
+    showCode: false,
     discreet,
     locale,
   };
-  const stakedBalance = formatCurrencyUnit(unit, neurons.totalStaked, formatConfig);
+  const stakedBalance = formatCurrencyUnit(unit, neurons.totalStaked, {
+    ...formatConfig,
+    showCode: true,
+  });
   const maturityBalance = formatCurrencyUnit(
     unit,
     neurons.totalMaturity.plus(neurons.totalMaturityStaked),
