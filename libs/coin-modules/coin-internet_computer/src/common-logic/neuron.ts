@@ -1,6 +1,6 @@
 import { ICPAccount, ICPNeuron } from "../types";
 import { fromNullable } from "@dfinity/utils";
-import { getTimeUntil } from "./utils";
+import { getTimeUntil, nowInSeconds } from "./utils";
 import {
   LAST_SYNC_THRESHOLD_IN_DAYS,
   MIN_DISSOLVE_DELAY,
@@ -15,21 +15,32 @@ const votingPowerNeedsRefresh = (
 ): {
   needsRefresh: boolean;
   minDays: number;
+  minMinutes: number;
 } => {
   let minDays = Number.MAX_SAFE_INTEGER;
+  let minMinutes = Number.MAX_SAFE_INTEGER;
   for (const neuron of account.neurons.fullNeurons) {
     const votingPowerNextRefresh = fromNullable(
       neuron.neuronInfo.voting_power_refreshed_timestamp_seconds,
     );
     if (!votingPowerNextRefresh) continue;
+    if (votingPowerNextRefresh < nowInSeconds()) {
+      return {
+        needsRefresh: true,
+        minDays: 0,
+        minMinutes: 0,
+      };
+    }
 
-    const { days } = getTimeUntil(Number(votingPowerNextRefresh));
+    const { days, minutes } = getTimeUntil(Number(votingPowerNextRefresh));
     minDays = Math.min(minDays, days);
+    minMinutes = Math.min(minMinutes, minutes);
   }
 
   return {
     needsRefresh: minDays <= VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS,
     minDays,
+    minMinutes,
   };
 };
 
@@ -48,13 +59,13 @@ interface getBannerStateReturn {
 }
 export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
   // Check Neuron Periodic Confirmation (Priority 1)
-  const { needsRefresh, minDays } = votingPowerNeedsRefresh(account);
+  const { needsRefresh, minDays, minMinutes } = votingPowerNeedsRefresh(account);
   if (needsRefresh) {
     return {
       state: "confirm_following",
       data: {
         days: minDays,
-        minutes: 0,
+        minutes: minMinutes,
       },
     };
   }

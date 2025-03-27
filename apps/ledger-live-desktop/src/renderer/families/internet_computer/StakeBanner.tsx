@@ -70,7 +70,10 @@ const StakeBanner: React.FC<{ account: ICPAccount }> = ({ account }) => {
   const bannerContent = {
     confirm_following: {
       title: "Confirm Your Following",
-      description: `Your neuron's following needs to be confirmed in ${data?.days} days`,
+      description:
+        data?.days || data?.minutes
+          ? `Your neuron's following needs to be confirmed in ${data.days} days and ${data.minutes} minutes`
+          : "You are losing rewards, confirm neuron following to continue earning",
       cta: "Confirm Following",
       action: onClickConfirmFollowing,
     },
