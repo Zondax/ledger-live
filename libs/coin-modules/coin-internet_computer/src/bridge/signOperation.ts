@@ -226,6 +226,7 @@ const createUnsignedNeuronCommandTransaction = (
     hotKeyToRemove,
     followTopic,
     followeesIds,
+    percentageToStake,
   } = transaction;
   invariant(neuronId, "[ICP](createUnsignedNeuronCommandTransaction) Neuron ID is required");
 
@@ -263,7 +264,7 @@ const createUnsignedNeuronCommandTransaction = (
     case "stake_maturity":
       rawCommand.command = [
         {
-          StakeMaturity: { percentage_to_stake: [100] },
+          StakeMaturity: { percentage_to_stake: [Number(percentageToStake)] },
         },
       ];
       break;

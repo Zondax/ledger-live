@@ -89,8 +89,8 @@ export default function StepListNeuron({
           neurons={{
             fullNeurons: neurons.fullNeurons.sort(
               (a, b) =>
-                Number(b.neuronInfo.voting_power_refreshed_timestamp_seconds[0]) -
-                Number(a.neuronInfo.voting_power_refreshed_timestamp_seconds[0]),
+                Number(a.neuronInfo.voting_power_refreshed_timestamp_seconds[0]) -
+                Number(b.neuronInfo.voting_power_refreshed_timestamp_seconds[0]),
             ),
             lastUpdatedMSecs: neurons.lastUpdatedMSecs,
           }}

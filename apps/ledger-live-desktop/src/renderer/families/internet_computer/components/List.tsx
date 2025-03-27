@@ -156,26 +156,35 @@ export function List({
                     )}
                     {modalName === "MODAL_ICP_REFRESH_VOTING_POWER" && (
                       <>
-                        <Td>
-                          <Text ff="Inter|Regular" fontSize={3}>
-                            {secondsToDurationString(
-                              BigNumber(
-                                neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]?.toString() ??
-                                  "0",
-                              )
-                                .minus(nowInSeconds())
-                                .abs()
-                                .toString(),
-                            )}
-                          </Text>
-                        </Td>
-                        <Td>
-                          {onClickConfirmFollowing && (
-                            <Button primary onClick={() => onClickConfirmFollowing(neuron)}>
-                              Confirm Following
-                            </Button>
-                          )}
-                        </Td>
+                        {(() => {
+                          const votingPowerRefreshedSeconds =
+                            neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]?.toString() ??
+                            "0";
+                          const votingPowerRefreshedSecondsDiff = BigNumber(
+                            votingPowerRefreshedSeconds,
+                          ).minus(nowInSeconds());
+
+                          return (
+                            <>
+                              <Td>
+                                <Text ff="Inter|Regular" fontSize={3}>
+                                  {votingPowerRefreshedSecondsDiff.gt(0)
+                                    ? secondsToDurationString(
+                                        votingPowerRefreshedSecondsDiff.toString(),
+                                      )
+                                    : "Inactive neuron"}
+                                </Text>
+                              </Td>
+                              <Td>
+                                {onClickConfirmFollowing && (
+                                  <Button primary onClick={() => onClickConfirmFollowing(neuron)}>
+                                    Confirm Following
+                                  </Button>
+                                )}
+                              </Td>
+                            </>
+                          );
+                        })()}
                       </>
                     )}
                   </Tr>

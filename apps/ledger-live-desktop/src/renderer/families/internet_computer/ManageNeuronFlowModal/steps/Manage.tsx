@@ -59,6 +59,11 @@ export default function StepManage({
   const unit = account.currency.units[0];
   const neuron = neurons.fullNeurons[manageNeuronIndex];
   const neuronId = neuron.id[0]?.id.toString() ?? "";
+  const votingPowerRefreshedSeconds =
+    neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]?.toString() ?? "0";
+  const votingPowerRefreshedSecondsDiff = BigNumber(votingPowerRefreshedSeconds).minus(
+    nowInSeconds(),
+  );
 
   const onClickIncreaseStake = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -112,7 +117,7 @@ export default function StepManage({
           neuronId: neuron.id[0]?.id.toString(),
         }),
       );
-      transitionTo("device");
+      transitionTo("manageAction");
     },
     [account, onChangeTransaction, transitionTo],
   );
@@ -128,19 +133,6 @@ export default function StepManage({
       }),
     );
     setLastManageAction(action);
-    transitionTo("manageAction");
-  }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
-
-  const onClickStakeMaturity = useCallback(() => {
-    const bridge = getAccountBridge(account, undefined);
-    const initTx = bridge.createTransaction(account);
-    onChangeTransaction(
-      bridge.updateTransaction(initTx, {
-        neuronId: neuron.id[0]?.id.toString(),
-        type: "stake_maturity",
-      }),
-    );
-    setLastManageAction("stake_maturity");
     transitionTo("manageAction");
   }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
 
@@ -318,14 +310,11 @@ export default function StepManage({
             value={`Dissolve Delay: ${neuron.dissolveState === "Unlocked" ? "0" : getNeuronDissolveDuration(neuron)}`}
           />
           <ManageModalElementWithAction
-            label={`${secondsToDurationString(
-              BigNumber(
-                neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]?.toString() ?? "0",
-              )
-                .minus(nowInSeconds())
-                .abs()
-                .toString(),
-            )} to confirm following`}
+            label={
+              votingPowerRefreshedSecondsDiff.gt(0)
+                ? `${secondsToDurationString(votingPowerRefreshedSecondsDiff.toString())} to confirm following`
+                : "Confirm following"
+            }
             valueTooltip="ICP neurons that are inactive for 6 months start missing voting rewards. To avoid missing rewards, vote manually, edit, or confirm your following."
             action={[
               {
@@ -334,7 +323,7 @@ export default function StepManage({
               },
             ]}
             // TODO: get correct status
-            value={"Active neuron"}
+            value={votingPowerRefreshedSecondsDiff.gt(0) ? "Active neuron" : "Inactive neuron"}
           />
         </ManageModalSection>
 
@@ -374,7 +363,7 @@ export default function StepManage({
             action={[
               {
                 label: "Stake",
-                onClick: onClickStakeMaturity,
+                onClick: () => transitionTo("stakeMaturity"),
                 disabled: neuron.maturity_e8s_equivalent === BigInt(0),
               },
               {

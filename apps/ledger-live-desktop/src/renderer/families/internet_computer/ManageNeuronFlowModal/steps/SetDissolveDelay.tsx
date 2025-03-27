@@ -161,6 +161,9 @@ export function SetDissolveDelay({
       </Box>
 
       <Box horizontal justifyContent="flex-end">
+        <Button mr={2} onClick={() => transitionTo("manage")}>
+          Cancel
+        </Button>
         <Button
           primary
           onClick={onClickIncreaseDissolveDelay}

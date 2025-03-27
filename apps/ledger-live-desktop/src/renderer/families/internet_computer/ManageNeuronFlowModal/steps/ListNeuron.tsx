@@ -84,7 +84,12 @@ export default function StepListNeuron({
           </WarnBox>
         ) : null}
         <List
-          neurons={neurons}
+          neurons={{
+            fullNeurons: neurons.fullNeurons.sort(
+              (a, b) => Number(b.cached_neuron_stake_e8s) - Number(a.cached_neuron_stake_e8s),
+            ),
+            lastUpdatedMSecs: neurons.lastUpdatedMSecs,
+          }}
           modalName="MODAL_ICP_LIST_NEURONS"
           unit={unit}
           onClickManage={onClickManage}

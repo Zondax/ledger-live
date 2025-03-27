@@ -174,9 +174,14 @@ export function StepSelectFollowees({
                 </Box>
               ))}
             </Box>
-            <Button style={{ marginLeft: "auto" }} onClick={onClickFollowNeuron} primary>
-              Follow
-            </Button>
+            <Box horizontal justifyContent="flex-end">
+              <Button mr={2} onClick={() => transitionTo("manage")}>
+                Cancel
+              </Button>
+              <Button onClick={onClickFollowNeuron} primary>
+                Follow
+              </Button>
+            </Box>
           </Box>
         </>
       )}

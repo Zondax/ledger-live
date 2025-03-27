@@ -323,14 +323,15 @@ const getNeuronDissolveState = (dissolveState?: NNSDissolveState) => {
 };
 
 export const getNeuronDissolveDurationSeconds = (neuron: ICPNeuron) => {
-  const seconds =
-    neuron.dissolveDelaySeconds === "0"
-      ? BigInt(
-          BigNumber(neuron.whenDissolvedTimestampSeconds).minus(nowInSeconds()).abs().toString(),
-        )
-      : BigInt(neuron.dissolveDelaySeconds);
-
-  return seconds;
+  if (neuron.dissolveDelaySeconds === "0") {
+    if (neuron.whenDissolvedTimestampSeconds === "0") {
+      return BigInt(0);
+    }
+    return BigInt(
+      BigNumber(neuron.whenDissolvedTimestampSeconds).minus(nowInSeconds()).abs().toString(),
+    );
+  }
+  return BigInt(neuron.dissolveDelaySeconds);
 };
 
 export const secondsToDurationString = (seconds: string) => {

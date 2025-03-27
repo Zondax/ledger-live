@@ -8,6 +8,7 @@ import StepConfirmation from "../../components/Confirmation";
 import { StepSelectFollowees } from "./SelectFollowees";
 import { StepFollowSelectTopics } from "./FollowSelectTopics";
 import { SetDissolveDelay } from "./SetDissolveDelay";
+import { StakeMaturity } from "./StakeMaturity";
 export function useSteps(): St[] {
   const { t } = useTranslation();
   return useMemo<St[]>(
@@ -26,19 +27,14 @@ export function useSteps(): St[] {
         noScroll: false,
       },
       {
-        id: "manage",
-        label: "Manage neuron",
-        component: StepManage,
+        id: "followTopic",
+        label: "Follow topics",
+        component: StepFollowSelectTopics,
         onBack: ({ transitionTo }: StepProps) => {
-          transitionTo("confirmation");
+          transitionTo("manage");
         },
-      },
-      {
-        id: "manageAction",
-        label: "Manage neuron action",
-        component: GenericStepConnectDevice as React.ComponentType<StepProps>,
         excludeFromBreadcrumb: true,
-        noScroll: true,
+        noScroll: false,
       },
       {
         id: "setDissolveDelay",
@@ -51,9 +47,9 @@ export function useSteps(): St[] {
         noScroll: false,
       },
       {
-        id: "followTopic",
-        label: "Follow topics",
-        component: StepFollowSelectTopics,
+        id: "stakeMaturity",
+        label: "Stake Maturity",
+        component: StakeMaturity,
         onBack: ({ transitionTo }: StepProps) => {
           transitionTo("manage");
         },
@@ -69,6 +65,21 @@ export function useSteps(): St[] {
         },
         excludeFromBreadcrumb: true,
         noScroll: true,
+      },
+      {
+        id: "manageAction",
+        label: "Manage neuron action",
+        component: GenericStepConnectDevice as React.ComponentType<StepProps>,
+        excludeFromBreadcrumb: true,
+        noScroll: true,
+      },
+      {
+        id: "manage",
+        label: "Manage neuron",
+        component: StepManage,
+        onBack: ({ transitionTo }: StepProps) => {
+          transitionTo("listNeuron");
+        },
       },
       {
         id: "confirmation",
