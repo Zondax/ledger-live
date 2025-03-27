@@ -2,14 +2,22 @@ import React from "react";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { formatCurrencyUnit } from "@ledgerhq/live-common/currencies/index";
-import { localeSelector } from "~/renderer/reducers/settings";
-import Discreet, { useDiscreetMode } from "~/renderer/components/Discreet";
+import {
+  localeSelector,
+  counterValueCurrencySelector,
+  countervalueFirstSelector,
+} from "~/renderer/reducers/settings";
+import { useBalanceHistoryWithCountervalue } from "~/renderer/actions/portfolio";
+import Discreet from "~/renderer/components/Discreet";
 import Box from "~/renderer/components/Box/Box";
 import Text from "~/renderer/components/Text";
 import InfoCircle from "~/renderer/icons/InfoCircle";
 import ToolTip from "~/renderer/components/Tooltip";
 import { InternetComputerFamily } from "./types";
 import { useAccountUnit } from "~/renderer/hooks/useAccountUnit";
+import { AccountLike } from "@ledgerhq/types-live";
+import { BigNumber } from "bignumber.js";
+import { ICPAccount } from "@ledgerhq/live-common/families/internet_computer/types";
 
 const Wrapper = styled(Box).attrs(() => ({
   horizontal: true,
@@ -20,16 +28,19 @@ const Wrapper = styled(Box).attrs(() => ({
 }))`
   border-top: 1px solid ${p => p.theme.colors.palette.text.shade10};
 `;
+
 const BalanceDetail = styled(Box).attrs(() => ({
   flex: "0.25 0 auto",
   alignItems: "start",
   paddingRight: 20,
 }))``;
+
 const TitleWrapper = styled(Box).attrs(() => ({
   horizontal: true,
   alignItems: "center",
   mb: 1,
 }))``;
+
 const Title = styled(Text).attrs(() => ({
   fontSize: 4,
   ff: "Inter|Medium",
@@ -38,6 +49,7 @@ const Title = styled(Text).attrs(() => ({
   line-height: ${p => p.theme.space[4]}px;
   margin-right: ${p => p.theme.space[1]}px;
 `;
+
 const AmountValue = styled(Text).attrs(() => ({
   fontSize: 6,
   ff: "Inter|SemiBold",
@@ -46,27 +58,81 @@ const AmountValue = styled(Text).attrs(() => ({
   ${p => p.paddingRight && `padding-right: ${p.paddingRight}px`};
 `;
 
+const Separator = styled.div`
+  width: 1px;
+  height: 40px;
+  background-color: ${p => p.theme.colors.palette.text.shade10};
+  margin: 0 10px;
+  align-self: center;
+`;
+
+interface StakedBalanceCountervalue {
+  stakedCountervalue: number;
+  stakedValue: number;
+  countervalueAvailable: boolean;
+}
+
+const useStakedBalanceCountervalue = (account: AccountLike): StakedBalanceCountervalue | null => {
+  const { history, countervalueAvailable } = useBalanceHistoryWithCountervalue({
+    account,
+    range: "day",
+  });
+  if (account.type !== "Account") return null;
+  const icpAccount = account as unknown as ICPAccount;
+  if (!icpAccount.neurons?.totalStaked) return null;
+  const lastHistory = history[history.length - 1];
+  if (!lastHistory?.countervalue || !lastHistory?.value) return null;
+  const stakedRatio = icpAccount.neurons.totalStaked.div(account.balance);
+  return {
+    stakedCountervalue: lastHistory.countervalue * stakedRatio.toNumber(),
+    stakedValue: lastHistory.value * stakedRatio.toNumber(),
+    countervalueAvailable,
+  };
+};
+
+const useCountervaluePreferences = () => {
+  const countervalueFirst = useSelector(countervalueFirstSelector);
+  return { countervalueFirst };
+};
+
 const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummaryFooter"] = ({
   account,
+  discreetMode,
 }) => {
-  const discreet = useDiscreetMode();
   const locale = useSelector(localeSelector);
   const unit = useAccountUnit(account);
+  const counterValue = useSelector(counterValueCurrencySelector);
+  const stakedCountervalue = useStakedBalanceCountervalue(account);
+  const { countervalueFirst } = useCountervaluePreferences();
 
   if (account.type !== "Account") return null;
 
-  const { neurons } = account;
+  const icpAccount = account as unknown as ICPAccount;
+  const { neurons } = icpAccount;
 
   const formatConfig = {
     alwaysShowSign: false,
     showCode: false,
-    discreet,
+    discreet: discreetMode,
     locale,
   };
+
   const stakedBalance = formatCurrencyUnit(unit, neurons.totalStaked, {
     ...formatConfig,
-    showCode: true,
+    showCode: !countervalueFirst,
   });
+
+  const stakedCountervalueFormatted = stakedCountervalue
+    ? formatCurrencyUnit(
+        counterValue.units[0],
+        new BigNumber(stakedCountervalue.stakedCountervalue),
+        {
+          ...formatConfig,
+          showCode: true,
+        },
+      )
+    : null;
+
   const maturityBalance = formatCurrencyUnit(
     unit,
     neurons.totalMaturity.plus(neurons.totalMaturityStaked),
@@ -74,6 +140,8 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
   );
   const maturityStakedBalance = formatCurrencyUnit(unit, neurons.totalMaturityStaked, formatConfig);
   const maturityLiquidBalance = formatCurrencyUnit(unit, neurons.totalMaturity, formatConfig);
+
+  const countervalueAvailable = stakedCountervalue?.countervalueAvailable;
 
   return (
     <Wrapper>
@@ -87,10 +155,17 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
               </TitleWrapper>
             </ToolTip>
             <AmountValue>
-              <Discreet>{stakedBalance}</Discreet>
+              <Discreet>
+                {countervalueFirst && countervalueAvailable && stakedCountervalueFormatted
+                  ? stakedCountervalueFormatted
+                  : stakedBalance}
+              </Discreet>
             </AmountValue>
           </BalanceDetail>
         )}
+
+        {neurons.totalStaked.gt(0) && neurons.totalMaturity.gt(0) && <Separator />}
+
         {neurons.totalMaturity.gt(0) && (
           <BalanceDetail>
             <ToolTip content="The total accumulated rewards from staking, including both staked and liquid maturity. These rewards can be either staked again or claimed as liquid ICP.">
@@ -144,4 +219,5 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
     </Wrapper>
   );
 };
+
 export default AccountBalanceSummaryFooter;
