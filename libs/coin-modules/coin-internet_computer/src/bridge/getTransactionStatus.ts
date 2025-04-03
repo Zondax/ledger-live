@@ -17,7 +17,12 @@ import {
   NeuronNotFound,
   NotEnoughTransferAmount,
 } from "../errors";
-import { ICP_MIN_STAKING_AMOUNT, MAX_DISSOLVE_DELAY, MIN_DISSOLVE_DELAY } from "../consts";
+import {
+  ICP_FEES,
+  ICP_MIN_STAKING_AMOUNT,
+  MAX_DISSOLVE_DELAY,
+  MIN_DISSOLVE_DELAY,
+} from "../consts";
 import { getNeuronDissolveDurationSeconds } from "../neurons";
 
 export const getTransactionStatus: AccountBridge<
@@ -54,6 +59,30 @@ export const getTransactionStatus: AccountBridge<
     }
   }
 
+  if (type === "split_neuron") {
+    const neuron = account.neurons.fullNeurons.find(
+      neuron => neuron.id[0]?.id.toString() === neuronId,
+    );
+    if (!neuron) {
+      errors.neuron = new NeuronNotFound();
+    } else {
+      if (BigNumber(neuron.cached_neuron_stake_e8s.toString()).lt(amount)) {
+        errors.splitNeuron = new NotEnoughBalance();
+      }
+      if (BigNumber(amount).lte(ICP_FEES)) {
+        errors.splitNeuron = new NotEnoughTransferAmount("", {
+          purpose: "split",
+          amount:
+            BigNumber(ICP_FEES)
+              .div(10 ** account.currency.units[0].magnitude)
+              .toString() +
+            " " +
+            account.currency.ticker,
+        });
+      }
+    }
+  }
+
   if (!recipient) {
     errors.recipient = new RecipientRequired();
   } else if (!(await validateAddress(recipient)).isValid) {
@@ -81,7 +110,15 @@ export const getTransactionStatus: AccountBridge<
       "This operation will transfer the amount to a new neuron. Upon successful confirmation, the neuron will be available for further operations.",
     );
     if (transaction.amount.lt(ICP_MIN_STAKING_AMOUNT)) {
-      errors.amount = new NotEnoughTransferAmount();
+      errors.amount = new NotEnoughTransferAmount("", {
+        purpose: "stake",
+        amount:
+          BigNumber(ICP_MIN_STAKING_AMOUNT)
+            .div(10 ** account.currency.units[0].magnitude)
+            .toString() +
+          " " +
+          account.currency.ticker,
+      });
     }
   }
 

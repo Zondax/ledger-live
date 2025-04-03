@@ -17,7 +17,10 @@ export const refreshNeuronsData = (
       if (optimisticOperation.type !== "NONE") {
         account = addPendingOperation(account, optimisticOperation);
       }
-      if (optimisticOperation.extra.neurons) {
+      if (
+        optimisticOperation.extra.neurons &&
+        optimisticOperation.extra.neurons.fullNeurons.length > 0
+      ) {
         const neuronAddresses = optimisticOperation.extra.neurons?.fullNeurons.map(
           neuron => neuron.accountIdentifier,
         );

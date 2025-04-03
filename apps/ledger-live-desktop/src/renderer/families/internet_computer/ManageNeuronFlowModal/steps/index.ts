@@ -9,6 +9,7 @@ import { StepSelectFollowees } from "./SelectFollowees";
 import { StepFollowSelectTopics } from "./FollowSelectTopics";
 import { SetDissolveDelay } from "./SetDissolveDelay";
 import { StakeMaturity } from "./StakeMaturity";
+import { SplitNeuron } from "./SplitNeuron";
 export function useSteps(): St[] {
   const { t } = useTranslation();
   return useMemo<St[]>(
@@ -62,6 +63,16 @@ export function useSteps(): St[] {
         component: StepSelectFollowees,
         onBack: ({ transitionTo }: StepProps) => {
           transitionTo("followTopic");
+        },
+        excludeFromBreadcrumb: true,
+        noScroll: true,
+      },
+      {
+        id: "splitNeuron",
+        label: "Split neuron",
+        component: SplitNeuron,
+        onBack: ({ transitionTo }: StepProps) => {
+          transitionTo("manage");
         },
         excludeFromBreadcrumb: true,
         noScroll: true,

@@ -158,19 +158,10 @@ export default function StepManage({
   }, [transitionTo]);
 
   const onClickSplitNeuron = useCallback(() => {
-    const bridge = getAccountBridge(account, undefined);
-    const initTx = bridge.createTransaction(account);
     const action = "split_neuron";
-    onChangeTransaction(
-      bridge.updateTransaction(initTx, {
-        type: action,
-        neuronId: neuron.id[0]?.id.toString(),
-        amount: BigNumber(neuron.cached_neuron_stake_e8s.toString()).div(2).integerValue(),
-      }),
-    );
     setLastManageAction(action);
-    transitionTo("manageAction");
-  }, [account, onChangeTransaction, transitionTo, neuron, setLastManageAction]);
+    transitionTo("splitNeuron");
+  }, [transitionTo, setLastManageAction]);
 
   const onClickRemoveHotKey = useCallback(
     (hotKey: string) => {

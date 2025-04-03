@@ -20,7 +20,8 @@ export type StepId =
   | "followTopic"
   | "selectFollowees"
   | "setDissolveDelay"
-  | "stakeMaturity";
+  | "stakeMaturity"
+  | "splitNeuron";
 export type StepProps = {
   lastManageAction?: ICPTransactionType;
   setLastManageAction: (a: ICPTransactionType) => void;

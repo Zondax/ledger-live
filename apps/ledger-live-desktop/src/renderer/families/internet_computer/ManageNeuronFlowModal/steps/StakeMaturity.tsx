@@ -74,7 +74,7 @@ export function StakeMaturity({
         />
         <Box horizontal justifyContent="space-between">
           <Text ff="Inter|Regular" fontSize={12} color="palette.text.shade60">
-            {((availableMaturity * maturityPercentageToStake) / 100).toFixed(2)}
+            {(availableMaturity * maturityPercentageToStake) / 100}
           </Text>
           <Text ff="Inter|Regular" fontSize={12} color="palette.text.shade60">
             {maturityPercentageToStake}%
