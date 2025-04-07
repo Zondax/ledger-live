@@ -157,7 +157,13 @@ export function flattenOperationWithInternalsAndNfts(op: Operation): Operation[]
   return ops;
 }
 
-export const OPERATION_TYPE_IN_FAMILY = ["IN", "REWARD", "REWARD_PAYOUT", "WITHDRAW"];
+export const OPERATION_TYPE_IN_FAMILY = [
+  "IN",
+  "REWARD",
+  "REWARD_PAYOUT",
+  "WITHDRAW",
+  "DISBURSE_NEURON",
+];
 export const OPERATION_TYPE_OUT_FAMILY = [
   "OUT",
   "REVEAL",
@@ -171,6 +177,7 @@ export const OPERATION_TYPE_OUT_FAMILY = [
   "SLASH",
   "LOCK",
   "BURN",
+  "TOP_UP_NEURON",
 ];
 export const OPERATION_TYPE_STAKE_FAMILY = [
   "FREEZE",
@@ -192,6 +199,7 @@ export const OPERATION_TYPE_STAKE_FAMILY = [
   "STAKE",
   "UNSTAKE",
   "WITHDRAW_UNSTAKED",
+  "STAKE_NEURON",
 ];
 
 export function getOperationAmountNumber(op: Operation): BigNumber {

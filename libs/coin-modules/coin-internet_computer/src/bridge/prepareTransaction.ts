@@ -1,5 +1,11 @@
 import { AccountBridge } from "@ledgerhq/types-live";
-import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "../types";
+import {
+  ICPAccount,
+  ICPAccountRaw,
+  InternetComputerOperation,
+  Transaction,
+  TransactionStatus,
+} from "../types";
 import { getAddress, validateAddress } from "./bridgeHelpers/addresses";
 import { AccountIdentifier, SubAccount } from "@dfinity/ledger-icp";
 import { Principal } from "@dfinity/principal";
@@ -28,6 +34,7 @@ export const prepareTransaction: AccountBridge<
   Transaction,
   ICPAccount,
   TransactionStatus,
+  InternetComputerOperation,
   ICPAccountRaw
 >["prepareTransaction"] = async (account, transaction) => {
   // log("debug", "[prepareTransaction] start fn");

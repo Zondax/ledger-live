@@ -15,6 +15,7 @@ import type {
   ICPSigner,
   ICPAccount,
   ICPAccountRaw,
+  InternetComputerOperation,
 } from "../types";
 import { getTransactionStatus } from "./getTransactionStatus";
 import { estimateMaxSpendable } from "./estimateMaxSpendable";
@@ -41,13 +42,25 @@ function buildCurrencyBridge(signerContext: SignerContext<ICPSigner>): CurrencyB
   };
 }
 
-const sync = makeSync<Transaction, ICPAccount, TransactionStatus, ICPAccountRaw>({
+const sync = makeSync<
+  Transaction,
+  ICPAccount,
+  TransactionStatus,
+  InternetComputerOperation,
+  ICPAccountRaw
+>({
   getAccountShape,
 });
 
 function buildAccountBridge(
   signerContext: SignerContext<ICPSigner>,
-): AccountBridge<Transaction, ICPAccount, TransactionStatus, ICPAccountRaw> {
+): AccountBridge<
+  Transaction,
+  ICPAccount,
+  TransactionStatus,
+  InternetComputerOperation,
+  ICPAccountRaw
+> {
   const getAddress = resolver(signerContext);
 
   const receive = makeAccountBridgeReceive(getAddressWrapper(getAddress));

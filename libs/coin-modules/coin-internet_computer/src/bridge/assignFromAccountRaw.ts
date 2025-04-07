@@ -1,5 +1,11 @@
 import { AccountBridge } from "@ledgerhq/types-live";
-import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "../types";
+import {
+  ICPAccount,
+  ICPAccountRaw,
+  InternetComputerOperation,
+  Transaction,
+  TransactionStatus,
+} from "../types";
 import { NeuronsData } from "../neurons";
 import { log } from "@ledgerhq/logs";
 
@@ -7,6 +13,7 @@ export const assignFromAccountRaw: AccountBridge<
   Transaction,
   ICPAccount,
   TransactionStatus,
+  InternetComputerOperation,
   ICPAccountRaw
 >["assignFromAccountRaw"] = (accountRaw, account) => {
   log("debug", `[ICP](assignFromAccountRaw) deserializing neurons`);

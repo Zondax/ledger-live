@@ -1,12 +1,19 @@
 import BigNumber from "bignumber.js";
 import { AccountBridge } from "@ledgerhq/types-live";
 import { getEstimatedFees } from "./bridgeHelpers/fee";
-import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "../types";
+import {
+  ICPAccount,
+  ICPAccountRaw,
+  InternetComputerOperation,
+  Transaction,
+  TransactionStatus,
+} from "../types";
 
 export const estimateMaxSpendable: AccountBridge<
   Transaction,
   ICPAccount,
   TransactionStatus,
+  InternetComputerOperation,
   ICPAccountRaw
 >["estimateMaxSpendable"] = async ({ account, transaction }) => {
   const balance = account.balance;

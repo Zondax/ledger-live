@@ -31,6 +31,7 @@ export const broadcast: AccountBridge<
   Transaction,
   ICPAccount,
   TransactionStatus,
+  InternetComputerOperation,
   ICPAccountRaw
 >["broadcast"] = async ({ account, signedOperation: { operation, rawData } }) => {
   log("debug", "[broadcast] Internet Computer transaction broadcast initiated");

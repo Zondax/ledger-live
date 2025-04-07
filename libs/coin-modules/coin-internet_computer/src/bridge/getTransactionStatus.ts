@@ -8,7 +8,13 @@ import {
 import BigNumber from "bignumber.js";
 import { AccountBridge } from "@ledgerhq/types-live";
 import { getAddress, validateAddress, validateMemo } from "../bridge/bridgeHelpers/addresses";
-import { ICPAccount, ICPAccountRaw, Transaction, TransactionStatus } from "../types";
+import {
+  ICPAccount,
+  ICPAccountRaw,
+  InternetComputerOperation,
+  Transaction,
+  TransactionStatus,
+} from "../types";
 import {
   DissolveDelayGTMax,
   DissolveDelayLTCurrent,
@@ -29,6 +35,7 @@ export const getTransactionStatus: AccountBridge<
   Transaction,
   ICPAccount,
   TransactionStatus,
+  InternetComputerOperation,
   ICPAccountRaw
 >["getTransactionStatus"] = async (account, transaction) => {
   const errors: TransactionStatus["errors"] = {};

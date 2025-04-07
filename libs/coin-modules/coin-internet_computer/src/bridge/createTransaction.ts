@@ -1,5 +1,11 @@
 import { AccountBridge } from "@ledgerhq/types-live";
-import { ICPAccountRaw, ICPAccount, TransactionStatus, Transaction } from "../types";
+import {
+  ICPAccountRaw,
+  ICPAccount,
+  TransactionStatus,
+  Transaction,
+  InternetComputerOperation,
+} from "../types";
 import BigNumber from "bignumber.js";
 import { getEstimatedFees } from "./bridgeHelpers/fee";
 
@@ -7,6 +13,7 @@ export const createTransaction: AccountBridge<
   Transaction,
   ICPAccount,
   TransactionStatus,
+  InternetComputerOperation,
   ICPAccountRaw
 >["createTransaction"] = () => {
   // log("debug", "[createTransaction] creating base tx");

@@ -14,6 +14,7 @@ import {
   Transaction,
   ICPAccount,
   ICPAccountRaw,
+  InternetComputerOperation,
 } from "@ledgerhq/coin-internet_computer/types/index";
 import {
   ICPGetAddrResponse,
@@ -58,9 +59,13 @@ const createSigner: CreateSigner<ICPSigner> = (transport: Transport) => {
   };
 };
 
-const bridge: Bridge<Transaction, ICPAccount, TransactionStatus, ICPAccountRaw> = createBridges(
-  executeWithSigner(createSigner),
-);
+const bridge: Bridge<
+  Transaction,
+  ICPAccount,
+  TransactionStatus,
+  InternetComputerOperation,
+  ICPAccountRaw
+> = createBridges(executeWithSigner(createSigner));
 
 const messageSigner = {
   signMessage,

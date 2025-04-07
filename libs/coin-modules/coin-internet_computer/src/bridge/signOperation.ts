@@ -2,7 +2,14 @@ import { Observable } from "rxjs";
 import { Account, AccountBridge, DeviceId } from "@ledgerhq/types-live";
 import { getAddress } from "./bridgeHelpers/addresses";
 import { buildOptimisticSendOperation as buildOptimisticOperation } from "./buildOptimisticOperation";
-import { ICPAccount, ICPAccountRaw, ICPSigner, Transaction, TransactionStatus } from "../types";
+import {
+  ICPAccount,
+  ICPAccountRaw,
+  ICPSigner,
+  InternetComputerOperation,
+  Transaction,
+  TransactionStatus,
+} from "../types";
 import {
   derivePrincipalFromPubkey,
   getPath,
@@ -503,7 +510,13 @@ const signUpdateICPTransaction = async (
 export const buildSignOperation =
   (
     signerContext: SignerContext<ICPSigner>,
-  ): AccountBridge<Transaction, ICPAccount, TransactionStatus, ICPAccountRaw>["signOperation"] =>
+  ): AccountBridge<
+    Transaction,
+    ICPAccount,
+    TransactionStatus,
+    InternetComputerOperation,
+    ICPAccountRaw
+  >["signOperation"] =>
   ({ account, transaction, deviceId }) =>
     new Observable(o => {
       async function main() {
