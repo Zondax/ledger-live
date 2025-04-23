@@ -19,6 +19,7 @@ export const FETCH_TXNS_LIMIT = 100;
 
 // Max ICP fees
 export const ICP_FEES = 1e4;
+export const E8S_PER_ICP = 100_000_000;
 
 // Voting power refresh threshold
 export const VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS = 300;

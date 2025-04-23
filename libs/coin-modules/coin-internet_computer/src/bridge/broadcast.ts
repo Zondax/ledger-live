@@ -8,10 +8,7 @@ import {
   Transaction,
   TransactionStatus,
 } from "../types";
-import {
-  ListNeuronsResponse,
-  RefreshVotingPowerResponse,
-} from "@dfinity/nns/dist/candid/governance";
+import { ListNeuronsResponse } from "@dfinity/nns/dist/candid/governance";
 import { log } from "@ledgerhq/logs";
 import invariant from "invariant";
 import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "../consts";
@@ -46,6 +43,22 @@ export const broadcast: AccountBridge<
   invariant(operation.extra, "[ICP](broadcast) Missing operation extra");
 
   const sendTypes = ["send", "increase_stake", "create_neuron"];
+  const manageNeuronTypes = [
+    "start_dissolving",
+    "stop_dissolving",
+    "disburse",
+    "spawn_neuron",
+    "stake_maturity",
+    "refresh_voting_power",
+    "increase_dissolve_delay",
+    "auto_stake_maturity",
+    "spawn_neuron_from_maturity",
+    "set_auto_stake_maturity",
+    "set_dissolve_delay",
+    "remove_hot_key",
+    "follow",
+    "split_neuron",
+  ];
 
   // Logic for different transaction types
   if (sendTypes.includes(rawDataTyped.methodName)) {
@@ -104,30 +117,27 @@ export const broadcast: AccountBridge<
   if (
     rawDataTyped.encodedSignedReadStateBlob &&
     rawDataTyped.requestId &&
-    rawDataTyped.methodName === "refresh_voting_power"
+    manageNeuronTypes.includes(rawDataTyped.methodName)
   ) {
-    const reply = await pollForReadState(
+    await pollForReadState(
       Buffer.from(rawDataTyped.encodedSignedReadStateBlob, "hex"),
       MAINNET_GOVERNANCE_CANISTER_ID,
       rawDataTyped.requestId,
     );
-    const refreshVotingPowerIdlFunc = idlFactoryGovernance({ IDL })._fields.find(
+    const manageNeuronIdlFunc = idlFactoryGovernance({ IDL })._fields.find(
       func => func[0] === "manage_neuron",
     );
 
     invariant(
-      refreshVotingPowerIdlFunc,
-      `[ICP](broadcast) Missing refreshVotingPowerIdlFunc with methodName: ${rawDataTyped.methodName}`,
+      manageNeuronIdlFunc,
+      `[ICP](broadcast) Missing manageNeuronIdlFunc with methodName: ${rawDataTyped.methodName}`,
     );
-    const [_refreshVotingPowerResponse]: [RefreshVotingPowerResponse] = IDL.decode(
-      refreshVotingPowerIdlFunc[1].retTypes,
-      reply,
-    ) as any;
 
     return operation;
   }
 
   // Additional logic post-transaction broadcast
+
   // Additional step for neuron creation
   if (rawDataTyped.methodName === "create_neuron") {
     invariant(account.xpub, `[ICP](broadcast-${rawDataTyped.methodName}) Missing account xpub`);

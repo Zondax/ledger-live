@@ -8,7 +8,11 @@ import {
   SECONDS_IN_HOUR,
   VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS,
 } from "../consts";
-import { getNeuronDissolveDurationSeconds } from "../neurons";
+import {
+  getAgeMultiplier,
+  getDissolveDelayMultiplier,
+  getNeuronDissolveDurationSeconds,
+} from "../neurons";
 
 const votingPowerNeedsRefresh = (
   account: ICPAccount,
@@ -146,17 +150,21 @@ export const getNeuronVotingPower = (neuron: ICPNeuron) => {
 };
 
 export const getNeuronAgeBonus = (neuron: ICPNeuron) => {
+  const age = neuron.neuronInfo.age_seconds;
   if (getNeuronDissolveDurationSeconds(neuron) < SECONDS_IN_HALF_YEAR) {
     return 0;
   }
 
-  return 0;
+  const multiplier = getAgeMultiplier(BigInt(age));
+  return Math.round((multiplier + Number.EPSILON - 1) * 100);
 };
 
 export const getNeuronDissolveDelayBonus = (neuron: ICPNeuron) => {
-  if (getNeuronDissolveDurationSeconds(neuron) < SECONDS_IN_HALF_YEAR) {
+  const dissolveDelay = getNeuronDissolveDurationSeconds(neuron);
+  if (dissolveDelay < SECONDS_IN_HALF_YEAR) {
     return 0;
   }
 
-  return 0;
+  const multiplier = getDissolveDelayMultiplier(BigInt(dissolveDelay));
+  return Math.round((multiplier + Number.EPSILON - 1) * 100);
 };

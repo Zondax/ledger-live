@@ -14,7 +14,7 @@ import {
 import {
   getMinDissolveDelay,
   secondsToDurationString,
-  calculateVotingPower,
+  neuronPotentialVotingPower,
 } from "@ledgerhq/live-common/families/internet_computer/utils";
 
 export function SetDissolveDelay({
@@ -26,8 +26,10 @@ export function SetDissolveDelay({
   setLastManageAction,
   transitionTo,
 }: StepProps) {
-  const [dissolveDelay, setDissolveDelay] = useState("");
   const neuron = neurons.fullNeurons[manageNeuronIndex];
+  const minDissolveDelay = (getMinDissolveDelay(neuron) / SECONDS_IN_DAY).toPrecision(4);
+  const maxDissolveDelay = (MAX_DISSOLVE_DELAY / SECONDS_IN_DAY).toPrecision(4);
+  const [dissolveDelay, setDissolveDelay] = useState(minDissolveDelay.toString());
   const { errors } = status;
 
   const onChangeDissolveDelay = useCallback(
@@ -115,10 +117,10 @@ export function SetDissolveDelay({
 
         <Box horizontal justifyContent="space-between">
           <Text ff="Inter|SemiBold" fontSize={14} color="palette.text.shade80">
-            Min: {(getMinDissolveDelay(neuron) / SECONDS_IN_DAY).toFixed(4)}
+            Min: {minDissolveDelay}
           </Text>
           <Text ff="Inter|SemiBold" fontSize={14} color="palette.text.shade80">
-            Max: {MAX_DISSOLVE_DELAY / SECONDS_IN_DAY}
+            Max: {maxDissolveDelay}
           </Text>
         </Box>
         <Input
@@ -144,12 +146,12 @@ export function SetDissolveDelay({
           <Box alignItems="center">
             <Text ff="Inter|SemiBold" fontSize={14} color="palette.text.shade60">
               {dissolveDelay
-                ? calculateVotingPower({
-                    stakeE8s: neuron.cached_neuron_stake_e8s,
-                    dissolveDelay: BigInt(
-                      BigNumber(dissolveDelay).times(SECONDS_IN_DAY).integerValue().toString(),
-                    ),
-                    ageSeconds: neuron.aging_since_timestamp_seconds,
+                ? neuronPotentialVotingPower({
+                    neuron,
+                    newDissolveDelayInSeconds: BigNumber(dissolveDelay)
+                      .times(SECONDS_IN_DAY)
+                      .integerValue()
+                      .toNumber(),
                   }).toString()
                 : "0"}
             </Text>

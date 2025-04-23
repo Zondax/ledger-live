@@ -9,6 +9,7 @@ import { principalToAccountIdentifier } from "@dfinity/ledger-icp";
 import { fromNullable, secondsToDuration } from "@dfinity/utils";
 import { Principal } from "@dfinity/principal";
 import {
+  E8S_PER_ICP,
   MAINNET_GOVERNANCE_CANISTER_ID,
   MAX_AGE_BONUS,
   MAX_DISSOLVE_DELAY_BONUS,
@@ -233,6 +234,23 @@ export const neuronVotingPower = ({ neuron }: { neuron: NNSNeuron }): BigNumber 
   return BigNumber(votingPowerBigInt.toString());
 };
 
+export const neuronPotentialVotingPower = ({
+  neuron,
+  newDissolveDelayInSeconds,
+}: {
+  neuron: ICPNeuron;
+  newDissolveDelayInSeconds: number;
+}): number => {
+  const stakeE8s =
+    neuron.cached_neuron_stake_e8s + (neuron.staked_maturity_e8s_equivalent?.[0] ?? 0n);
+
+  return calculateVotingPower({
+    stakeE8s,
+    dissolveDelay: BigInt(newDissolveDelayInSeconds),
+    ageSeconds: BigInt(neuron.aging_since_timestamp_seconds),
+  });
+};
+
 // Calculates the bonus multiplier for an amount (such as dissolve delay or age)
 // which results in bonus eligibility which scales linearly from 1 to
 // `maxBonus`. For example for dissolve delay, the values
@@ -278,28 +296,16 @@ export const calculateVotingPower = ({
   stakeE8s,
   dissolveDelay,
   ageSeconds,
-  maxAgeBonus = MAX_AGE_BONUS,
-  maxDissolveDelayBonus = MAX_DISSOLVE_DELAY_BONUS,
-  maxDissolveDelaySeconds = SECONDS_IN_EIGHT_YEARS,
-  maxAgeSeconds = SECONDS_IN_FOUR_YEARS,
   minDissolveDelaySeconds = SECONDS_IN_HALF_YEAR,
-}: VotingPowerParams): bigint => {
+}: VotingPowerParams): number => {
   if (dissolveDelay < minDissolveDelaySeconds) {
-    return BigInt(0);
+    return 0;
   }
-  const dissolveDelayMultiplier = bonusMultiplier({
-    amount: dissolveDelay,
-    maxBonus: maxDissolveDelayBonus,
-    amountForMaxBonus: maxDissolveDelaySeconds,
-  });
-  const ageMultiplier = bonusMultiplier({
-    amount: ageSeconds,
-    maxBonus: maxAgeBonus,
-    amountForMaxBonus: maxAgeSeconds,
-  });
-  // We don't use dissolveDelayMultiplier and ageMultiplier directly because those are specific to NNS.
-  // This function is generic and could be used for SNS.
-  return BigInt(Math.round(Number(stakeE8s) * dissolveDelayMultiplier * ageMultiplier));
+
+  const dissolveDelayMultiplier = getDissolveDelayMultiplier(dissolveDelay);
+  const ageMultiplier = getAgeMultiplier(ageSeconds);
+
+  return Math.round(Number(stakeE8s) * dissolveDelayMultiplier * ageMultiplier) / E8S_PER_ICP;
 };
 
 // https://github.com/dfinity/nns-dapp/blob/main/frontend/src/lib/utils/sns-neuron.utils.ts#L46
@@ -346,3 +352,17 @@ export const getNeuronDissolveDuration = (neuron: ICPNeuron) => {
     seconds,
   });
 };
+
+export const getDissolveDelayMultiplier = (delayInSeconds: bigint): number =>
+  bonusMultiplier({
+    amount: delayInSeconds,
+    maxBonus: MAX_DISSOLVE_DELAY_BONUS,
+    amountForMaxBonus: SECONDS_IN_EIGHT_YEARS,
+  });
+
+export const getAgeMultiplier = (ageSeconds: bigint): number =>
+  bonusMultiplier({
+    amount: ageSeconds,
+    maxBonus: MAX_AGE_BONUS,
+    amountForMaxBonus: SECONDS_IN_FOUR_YEARS,
+  });
