@@ -11,7 +11,7 @@ export default {
   casper,
   evm,
   filecoin,
-  solana,
   internet_computer,
+  solana,
   ton,
 };

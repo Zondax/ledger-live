@@ -19,14 +19,14 @@ const votingPowerNeedsRefresh = (
 ): {
   needsRefresh: boolean;
   minDays: number;
+  minHours: number;
   minMinutes: number;
 } => {
-  let minDays = Number.MAX_SAFE_INTEGER;
-  let minMinutes = Number.MAX_SAFE_INTEGER;
   const filteredNeurons = account.neurons.fullNeurons.filter(
     neuron => getNeuronVotingPower(neuron) > 0,
   );
 
+  let minSeconds = Number.MAX_SAFE_INTEGER;
   for (const neuron of filteredNeurons) {
     const secondsTillVotingPowerExpires = getSecondsTillVotingPowerExpires(neuron);
     if (secondsTillVotingPowerExpires <= 0) {
@@ -34,18 +34,20 @@ const votingPowerNeedsRefresh = (
         needsRefresh: true,
         minDays: 0,
         minMinutes: 0,
+        minHours: 0,
       };
     }
 
-    const { days, minutes } = getTimeUntil(secondsTillVotingPowerExpires);
-    minDays = Math.min(minDays, days);
-    minMinutes = Math.min(minMinutes, minutes);
+    minSeconds = Math.min(minSeconds, secondsTillVotingPowerExpires);
   }
 
+  const { days, minutes, hours } = getTimeUntil(minSeconds, false);
+
   return {
-    needsRefresh: minDays <= VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS,
-    minDays,
-    minMinutes,
+    needsRefresh: days <= VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS,
+    minDays: days,
+    minHours: hours,
+    minMinutes: minutes,
   };
 };
 
@@ -59,17 +61,19 @@ interface getBannerStateReturn {
   state: BannerState;
   data?: {
     days: number;
+    hours: number;
     minutes: number;
   };
 }
 export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
   // Check Neuron Periodic Confirmation (Priority 1)
-  const { needsRefresh, minDays, minMinutes } = votingPowerNeedsRefresh(account);
+  const { needsRefresh, minDays, minHours, minMinutes } = votingPowerNeedsRefresh(account);
   if (needsRefresh) {
     return {
       state: "confirm_following",
       data: {
         days: minDays,
+        hours: minHours,
         minutes: minMinutes,
       },
     };
@@ -77,12 +81,13 @@ export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
 
   // Check Last Time Neurons Sync (Priority 2)
   const lastSync = account.neurons.lastUpdatedMSecs;
-  const { days, minutes } = getTimeUntil(lastSync / 1000);
+  const { days, hours, minutes } = getTimeUntil(lastSync / 1000);
   if (lastSync && days > LAST_SYNC_THRESHOLD_IN_DAYS) {
     return {
       state: "sync_neurons",
       data: {
         days,
+        hours,
         minutes,
       },
     };

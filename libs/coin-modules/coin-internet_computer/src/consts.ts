@@ -22,7 +22,7 @@ export const ICP_FEES = 1e4;
 export const E8S_PER_ICP = 100_000_000;
 
 // Voting power refresh threshold
-export const VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS = 300;
+export const VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS = 30;
 
 // Last sync threshold
 export const LAST_SYNC_THRESHOLD_IN_DAYS = 14;
@@ -56,6 +56,9 @@ export const MAX_DISSOLVE_DELAY = SECONDS_IN_EIGHT_YEARS;
 export const KNOWN_NEURON_IDS: Record<string, string> = {
   "27": "DFINITY Foundation",
   "12093733865587997066": "Aviate Labs",
+  "55674167450360693": "ICPL.app",
+  "1100477100620240869": "ICP Hub Bulgaria",
+  "2776371642396604393": "ICP Hub México",
 };
 
 // Topics name same as 'getTopicTitle' in ../common-logic/neuron.ts

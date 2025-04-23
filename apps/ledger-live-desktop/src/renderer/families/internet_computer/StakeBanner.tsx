@@ -72,7 +72,7 @@ const StakeBanner: React.FC<{ account: ICPAccount }> = ({ account }) => {
       title: "Confirm Your Following",
       description:
         data?.days || data?.minutes
-          ? `Your neuron's following needs to be confirmed in ${data.days} days and ${data.minutes} minutes`
+          ? `Your neuron's following needs to be confirmed in ${data.days} days and ${data.hours} hours`
           : "You are losing rewards, confirm neuron following to continue earning",
       cta: "Confirm Following",
       action: onClickConfirmFollowing,
@@ -80,7 +80,7 @@ const StakeBanner: React.FC<{ account: ICPAccount }> = ({ account }) => {
     sync_neurons: {
       title: "Sync Your Staked ICP",
       description: data
-        ? `Your staked ICP has last been synced ${data.days} days and ${data.minutes} minutes ago. If you want to see the latest details, we recommend you sync often.`
+        ? `Your staked ICP has last been synced ${data.days} days and ${data.hours} hours ago. If you want to see the latest details, we recommend you sync often.`
         : "We recommend syncing your neurons to see the latest details",
       cta: "Sync Neurons",
       action: () => onClickManageNeurons(true),

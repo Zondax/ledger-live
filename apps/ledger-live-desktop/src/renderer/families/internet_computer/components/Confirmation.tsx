@@ -72,7 +72,7 @@ export default function StepConfirmation({
       <Flex flexDirection="column" alignItems="center" flex={1} justifyContent="center">
         <SuccessIcon size={64} />
 
-        <ActionText variant="large" mt={6} mb={2} color={colors.positiveGreen}>
+        <ActionText mt={6} mb={2} color={colors.positiveGreen}>
           {t(`internetComputer.manageNeuron.actions.${lastManageAction}`)} was successful
         </ActionText>
 

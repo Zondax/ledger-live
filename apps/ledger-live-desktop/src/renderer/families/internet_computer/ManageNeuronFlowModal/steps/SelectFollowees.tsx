@@ -25,6 +25,8 @@ export function StepSelectFollowees({
   const [error, setError] = useState<InputError>(null);
   const [followNeuronId, setFollowNeuronId] = useState<string>("");
   const neuron = neurons.fullNeurons[manageNeuronIndex];
+  const hasInitialFollowees = neuron.followees.length > 0;
+
   const [followees, setFollowees] = useState<string[]>([
     ...(Object.entries(neuron.modFollowees)
       .map(([key, value]) => {
@@ -151,7 +153,7 @@ export function StepSelectFollowees({
           ))}
         </Box>
       </Box>
-      {!!followees.length && (
+      {(!!followees.length || hasInitialFollowees) && (
         <>
           <Divider my={4} />
           <Box style={{ gap: 10 }}>
@@ -177,9 +179,15 @@ export function StepSelectFollowees({
               <Button mr={2} onClick={() => transitionTo("manage")}>
                 Cancel
               </Button>
-              <Button onClick={onClickFollowNeuron} primary>
-                Follow
-              </Button>
+              {followees.length ? (
+                <Button onClick={onClickFollowNeuron} primary>
+                  Follow
+                </Button>
+              ) : (
+                <Button onClick={onClickFollowNeuron} primary>
+                  Set
+                </Button>
+              )}
             </Box>
           </Box>
         </>

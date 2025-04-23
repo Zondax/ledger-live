@@ -163,11 +163,15 @@ export function List({
                             <>
                               <Td>
                                 <Text ff="Inter|Regular" fontSize={3}>
-                                  {secondsTillVotingPowerExpires > 0
-                                    ? secondsToDurationString(
-                                        secondsTillVotingPowerExpires.toString(),
-                                      )
-                                    : "Inactive neuron"}
+                                  {secondsTillVotingPowerExpires > 0 ? (
+                                    secondsToDurationString(
+                                      secondsTillVotingPowerExpires.toString(),
+                                    )
+                                  ) : (
+                                    <Text ff="Inter|Regular" fontSize={3}>
+                                      Inactive neuron
+                                    </Text>
+                                  )}
                                 </Text>
                               </Td>
                               <Td>
