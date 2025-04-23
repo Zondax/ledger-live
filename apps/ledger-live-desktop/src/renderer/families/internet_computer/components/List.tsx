@@ -9,10 +9,9 @@ import { ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/type
 import {
   getNeuronDissolveDuration,
   secondsToDurationString,
-  nowInSeconds,
+  getSecondsTillVotingPowerExpires,
 } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { Unit } from "@ledgerhq/types-cryptoassets";
-import BigNumber from "bignumber.js";
 
 const TableWrapper = styled.div`
   max-height: 500px;
@@ -157,20 +156,16 @@ export function List({
                     {modalName === "MODAL_ICP_REFRESH_VOTING_POWER" && (
                       <>
                         {(() => {
-                          const votingPowerRefreshedSeconds =
-                            neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]?.toString() ??
-                            "0";
-                          const votingPowerRefreshedSecondsDiff = BigNumber(
-                            votingPowerRefreshedSeconds,
-                          ).minus(nowInSeconds());
+                          const secondsTillVotingPowerExpires =
+                            getSecondsTillVotingPowerExpires(neuron);
 
                           return (
                             <>
                               <Td>
                                 <Text ff="Inter|Regular" fontSize={3}>
-                                  {votingPowerRefreshedSecondsDiff.gt(0)
+                                  {secondsTillVotingPowerExpires > 0
                                     ? secondsToDurationString(
-                                        votingPowerRefreshedSecondsDiff.toString(),
+                                        secondsTillVotingPowerExpires.toString(),
                                       )
                                     : "Inactive neuron"}
                                 </Text>

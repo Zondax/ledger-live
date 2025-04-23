@@ -1,8 +1,5 @@
 import React, { useCallback, useState } from "react";
-import {
-  KNOWN_NEURON_IDS,
-  KNOWN_TOPICS,
-} from "@ledgerhq/live-common/families/internet_computer/consts";
+import { KNOWN_NEURON_IDS } from "@ledgerhq/live-common/families/internet_computer/consts";
 import Input, { InputError } from "~/renderer/components/Input";
 import Label from "~/renderer/components/Label";
 import Text from "~/renderer/components/Text";
@@ -12,6 +9,7 @@ import Cross from "~/renderer/icons/Cross";
 import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
 import Button from "~/renderer/components/Button";
 import { StepProps } from "../types";
+import { useTranslation } from "react-i18next";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 
 export function StepSelectFollowees({
@@ -23,6 +21,7 @@ export function StepSelectFollowees({
   account,
   onChangeTransaction,
 }: StepProps) {
+  const { t } = useTranslation();
   const [error, setError] = useState<InputError>(null);
   const [followNeuronId, setFollowNeuronId] = useState<string>("");
   const neuron = neurons.fullNeurons[manageNeuronIndex];
@@ -97,7 +96,7 @@ export function StepSelectFollowees({
     <Box>
       <Box mb={4}>
         <Text ff="Inter|SemiBold" fontSize={16}>
-          Topic: {KNOWN_TOPICS[followTopic]}
+          {t(`internetComputer.manageNeuron.followTopic.${followTopic}.title`)}
         </Text>
       </Box>
       <Box style={{ gap: 5 }}>

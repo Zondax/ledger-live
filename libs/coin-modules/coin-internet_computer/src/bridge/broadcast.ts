@@ -8,7 +8,10 @@ import {
   Transaction,
   TransactionStatus,
 } from "../types";
-import { ListNeuronsResponse } from "@dfinity/nns/dist/candid/governance";
+import {
+  ListNeuronsResponse,
+  RefreshVotingPowerResponse,
+} from "@dfinity/nns/dist/candid/governance";
 import { log } from "@ledgerhq/logs";
 import invariant from "invariant";
 import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "../consts";
@@ -42,37 +45,21 @@ export const broadcast: AccountBridge<
   invariant(rawDataTyped.encodedSignedCallBlob, "[ICP](broadcast) Missing encodedSignedCallBlob");
   invariant(operation.extra, "[ICP](broadcast) Missing operation extra");
 
-  // Logic for different transaction types
-  switch (rawDataTyped.methodName) {
-    case "list_neurons":
-    case "start_dissolving":
-    case "stop_dissolving":
-    case "disburse":
-    case "refresh_voting_power":
-    case "stake_maturity":
-    case "spawn_neuron":
-    case "increase_dissolve_delay":
-    case "set_dissolve_delay":
-    case "split_neuron":
-    case "remove_hot_key":
-    case "auto_stake_maturity":
-    case "follow":
-      await broadcastTxn(
-        Buffer.from(rawDataTyped.encodedSignedCallBlob, "hex"),
-        MAINNET_GOVERNANCE_CANISTER_ID,
-        "call",
-      );
-      break;
+  const sendTypes = ["send", "increase_stake", "create_neuron"];
 
-    case "send":
-    case "increase_stake":
-    case "create_neuron":
-      await broadcastTxn(
-        Buffer.from(rawDataTyped.encodedSignedCallBlob, "hex"),
-        MAINNET_LEDGER_CANISTER_ID,
-        "call",
-      );
-      break;
+  // Logic for different transaction types
+  if (sendTypes.includes(rawDataTyped.methodName)) {
+    await broadcastTxn(
+      Buffer.from(rawDataTyped.encodedSignedCallBlob, "hex"),
+      MAINNET_LEDGER_CANISTER_ID,
+      "call",
+    );
+  } else {
+    await broadcastTxn(
+      Buffer.from(rawDataTyped.encodedSignedCallBlob, "hex"),
+      MAINNET_GOVERNANCE_CANISTER_ID,
+      "call",
+    );
   }
 
   // Synchronizing neurons if "list_neurons" is called
@@ -112,6 +99,32 @@ export const broadcast: AccountBridge<
         neurons,
       },
     } as InternetComputerOperation;
+  }
+
+  if (
+    rawDataTyped.encodedSignedReadStateBlob &&
+    rawDataTyped.requestId &&
+    rawDataTyped.methodName === "refresh_voting_power"
+  ) {
+    const reply = await pollForReadState(
+      Buffer.from(rawDataTyped.encodedSignedReadStateBlob, "hex"),
+      MAINNET_GOVERNANCE_CANISTER_ID,
+      rawDataTyped.requestId,
+    );
+    const refreshVotingPowerIdlFunc = idlFactoryGovernance({ IDL })._fields.find(
+      func => func[0] === "manage_neuron",
+    );
+
+    invariant(
+      refreshVotingPowerIdlFunc,
+      `[ICP](broadcast) Missing refreshVotingPowerIdlFunc with methodName: ${rawDataTyped.methodName}`,
+    );
+    const [_refreshVotingPowerResponse]: [RefreshVotingPowerResponse] = IDL.decode(
+      refreshVotingPowerIdlFunc[1].retTypes,
+      reply,
+    ) as any;
+
+    return operation;
   }
 
   // Additional logic post-transaction broadcast

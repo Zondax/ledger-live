@@ -525,30 +525,19 @@ export const buildSignOperation =
 
         invariant(account.xpub, "[ICP](signOperation) Account xpub is required");
         const { derivationPath } = getAddress(account);
+        const sendTypes = ["send", "increase_stake", "create_neuron"];
+
         let unsignedTransaction: UnsignedTransaction;
         let transferRawRequest: TransferRawRequest | undefined;
-        if (transaction.type === "list_neurons") {
-          ({ unsignedTransaction } = createUnsignedListNeuronsTransaction(account));
-        } else if (
-          transaction.type === "disburse" ||
-          transaction.type === "start_dissolving" ||
-          transaction.type === "stop_dissolving" ||
-          transaction.type === "stake_maturity" ||
-          transaction.type === "spawn_neuron" ||
-          transaction.type === "increase_dissolve_delay" ||
-          transaction.type === "set_dissolve_delay" ||
-          transaction.type === "refresh_voting_power" ||
-          transaction.type === "auto_stake_maturity" ||
-          transaction.type === "remove_hot_key" ||
-          transaction.type === "split_neuron" ||
-          transaction.type === "follow"
-        ) {
-          ({ unsignedTransaction } = createUnsignedNeuronCommandTransaction(transaction, account));
-        } else {
+        if (sendTypes.includes(transaction.type)) {
           ({ unsignedTransaction, transferRawRequest } = createUnsignedSendTransaction(
             transaction,
             account,
           ));
+        } else if (transaction.type === "list_neurons") {
+          ({ unsignedTransaction } = createUnsignedListNeuronsTransaction(account));
+        } else {
+          ({ unsignedTransaction } = createUnsignedNeuronCommandTransaction(transaction, account));
         }
 
         o.next({
@@ -559,7 +548,18 @@ export const buildSignOperation =
         let encodedSignedCallBlob: string = "";
         let encodedSignedReadStateBlob: string = "";
         let requestId: string = "";
-        if (transaction.type === "list_neurons") {
+        if (sendTypes.includes(transaction.type)) {
+          const res = await signICPTransaction(
+            unsignedTransaction,
+            getPath(derivationPath),
+            signerContext,
+            account,
+            transaction.type === "create_neuron",
+            deviceId,
+          );
+          signature = res.signature;
+          encodedSignedCallBlob = Buffer.from(Cbor.encode(res.callBody)).toString("hex");
+        } else {
           const res = await signUpdateICPTransaction(
             unsignedTransaction,
             getPath(derivationPath),
@@ -571,17 +571,6 @@ export const buildSignOperation =
           encodedSignedCallBlob = Buffer.from(Cbor.encode(res.callBody)).toString("hex");
           encodedSignedReadStateBlob = Buffer.from(Cbor.encode(res.readStateBody)).toString("hex");
           requestId = Buffer.from(res.requestId).toString("hex");
-        } else {
-          const res = await signICPTransaction(
-            unsignedTransaction,
-            getPath(derivationPath),
-            signerContext,
-            account,
-            transaction.type === "create_neuron",
-            deviceId,
-          );
-          signature = res.signature;
-          encodedSignedCallBlob = Buffer.from(Cbor.encode(res.callBody)).toString("hex");
         }
         invariant(signature, "[ICP](signOperation) Signature not found");
 

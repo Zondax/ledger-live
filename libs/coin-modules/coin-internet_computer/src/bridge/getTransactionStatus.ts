@@ -16,11 +16,11 @@ import {
   TransactionStatus,
 } from "../types";
 import {
-  DissolveDelayGTMax,
-  DissolveDelayLTCurrent,
-  DissolveDelayLTMin,
+  ICPDissolveDelayGTMax,
+  ICPDissolveDelayLTCurrent,
+  ICPDissolveDelayLTMin,
   InvalidMemoICP,
-  NeuronNotFound,
+  ICPNeuronNotFound,
   NotEnoughTransferAmount,
 } from "../errors";
 import {
@@ -52,17 +52,21 @@ export const getTransactionStatus: AccountBridge<
       neuron => neuron.id[0]?.id.toString() === neuronId,
     );
     if (!neuron) {
-      errors.neuron = new NeuronNotFound();
+      errors.neuron = new ICPNeuronNotFound();
     } else {
       const currentDissolveDelay = BigNumber(getNeuronDissolveDurationSeconds(neuron).toString());
       if (BigNumber(dissolveDelay).lt(currentDissolveDelay)) {
-        errors.dissolveDelay = new DissolveDelayLTCurrent();
+        errors.dissolveDelay = new ICPDissolveDelayLTCurrent();
       }
     }
     if (dissolveDelay.lt(MIN_DISSOLVE_DELAY)) {
-      errors.dissolveDelay = new DissolveDelayLTMin();
+      errors.dissolveDelay = new ICPDissolveDelayLTMin(undefined, {
+        min: "182.5 days",
+      });
     } else if (dissolveDelay.gt(MAX_DISSOLVE_DELAY)) {
-      errors.dissolveDelay = new DissolveDelayGTMax();
+      errors.dissolveDelay = new ICPDissolveDelayGTMax(undefined, {
+        max: "8 years",
+      });
     }
   }
 
@@ -71,7 +75,7 @@ export const getTransactionStatus: AccountBridge<
       neuron => neuron.id[0]?.id.toString() === neuronId,
     );
     if (!neuron) {
-      errors.neuron = new NeuronNotFound();
+      errors.neuron = new ICPNeuronNotFound();
     } else {
       if (BigNumber(neuron.cached_neuron_stake_e8s.toString()).lt(amount)) {
         errors.splitNeuron = new NotEnoughBalance();

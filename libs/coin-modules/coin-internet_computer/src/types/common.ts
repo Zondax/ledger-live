@@ -26,13 +26,15 @@ export interface ICPAccountRaw extends AccountRaw {
 }
 
 export type ICPTransactionType =
+  // Send
+  | "increase_stake"
+  | "send"
+  | "create_neuron"
+  // Neuron
   | "start_dissolving"
   | "stop_dissolving"
   | "list_neurons"
-  | "increase_stake"
-  | "create_neuron"
   | "disburse"
-  | "send"
   | "spawn_neuron"
   | "stake_maturity"
   | "refresh_voting_power"

@@ -31,7 +31,7 @@ export function StepFollowSelectTopics({ setFollowTopic, transitionTo }: StepPro
           List of available topics to follow
         </Text>
         <Box style={{ gap: 10 }}>
-          {Object.entries(KNOWN_TOPICS).map(([key, value]) => (
+          {Object.entries(KNOWN_TOPICS).map(([key]) => (
             <Box
               key={key}
               style={{
@@ -43,7 +43,7 @@ export function StepFollowSelectTopics({ setFollowTopic, transitionTo }: StepPro
               <CollapsibleCard
                 header={
                   <Text ff="Inter|Regular" fontSize={14}>
-                    {value}
+                    {t(`internetComputer.manageNeuron.followTopic.${key}.title`)}
                   </Text>
                 }
                 width="100%"

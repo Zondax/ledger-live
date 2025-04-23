@@ -10,6 +10,7 @@ import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import List from "../../components/List";
 import { StepProps } from "../types";
 import { ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/types";
+import { getSecondsTillVotingPowerExpires } from "@ledgerhq/live-common/families/internet_computer/utils";
 
 interface ContainerProps {
   shouldSpace?: boolean;
@@ -88,9 +89,7 @@ export default function StepListNeuron({
         <List
           neurons={{
             fullNeurons: neurons.fullNeurons.sort(
-              (a, b) =>
-                Number(a.neuronInfo.voting_power_refreshed_timestamp_seconds[0]) -
-                Number(b.neuronInfo.voting_power_refreshed_timestamp_seconds[0]),
+              (a, b) => getSecondsTillVotingPowerExpires(a) - getSecondsTillVotingPowerExpires(b),
             ),
             lastUpdatedMSecs: neurons.lastUpdatedMSecs,
           }}

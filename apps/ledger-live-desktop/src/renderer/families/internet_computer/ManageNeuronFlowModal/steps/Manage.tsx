@@ -9,12 +9,16 @@ import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField"
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 // import { closeModal, openModal } from "~/renderer/actions/modals";
 import BigNumber from "bignumber.js";
+import { useTranslation } from "react-i18next";
 import Text from "~/renderer/components/Text";
-import { Divider } from "@ledgerhq/react-ui";
+import { Divider, Link } from "@ledgerhq/react-ui";
 import {
   getNeuronDissolveDuration,
-  nowInSeconds,
   secondsToDurationString,
+  getNeuronVotingPower,
+  getNeuronAgeBonus,
+  getNeuronDissolveDelayBonus,
+  getSecondsTillVotingPowerExpires,
 } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { closeModal } from "~/renderer/actions/modals";
 import {
@@ -28,6 +32,7 @@ import {
   KNOWN_TOPICS,
   KNOWN_NEURON_IDS,
 } from "@ledgerhq/live-common/families/internet_computer/consts";
+import WarnBox from "~/renderer/components/WarnBox";
 
 const Container = styled(Box).attrs(() => ({
   alignItems: "center",
@@ -54,16 +59,16 @@ export default function StepManage({
   openModal,
   setLastManageAction,
 }: StepProps) {
+  const { t } = useTranslation();
   const currencyId = account.currency.id;
   const dispatch = useDispatch();
   const unit = account.currency.units[0];
   const neuron = neurons.fullNeurons[manageNeuronIndex];
   const neuronId = neuron.id[0]?.id.toString() ?? "";
-  const votingPowerRefreshedSeconds =
-    neuron.neuronInfo.voting_power_refreshed_timestamp_seconds[0]?.toString() ?? "0";
-  const votingPowerRefreshedSecondsDiff = BigNumber(votingPowerRefreshedSeconds).minus(
-    nowInSeconds(),
-  );
+  const secondsTillVotingPowerExpires = BigNumber(getSecondsTillVotingPowerExpires(neuron));
+  const votingPower = getNeuronVotingPower(neuron);
+  const ageBonus = getNeuronAgeBonus(neuron);
+  const dissolveDelayBonus = getNeuronDissolveDelayBonus(neuron);
 
   const onClickIncreaseStake = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -228,11 +233,11 @@ export default function StepManage({
                 Voting Power:
               </Text>
               <Text ff="Inter|SemiBold" fontSize={4}>
-                <FormattedVal
-                  val={Number(neuron.neuronInfo.voting_power.toString())}
-                  unit={unit}
-                  color="palette.text.shade100"
-                />
+                {votingPower > 0 ? (
+                  <FormattedVal val={votingPower} unit={unit} color="palette.text.shade100" />
+                ) : (
+                  "No voting power"
+                )}
               </Text>
             </Box>
           </Box>
@@ -244,12 +249,13 @@ export default function StepManage({
         <ManageModalSection
           title="Voting Power"
           value={
-            <FormattedVal
-              color="palette.text.shade100"
-              val={Number(neuron.neuronInfo.voting_power.toString())}
-              unit={unit}
-            />
+            votingPower > 0 ? (
+              <FormattedVal color="palette.text.shade100" val={votingPower} unit={unit} />
+            ) : (
+              "None"
+            )
           }
+          titleTooltip="The dissolve delay must be at least 6 months for the neuron to have voting power."
         >
           <ManageModalElementWithAction
             label="ICP Staked"
@@ -269,8 +275,7 @@ export default function StepManage({
             }
           />
           <ManageModalElementWithAction
-            // TODO: add age bonus, need helper methods ageMultiplier
-            label={"Age bonus: +0%"}
+            label={`Age bonus: +${ageBonus}%`}
             valueTooltip="Your neuron can be locked, unlocked or dissolving. In a locked state, it is accruing age bonus, while its dissolve delay stays constant. If the neuron is in a dissolving state, its age bonus is set to 0, while dissolve delay decreases with time. After dissolve delay reaches 0, the neuron is unlocked, and ICP held in it can be sent to any ICP account."
             action={[
               {
@@ -289,8 +294,7 @@ export default function StepManage({
             value={neuron.dissolveState}
           />
           <ManageModalElementWithAction
-            // TODO: add dissolve delay bonus, need helper methods dissolveDelayMultiplier, bonusMultiplier
-            label={"Dissolve delay bonus: +0%"}
+            label={`Dissolve delay bonus: +${dissolveDelayBonus}%`}
             valueTooltip="Dissolve delay is the minimum amount of time you have to wait for the neuron to unlock, and ICP to be available again. If your neuron is dissolving, your ICP will be available in 7 years, 365 days."
             action={[
               {
@@ -301,9 +305,10 @@ export default function StepManage({
             value={`Dissolve Delay: ${neuron.dissolveState === "Unlocked" ? "0" : getNeuronDissolveDuration(neuron)}`}
           />
           <ManageModalElementWithAction
+            hidden={votingPower === 0}
             label={
-              votingPowerRefreshedSecondsDiff.gt(0)
-                ? `${secondsToDurationString(votingPowerRefreshedSecondsDiff.toString())} to confirm following`
+              secondsTillVotingPowerExpires.gt(0)
+                ? `${secondsToDurationString(secondsTillVotingPowerExpires.toString())} to confirm following`
                 : "Confirm following"
             }
             valueTooltip="ICP neurons that are inactive for 6 months start missing voting rewards. To avoid missing rewards, vote manually, edit, or confirm your following."
@@ -314,7 +319,7 @@ export default function StepManage({
               },
             ]}
             // TODO: get correct status
-            value={votingPowerRefreshedSecondsDiff.gt(0) ? "Active neuron" : "Inactive neuron"}
+            value={secondsTillVotingPowerExpires.gt(0) ? "Active neuron" : "Inactive neuron"}
           />
         </ManageModalSection>
 
@@ -444,6 +449,16 @@ export default function StepManage({
         <Divider my={6} width={"100%"} />
 
         {/* Following Section */}
+        {neuron.followees.length === 0 && (
+          <WarnBox>
+            <Text ff="Inter|SemiBold" fontSize={14}>
+              Without followees you might not get rewards. To get rewards, neurons must vote
+              directly (for example, with{" "}
+              <Link href="https://nns.ic0.app/proposals/">NNS Dapp</Link>) or follow neurons that
+              do.
+            </Text>
+          </WarnBox>
+        )}
         <ManageModalSection
           title="Following"
           titleTooltip="Following allows you to delegate your votes to another neuron holder. You still earn rewards if you delegate your voting rights. You can change your following at any time."
@@ -452,7 +467,13 @@ export default function StepManage({
             return (
               <ManageModalElement
                 key={`followees-${neuronId}`}
-                value={`${topics.map(topic => KNOWN_TOPICS[topic] ?? topic).join(", ")}`}
+                value={`${topics
+                  .map(topic =>
+                    KNOWN_TOPICS[topic]
+                      ? t(`internetComputer.manageNeuron.followTopic.${topic}.title`)
+                      : topic,
+                  )
+                  .join(", ")}`}
                 copiableLabel
                 label={KNOWN_NEURON_IDS[neuronId] ?? neuronId}
               />

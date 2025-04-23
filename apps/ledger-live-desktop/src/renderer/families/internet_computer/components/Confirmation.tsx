@@ -1,8 +1,9 @@
-import React, { useCallback } from "react";
+import React from "react";
 import styled from "styled-components";
 import { Box, Text, Flex } from "@ledgerhq/react-ui";
 import CheckCircle from "~/renderer/icons/CheckCircle";
 import TrackPage from "~/renderer/analytics/TrackPage";
+import { useTranslation } from "react-i18next";
 import { SyncOneAccountOnMount } from "@ledgerhq/live-common/bridge/react/index";
 import { colors } from "~/renderer/styles/theme";
 import ErrorDisplay from "~/renderer/components/ErrorDisplay";
@@ -42,14 +43,8 @@ export default function StepConfirmation({
   transitionTo,
   error,
 }: Props) {
+  const { t } = useTranslation();
   const currencyId = account.currency.id;
-  const getActionText = useCallback(() => {
-    if (lastManageAction === "increase_stake") {
-      return "Increasing Stake";
-    }
-    return lastManageAction?.replace(/_/g, " ").toLowerCase();
-  }, [lastManageAction]);
-
   if (error) {
     return <ErrorDisplay error={error} />;
   }
@@ -78,7 +73,7 @@ export default function StepConfirmation({
         <SuccessIcon size={64} />
 
         <ActionText variant="large" mt={6} mb={2} color={colors.positiveGreen}>
-          {getActionText()} was successful
+          {t(`internetComputer.manageNeuron.actions.${lastManageAction}`)} was successful
         </ActionText>
 
         <Text variant="paragraph" color="neutral.c70" textAlign="center">

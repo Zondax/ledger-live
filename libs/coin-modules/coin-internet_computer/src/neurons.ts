@@ -224,7 +224,7 @@ export const neuronVotingPower = ({ neuron }: { neuron: NNSNeuron }): BigNumber 
   const cachedNeuronStakeE8s = BigInt(neuron.cached_neuron_stake_e8s);
   const stakedMaturityE8s = BigInt(neuron.staked_maturity_e8s_equivalent?.[0] ?? 0);
   const stakeE8s = cachedNeuronStakeE8s + stakedMaturityE8s;
-  const votingPowerBigInt = votingPower({
+  const votingPowerBigInt = calculateVotingPower({
     stakeE8s,
     dissolveDelay,
     ageSeconds: BigInt(neuron.aging_since_timestamp_seconds),
@@ -274,7 +274,7 @@ interface VotingPowerParams {
  *
  * It might be useful to use it for SNS neurons.
  */
-export const votingPower = ({
+export const calculateVotingPower = ({
   stakeE8s,
   dissolveDelay,
   ageSeconds,

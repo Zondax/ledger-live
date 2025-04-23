@@ -192,6 +192,7 @@ type ManageModalElementWithIconProps = {
   }[];
   icon?: React.ReactNode;
   copiableLabel?: boolean;
+  hidden?: boolean;
 };
 
 export function ManageModalElementWithAction({
@@ -202,7 +203,12 @@ export function ManageModalElementWithAction({
   copiableLabel,
   action,
   icon,
+  hidden,
 }: ManageModalElementWithIconProps) {
+  if (hidden) {
+    return null;
+  }
+
   return (
     <Element>
       <Box style={{ flexDirection: "row", gap: 8 }}>

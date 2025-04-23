@@ -16,18 +16,30 @@ export async function validateAddress(address: string): Promise<{ isValid: boole
       throw new Error("Invalid address, account identifier could not be created.");
     }
     return { isValid: true };
-  } catch (e: any) {
-    log("error", e.message ?? "Failed to validate address");
+  } catch (e) {
+    if (e instanceof Error) {
+      log("error", e.message ?? "Failed to validate address");
+    } else {
+      log("error", "Failed to validate address");
+    }
     return { isValid: false };
   }
 }
 
 export function validateMemo(memo?: string): { isValid: boolean } {
-  const res = BigInt(memo ?? 0);
+  try {
+    const res = BigInt(memo ?? 0);
 
-  if (res < 0) {
+    if (res < 0) {
+      return { isValid: false };
+    }
+    return { isValid: true };
+  } catch (e) {
+    if (e instanceof Error) {
+      log("error", e.message ?? "Failed to validate memo");
+    } else {
+      log("error", "Failed to validate memo");
+    }
     return { isValid: false };
   }
-
-  return { isValid: true };
 }

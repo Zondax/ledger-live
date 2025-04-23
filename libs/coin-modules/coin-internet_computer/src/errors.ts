@@ -13,19 +13,19 @@ export const NotEnoughTransferAmount = createCustomErrorClass("NotEnoughTransfer
 /*
  * When the dissolve delay is negative
  */
-export const DissolveDelayLTMin = createCustomErrorClass("DissolveDelayLTMin");
+export const ICPDissolveDelayLTMin = createCustomErrorClass("ICPDissolveDelayLTMin");
 
 /*
  * When the dissolve delay is greater than the maximum
  */
-export const DissolveDelayGTMax = createCustomErrorClass("DissolveDelayGTMax");
+export const ICPDissolveDelayGTMax = createCustomErrorClass("ICPDissolveDelayGTMax");
 
 /*
  * When the dissolve delay is less than the current dissolve delay
  */
-export const DissolveDelayLTCurrent = createCustomErrorClass("DissolveDelayLTCurrent");
+export const ICPDissolveDelayLTCurrent = createCustomErrorClass("ICPDissolveDelayLTCurrent");
 
 /*
  * When the neuron is not found
  */
-export const NeuronNotFound = createCustomErrorClass("NeuronNotFound");
+export const ICPNeuronNotFound = createCustomErrorClass("ICPNeuronNotFound");

@@ -99,6 +99,22 @@ export const pollForReadState = async (payload: Buffer, canisterId: string, requ
     );
 
     switch (status) {
+      case "rejected":
+        {
+          const rejectCode = new Uint8Array(
+            lookupResultToBuffer(certificate.lookup([...path, "reject_code"]))!,
+          )[0];
+          const rejectMessage = new TextDecoder().decode(
+            lookupResultToBuffer(certificate.lookup([...path, "reject_message"]))!,
+          );
+          const error_code_buf = lookupResultToBuffer(certificate.lookup([...path, "error_code"]));
+          const error_code = error_code_buf ? new TextDecoder().decode(error_code_buf) : undefined;
+
+          console.log("rejectCode", rejectCode);
+          console.log("rejectMessage", rejectMessage);
+          console.log("error_code", error_code);
+        }
+        break;
       case "replied":
         reply = lookupResultToBuffer(certificate.lookup([...path, "reply"]));
         // console.log("reply: ", reply);

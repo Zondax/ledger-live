@@ -14,7 +14,7 @@ import {
 import {
   getMinDissolveDelay,
   secondsToDurationString,
-  votingPower,
+  calculateVotingPower,
 } from "@ledgerhq/live-common/families/internet_computer/utils";
 
 export function SetDissolveDelay({
@@ -144,7 +144,7 @@ export function SetDissolveDelay({
           <Box alignItems="center">
             <Text ff="Inter|SemiBold" fontSize={14} color="palette.text.shade60">
               {dissolveDelay
-                ? votingPower({
+                ? calculateVotingPower({
                     stakeE8s: neuron.cached_neuron_stake_e8s,
                     dissolveDelay: BigInt(
                       BigNumber(dissolveDelay).times(SECONDS_IN_DAY).integerValue().toString(),

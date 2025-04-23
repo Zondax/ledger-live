@@ -6623,6 +6623,18 @@
     },
     "NotEnoughTransferAmount": {
       "title": "The minimum amount for {{purpose}} is {{amount}}."
+    },
+    "ICPDissolveDelayLTMin": {
+      "title": "The dissolve delay must be at least {{min}}."
+    },
+    "ICPDissolveDelayGTMax": {
+      "title": "The dissolve delay must be less than {{max}}."
+    },
+    "ICPDissolveDelayLTCurrent": {
+      "title": "The new dissolve delay must be greater than the current dissolve delay."
+    },
+    "ICPNeuronNotFound": {
+      "title": "The neuron was not found."
     }
   },
   "cryptoOrg": {
@@ -7101,14 +7113,97 @@
   },
   "internetComputer": {
     "manageNeuron": {
+      "actions": {
+        "increase_stake": "Increasing Stake",
+        "create_neuron": "Creating Neuron",
+        "start_dissolving": "Starting Dissolve",
+        "stop_dissolving": "Stopping Dissolve",
+        "list_neurons": "Listing Neurons",
+        "disburse": "Disbursing Neuron",
+        "spawn_neuron": "Spawning Neuron",
+        "stake_maturity": "Staking Maturity",
+        "refresh_voting_power": "Refreshing Voting Power",
+        "increase_dissolve_delay": "Increasing Dissolve Delay",
+        "auto_stake_maturity": "Auto Staking Maturity",
+        "spawn_neuron_from_maturity": "Spawning Neuron from Maturity",
+        "set_auto_stake_maturity": "Setting Auto Stake Maturity",
+        "set_dissolve_delay": "Setting Dissolve Delay",
+        "remove_hot_key": "Removing Hot Key",
+        "follow": "Following Neurons",
+        "split_neuron": "Splitting Neuron"
+      },
       "followTopic": {
         "0": {
           "title": "All Except Governance, and SNS & Neurons' Fund",
           "description": "Follow neurons on all proposal topics except the governance topic, and SNS & Neurons' Fund."
         },
+        "1": {
+          "title": "Neuron Management",
+          "description": ""
+        },
+        "2": {
+          "title": "Exchange Rate",
+          "description": "All proposals that provide “real time” information about the value of ICP, as measured by an IMF SDR, which allows the NNS to convert ICP to cycles (which power computation) at a rate which keeps their real world cost constant."
+        },
+        "3": {
+          "title": "Network Economics",
+          "description": "Proposals that administer network economics, for example, determining what rewards should be paid to node operators."
+        },
         "4": {
-          "description": "All proposals that administer governance, for example to freeze malicious canisters that are harming the network.",
-          "title": "Governance"
+          "title": "Governance",
+          "description": "All proposals that administer governance, for example to freeze malicious canisters that are harming the network."
+        },
+        "5": {
+          "title": "Node Admin",
+          "description": "All proposals that administer node machines somehow, including, but not limited to, upgrading or configuring the OS, upgrading or configuring the virtual machine framework and upgrading or configuring the node replica software."
+        },
+        "6": {
+          "title": "Participant Management",
+          "description": "All proposals that administer network participants, for example, granting and revoking DCIDs (data center identities) or NOIDs (node operator identities)."
+        },
+        "7": {
+          "title": "Subnet Management",
+          "description": "All proposals that administer network subnets, for example creating new subnets, adding and removing subnet nodes, and splitting subnets."
+        },
+        "8": {
+          "title": "Protocol Canister Management",
+          "description": "All proposals to manage protocol canisters, which are considered part of the ICP protocol and are essential for its proper functioning."
+        },
+        "9": {
+          "title": "KYC",
+          "description": "Proposals that update KYC information for regulatory purposes, for example during the initial Genesis distribution of ICP in the form of neurons."
+        },
+        "10": {
+          "title": "Node Provider Rewards",
+          "description": "Proposals that reward node providers"
+        },
+        "12": {
+          "title": "IC OS Version Deployment",
+          "description": "Proposals handling updates of a subnet's replica version"
+        },
+        "13": {
+          "title": "IC OS Version Election",
+          "description": "Proposals dealing with blessing and retirement of replica versions"
+        },
+        "14": {
+          "title": "SNS & Neurons' Fund",
+          "description": "Proposals related to SNS and Neurons' Fund"
+        },
+        "15": {
+          "title": "API Boundary Node Management",
+          "description": "Proposals related to the management of API boundary nodes"
+        },
+        "16": {
+          "title": "Subnet Rental",
+          "description": "All proposals related to renting a subnet, for example a subnet rental request."
+        },
+        "17": {
+          "title": "Protocol Canister Management",
+          "description": "All proposals to manage protocol canisters, which are considered part of the ICP protocol and are essential for its proper functioning."
+        },
+        "18": {
+          "title": "Service Nervous System Management",
+          "description": "All proposals to manage the canisters of service nervous systems (SNS), including upgrading relevant canisters and managing SNS framework canister WASMs through SNS-W."
         }
       }
     }

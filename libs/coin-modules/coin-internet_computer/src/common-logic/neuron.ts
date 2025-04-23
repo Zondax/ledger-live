@@ -19,12 +19,13 @@ const votingPowerNeedsRefresh = (
 } => {
   let minDays = Number.MAX_SAFE_INTEGER;
   let minMinutes = Number.MAX_SAFE_INTEGER;
-  for (const neuron of account.neurons.fullNeurons) {
-    const votingPowerNextRefresh = fromNullable(
-      neuron.neuronInfo.voting_power_refreshed_timestamp_seconds,
-    );
-    if (!votingPowerNextRefresh) continue;
-    if (votingPowerNextRefresh < nowInSeconds()) {
+  const filteredNeurons = account.neurons.fullNeurons.filter(
+    neuron => getNeuronVotingPower(neuron) > 0,
+  );
+
+  for (const neuron of filteredNeurons) {
+    const secondsTillVotingPowerExpires = getSecondsTillVotingPowerExpires(neuron);
+    if (secondsTillVotingPowerExpires <= 0) {
       return {
         needsRefresh: true,
         minDays: 0,
@@ -32,7 +33,7 @@ const votingPowerNeedsRefresh = (
       };
     }
 
-    const { days, minutes } = getTimeUntil(Number(votingPowerNextRefresh));
+    const { days, minutes } = getTimeUntil(secondsTillVotingPowerExpires);
     minDays = Math.min(minDays, days);
     minMinutes = Math.min(minMinutes, minutes);
   }
@@ -72,7 +73,7 @@ export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
 
   // Check Last Time Neurons Sync (Priority 2)
   const lastSync = account.neurons.lastUpdatedMSecs;
-  const { days, minutes } = getTimeUntil(lastSync);
+  const { days, minutes } = getTimeUntil(lastSync / 1000);
   if (lastSync && days > LAST_SYNC_THRESHOLD_IN_DAYS) {
     return {
       state: "sync_neurons",
@@ -85,7 +86,7 @@ export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
 
   // Check Lock Neurons (Priority 3)
   const hasUnlockedNeurons = account.neurons.fullNeurons.some(
-    neuron => neuron.neuronInfo.dissolve_delay_seconds <= SECONDS_IN_HALF_YEAR,
+    neuron => neuron.dissolveState === "Unlocked",
   );
   if (hasUnlockedNeurons) {
     return {
@@ -119,4 +120,43 @@ export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
 export const getMinDissolveDelay = (neuron: ICPNeuron) => {
   const currentDissolveDelay = getNeuronDissolveDurationSeconds(neuron);
   return Math.max(MIN_DISSOLVE_DELAY, Number(currentDissolveDelay) + SECONDS_IN_HOUR);
+};
+
+export const getSecondsTillVotingPowerExpires = (neuron: ICPNeuron) => {
+  const votingPowerLastRefresh = fromNullable(
+    neuron.neuronInfo.voting_power_refreshed_timestamp_seconds,
+  );
+
+  if (!votingPowerLastRefresh) {
+    return 0;
+  }
+
+  const timeNow = nowInSeconds();
+  const timeSinceLastRefresh = timeNow - Number(votingPowerLastRefresh);
+
+  return SECONDS_IN_HALF_YEAR - timeSinceLastRefresh;
+};
+
+export const getNeuronVotingPower = (neuron: ICPNeuron) => {
+  if (getNeuronDissolveDurationSeconds(neuron) < SECONDS_IN_HALF_YEAR) {
+    return 0;
+  }
+
+  return Number(neuron.neuronInfo.voting_power);
+};
+
+export const getNeuronAgeBonus = (neuron: ICPNeuron) => {
+  if (getNeuronDissolveDurationSeconds(neuron) < SECONDS_IN_HALF_YEAR) {
+    return 0;
+  }
+
+  return 0;
+};
+
+export const getNeuronDissolveDelayBonus = (neuron: ICPNeuron) => {
+  if (getNeuronDissolveDurationSeconds(neuron) < SECONDS_IN_HALF_YEAR) {
+    return 0;
+  }
+
+  return 0;
 };
