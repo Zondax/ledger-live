@@ -45,7 +45,8 @@ export type ICPTransactionType =
   | "set_dissolve_delay"
   | "remove_hot_key"
   | "follow"
-  | "split_neuron";
+  | "split_neuron"
+  | "add_hot_key";
 
 export type Transaction = TransactionCommon & {
   family: FamilyType;
@@ -60,6 +61,7 @@ export type Transaction = TransactionCommon & {
   additionalDissolveDelay?: string;
   autoStakeMaturity?: boolean;
   hotKeyToRemove?: string;
+  hotKeyToAdd?: string;
   followTopic?: keyof typeof KNOWN_TOPICS;
   followeesIds?: string[];
 };
@@ -77,6 +79,7 @@ export type TransactionRaw = TransactionCommonRaw & {
   additionalDissolveDelay?: string;
   autoStakeMaturity?: boolean;
   hotKeyToRemove?: string;
+  hotKeyToAdd?: string;
   followTopic?: keyof typeof KNOWN_TOPICS;
   followeesIds?: string[];
 };

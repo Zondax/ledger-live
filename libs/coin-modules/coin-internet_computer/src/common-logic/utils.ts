@@ -56,6 +56,8 @@ export const methodToString = (method: Transaction["type"]): string => {
       return "Split Neuron";
     case "remove_hot_key":
       return "Remove HotKey";
+    case "add_hot_key":
+      return "Add HotKey";
     case "follow":
       return "Follow";
     default:

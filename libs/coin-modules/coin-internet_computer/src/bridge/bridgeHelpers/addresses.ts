@@ -1,6 +1,7 @@
 import { log } from "@ledgerhq/logs";
 import { Account } from "@ledgerhq/types-live";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
+import { Principal } from "@dfinity/principal";
 
 export const getAddress = (
   a: Account,
@@ -9,6 +10,14 @@ export const getAddress = (
   derivationPath: string;
 } => ({ address: a.freshAddress, derivationPath: a.freshAddressPath });
 
+export const validatePrincipal = (principal: string): { isValid: boolean } => {
+  try {
+    Principal.fromText(principal);
+    return { isValid: true };
+  } catch (e) {
+    return { isValid: false };
+  }
+};
 export async function validateAddress(address: string): Promise<{ isValid: boolean }> {
   try {
     const accId = AccountIdentifier.fromHex(address);

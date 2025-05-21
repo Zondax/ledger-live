@@ -5778,6 +5778,9 @@
       "title": "Sorry, could not reset",
       "description": "Please try again or contact Ledger Support if the problem persists."
     },
+    "HotKeyAlreadyExists": {
+      "title": "The hot key already exists"
+    },
     "LanguageInstallRefusedOnDevice": {
       "title": "Language restore\ncancelled on device",
       "description": "If this was a mistake, retry now."
@@ -5888,6 +5891,9 @@
     "ImpossibleToCalculateAmountAndFees": {
       "title": "Impossible to calculate amount and fees",
       "description": "Impossible to calculate amount and fees"
+    },
+    "InvalidHotKey": {
+      "title": "The principal ID is invalid"
     },
     "InvalidRecipientForTokenTransfer": {
       "title": "Invalid recipient for token transfer, supported account types for token transfer: [f0, f4, 0x]"
@@ -7121,6 +7127,7 @@
         "list_neurons": "Listing Neurons",
         "disburse": "Disbursing Neuron",
         "spawn_neuron": "Spawning Neuron",
+        "add_hot_key": "Adding Hot Key",
         "stake_maturity": "Staking Maturity",
         "refresh_voting_power": "Refreshing Voting Power",
         "increase_dissolve_delay": "Increasing Dissolve Delay",

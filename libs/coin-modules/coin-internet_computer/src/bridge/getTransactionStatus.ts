@@ -7,7 +7,12 @@ import {
 } from "@ledgerhq/errors";
 import BigNumber from "bignumber.js";
 import { AccountBridge } from "@ledgerhq/types-live";
-import { getAddress, validateAddress, validateMemo } from "../bridge/bridgeHelpers/addresses";
+import {
+  getAddress,
+  validateAddress,
+  validateMemo,
+  validatePrincipal,
+} from "../bridge/bridgeHelpers/addresses";
 import {
   ICPAccount,
   ICPAccountRaw,
@@ -22,6 +27,8 @@ import {
   InvalidMemoICP,
   ICPNeuronNotFound,
   NotEnoughTransferAmount,
+  InvalidHotKey,
+  HotKeyAlreadyExists,
 } from "../errors";
 import {
   ICP_FEES,
@@ -45,12 +52,13 @@ export const getTransactionStatus: AccountBridge<
   const { address } = getAddress(account);
   const { recipient, useAllAmount, type, neuronId, dissolveDelay: dissolveDelayStr } = transaction;
   let { amount } = transaction;
+  const neuron = account.neurons.fullNeurons.find(
+    neuron => neuron.id[0]?.id.toString() === neuronId,
+  );
 
   if (type === "set_dissolve_delay" && !!dissolveDelayStr) {
     const dissolveDelay = new BigNumber(dissolveDelayStr);
-    const neuron = account.neurons.fullNeurons.find(
-      neuron => neuron.id[0]?.id.toString() === neuronId,
-    );
+
     if (!neuron) {
       errors.neuron = new ICPNeuronNotFound();
     } else {
@@ -71,20 +79,17 @@ export const getTransactionStatus: AccountBridge<
   }
 
   if (type === "split_neuron") {
-    const neuron = account.neurons.fullNeurons.find(
-      neuron => neuron.id[0]?.id.toString() === neuronId,
-    );
     if (!neuron) {
       errors.neuron = new ICPNeuronNotFound();
     } else {
-      if (BigNumber(neuron.cached_neuron_stake_e8s.toString()).lt(amount)) {
+      if (BigNumber(neuron.cached_neuron_stake_e8s.toString()).lt(amount.plus(ICP_FEES))) {
         errors.splitNeuron = new NotEnoughBalance();
       }
-      if (BigNumber(amount).lte(ICP_FEES)) {
+      if (BigNumber(amount).lte(ICP_MIN_STAKING_AMOUNT)) {
         errors.splitNeuron = new NotEnoughTransferAmount("", {
-          purpose: "split",
+          purpose: "neuron split",
           amount:
-            BigNumber(ICP_FEES)
+            BigNumber(ICP_MIN_STAKING_AMOUNT)
               .div(10 ** account.currency.units[0].magnitude)
               .toString() +
             " " +
@@ -137,6 +142,16 @@ export const getTransactionStatus: AccountBridge<
     warnings.staking = new Error(
       "This operation will transfer the amount to increase the stake of an existing neuron.",
     );
+  }
+
+  if (transaction.type === "add_hot_key" && transaction.hotKeyToAdd) {
+    if (!validatePrincipal(transaction.hotKeyToAdd).isValid) {
+      errors.addHotKey = new InvalidHotKey();
+    }
+
+    if (neuron?.hot_keys.map(hotKey => hotKey.toString()).includes(transaction.hotKeyToAdd)) {
+      errors.addHotKey = new HotKeyAlreadyExists();
+    }
   }
 
   // This is the worst case scenario (the tx won't cost more than this value)

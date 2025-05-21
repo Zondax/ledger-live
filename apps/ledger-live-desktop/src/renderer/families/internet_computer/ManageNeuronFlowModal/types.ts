@@ -21,7 +21,8 @@ export type StepId =
   | "selectFollowees"
   | "setDissolveDelay"
   | "stakeMaturity"
-  | "splitNeuron";
+  | "splitNeuron"
+  | "addHotKey";
 export type StepProps = {
   lastManageAction?: ICPTransactionType;
   setLastManageAction: (a: ICPTransactionType) => void;

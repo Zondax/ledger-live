@@ -8,6 +8,7 @@ import { formatCurrencyUnit } from "@ledgerhq/live-common/currencies/index";
 import { BigNumber } from "bignumber.js";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import TrackPage from "~/renderer/analytics/TrackPage";
+import { ICP_FEES } from "@ledgerhq/live-common/families/internet_computer/consts";
 
 export function SplitNeuron({
   manageNeuronIndex,
@@ -42,7 +43,12 @@ export function SplitNeuron({
   );
 
   const handleMax = useCallback(() => {
-    onChangeAmount(neuronBalance.div(10 ** unit.magnitude).toString());
+    onChangeAmount(
+      neuronBalance
+        .minus(ICP_FEES)
+        .div(10 ** unit.magnitude)
+        .toString(),
+    );
   }, [neuronBalance, onChangeAmount, unit.magnitude]);
 
   const onClickConfirmSplit = useCallback(() => {
@@ -131,11 +137,11 @@ export function SplitNeuron({
 
       <Box mb={24}>
         <Box>
-          <Text ff="Inter|Regular" fontSize={14} color="palette.text.shade80">
-            Transaction Fee
-          </Text>
-          <Text ff="Inter|Regular" fontSize={14} color="palette.text.shade80">
-            {formattedFee}
+          <Text ff="Inter|Regular" fontSize={12} color="palette.text.shade80">
+            Transaction Fee:{" "}
+            <Text ff="Inter|Bold" fontSize={12} color="palette.text.shade80">
+              {formattedFee}
+            </Text>
           </Text>
         </Box>
       </Box>

@@ -123,6 +123,12 @@ interface RemoveHotKeyConfig {
   };
 }
 
+interface AddHotKeyConfig {
+  AddHotKey: {
+    new_hot_key: [Principal];
+  };
+}
+
 interface ChangeAutoStakeMaturityConfig {
   ChangeAutoStakeMaturity: {
     requested_setting_for_auto_stake_maturity: boolean;
@@ -137,7 +143,8 @@ interface ConfigureOperationCommand {
       | IncreaseDissolveDelayConfig
       | SetDissolveDelayConfig
       | ChangeAutoStakeMaturityConfig
-      | RemoveHotKeyConfig,
+      | RemoveHotKeyConfig
+      | AddHotKeyConfig,
     ];
   };
 }
@@ -199,7 +206,8 @@ const createCommandConfigOperation = (
     | IncreaseDissolveDelayConfig
     | SetDissolveDelayConfig
     | ChangeAutoStakeMaturityConfig
-    | RemoveHotKeyConfig,
+    | RemoveHotKeyConfig
+    | AddHotKeyConfig,
 ): ConfigureOperationCommand => {
   return {
     Configure: {
@@ -231,6 +239,7 @@ const createUnsignedNeuronCommandTransaction = (
     additionalDissolveDelay,
     autoStakeMaturity,
     hotKeyToRemove,
+    hotKeyToAdd,
     followTopic,
     followeesIds,
     percentageToStake,
@@ -346,6 +355,17 @@ const createUnsignedNeuronCommandTransaction = (
       rawCommand.command = [
         createCommandConfigOperation({
           RemoveHotKey: { hot_key_to_remove: [Principal.fromText(hotKeyToRemove)] },
+        }),
+      ];
+      break;
+    case "add_hot_key":
+      invariant(
+        hotKeyToAdd,
+        "[ICP](createUnsignedNeuronCommandTransaction) Hot key to add is required",
+      );
+      rawCommand.command = [
+        createCommandConfigOperation({
+          AddHotKey: { new_hot_key: [Principal.fromText(hotKeyToAdd)] },
         }),
       ];
       break;

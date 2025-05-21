@@ -10,6 +10,8 @@ import { StepFollowSelectTopics } from "./FollowSelectTopics";
 import { SetDissolveDelay } from "./SetDissolveDelay";
 import { StakeMaturity } from "./StakeMaturity";
 import { SplitNeuron } from "./SplitNeuron";
+import { AddHotKey } from "./AddHotKey";
+
 export function useSteps(): St[] {
   const { t } = useTranslation();
   return useMemo<St[]>(
@@ -65,12 +67,22 @@ export function useSteps(): St[] {
           transitionTo("followTopic");
         },
         excludeFromBreadcrumb: true,
-        noScroll: true,
+        noScroll: false,
       },
       {
         id: "splitNeuron",
         label: "Split neuron",
         component: SplitNeuron,
+        onBack: ({ transitionTo }: StepProps) => {
+          transitionTo("manage");
+        },
+        excludeFromBreadcrumb: true,
+        noScroll: true,
+      },
+      {
+        id: "addHotKey",
+        label: "Add hot key",
+        component: AddHotKey,
         onBack: ({ transitionTo }: StepProps) => {
           transitionTo("manage");
         },

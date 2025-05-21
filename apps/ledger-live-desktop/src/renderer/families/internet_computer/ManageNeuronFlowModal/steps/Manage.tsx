@@ -19,6 +19,9 @@ import {
   getNeuronAgeBonus,
   getNeuronDissolveDelayBonus,
   getSecondsTillVotingPowerExpires,
+  canStakeMaturity,
+  canSpawnNeuron,
+  canSplitNeuron,
 } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { closeModal } from "~/renderer/actions/modals";
 import {
@@ -166,6 +169,12 @@ export default function StepManage({
     const action = "split_neuron";
     setLastManageAction(action);
     transitionTo("splitNeuron");
+  }, [transitionTo, setLastManageAction]);
+
+  const onClickAddHotKey = useCallback(() => {
+    const action = "add_hot_key";
+    setLastManageAction(action);
+    transitionTo("addHotKey");
   }, [transitionTo, setLastManageAction]);
 
   const onClickRemoveHotKey = useCallback(
@@ -337,7 +346,6 @@ export default function StepManage({
                 Number(neuron.maturity_e8s_equivalent)
               }
               unit={unit}
-              showCode
             />
           }
         >
@@ -349,7 +357,6 @@ export default function StepManage({
                 color="palette.text.shade100"
                 val={Number(neuron.staked_maturity_e8s_equivalent)}
                 unit={unit}
-                showCode
               />
             }
           />
@@ -360,12 +367,12 @@ export default function StepManage({
               {
                 label: "Stake",
                 onClick: () => transitionTo("stakeMaturity"),
-                disabled: neuron.maturity_e8s_equivalent === BigInt(0),
+                disabled: !canStakeMaturity(neuron),
               },
               {
                 label: "Spawn Neuron",
                 onClick: onClickSpawnNeuron,
-                disabled: neuron.maturity_e8s_equivalent < BigInt(1 * 10 ** unit.magnitude),
+                disabled: !canSpawnNeuron(neuron),
               },
             ]}
             value={
@@ -373,7 +380,6 @@ export default function StepManage({
                 color="palette.text.shade100"
                 val={Number(neuron.maturity_e8s_equivalent)}
                 unit={unit}
-                showCode
               />
             }
           />
@@ -395,13 +401,15 @@ export default function StepManage({
                   {
                     label: "Remove",
                     onClick: () => onClickRemoveHotKey(val.toString()),
-                    danger: true,
+                    danger: false,
+                    outline: true,
                   },
                 ]}
               />
             );
           })}
           {neuron.hot_keys.length === 0 && <ManageModalElement label="No HotKeys Found" />}
+          <ManageModalActionElement label="Add Hot Key" onClick={onClickAddHotKey} />
         </ManageModalSection>
 
         <Divider />
@@ -437,7 +445,11 @@ export default function StepManage({
             ellipsis
           />
 
-          <ManageModalActionElement label="Split Neuron" onClick={onClickSplitNeuron} />
+          <ManageModalActionElement
+            disabled={!canSplitNeuron(neuron)}
+            label="Split Neuron"
+            onClick={onClickSplitNeuron}
+          />
 
           <ManageModalActionElement
             label={`${neuron.auto_stake_maturity[0] ? "Stop" : "Start"} Automatic Stake Maturity`}

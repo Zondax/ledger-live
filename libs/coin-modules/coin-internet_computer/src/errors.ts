@@ -29,3 +29,13 @@ export const ICPDissolveDelayLTCurrent = createCustomErrorClass("ICPDissolveDela
  * When the neuron is not found
  */
 export const ICPNeuronNotFound = createCustomErrorClass("ICPNeuronNotFound");
+
+/*
+ * When the hot key is invalid
+ */
+export const InvalidHotKey = createCustomErrorClass("InvalidHotKey");
+
+/*
+ * When the hot key already exists
+ */
+export const HotKeyAlreadyExists = createCustomErrorClass("HotKeyAlreadyExists");

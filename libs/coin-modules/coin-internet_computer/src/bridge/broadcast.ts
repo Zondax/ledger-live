@@ -56,6 +56,7 @@ export const broadcast: AccountBridge<
     "set_auto_stake_maturity",
     "set_dissolve_delay",
     "remove_hot_key",
+    "add_hot_key",
     "follow",
     "split_neuron",
   ];

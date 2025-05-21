@@ -136,7 +136,6 @@ export function List({
                               Number(neuron.maturity_e8s_equivalent)
                             }
                             unit={unit}
-                            showCode
                           />
                         </Td>
                         <Td style={{ textAlign: "center" }}>

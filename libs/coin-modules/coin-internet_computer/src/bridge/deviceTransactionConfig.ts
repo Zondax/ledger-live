@@ -65,6 +65,14 @@ function getDeviceTransactionConfig({
       });
     }
 
+    if (transaction.type === "add_hot_key") {
+      fields.push({
+        type: "text",
+        label: "Principal",
+        value: transaction.hotKeyToAdd ?? "",
+      });
+    }
+
     if (transaction.type === "auto_stake_maturity") {
       fields.push({
         type: "text",

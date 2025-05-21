@@ -2,6 +2,8 @@ import { ICPAccount, ICPNeuron } from "../types";
 import { fromNullable } from "@dfinity/utils";
 import { getTimeUntil, nowInSeconds } from "./utils";
 import {
+  ICP_FEES,
+  ICP_MIN_STAKING_AMOUNT,
   LAST_SYNC_THRESHOLD_IN_DAYS,
   MIN_DISSOLVE_DELAY,
   SECONDS_IN_HALF_YEAR,
@@ -172,4 +174,16 @@ export const getNeuronDissolveDelayBonus = (neuron: ICPNeuron) => {
 
   const multiplier = getDissolveDelayMultiplier(BigInt(dissolveDelay));
   return Math.round((multiplier + Number.EPSILON - 1) * 100);
+};
+
+export const canSplitNeuron = (neuron: ICPNeuron) => {
+  return neuron.cached_neuron_stake_e8s > BigInt(2 * ICP_MIN_STAKING_AMOUNT + ICP_FEES);
+};
+
+export const canSpawnNeuron = (neuron: ICPNeuron) => {
+  return neuron.maturity_e8s_equivalent > BigInt(ICP_MIN_STAKING_AMOUNT);
+};
+
+export const canStakeMaturity = (neuron: ICPNeuron) => {
+  return neuron.maturity_e8s_equivalent > BigInt(0);
 };

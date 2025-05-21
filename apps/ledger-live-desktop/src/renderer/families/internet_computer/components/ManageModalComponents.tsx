@@ -189,6 +189,7 @@ type ManageModalElementWithIconProps = {
     onClick: () => void;
     disabled?: boolean;
     danger?: boolean;
+    outline?: boolean;
   }[];
   icon?: React.ReactNode;
   copiableLabel?: boolean;
@@ -269,10 +270,11 @@ export function ManageModalElementWithAction({
           action.map(action => (
             <Button
               key={action.label}
-              primary
+              primary={!action.outline}
               onClick={action.onClick}
               disabled={action.disabled}
               danger={action.danger}
+              outline={action.outline}
             >
               {action.label}
             </Button>
