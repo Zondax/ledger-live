@@ -5778,9 +5778,6 @@
       "title": "Sorry, could not reset",
       "description": "Please try again or contact Ledger Support if the problem persists."
     },
-    "HotKeyAlreadyExists": {
-      "title": "The hot key already exists"
-    },
     "LanguageInstallRefusedOnDevice": {
       "title": "Language restore\ncancelled on device",
       "description": "If this was a mistake, retry now."
@@ -5891,9 +5888,6 @@
     "ImpossibleToCalculateAmountAndFees": {
       "title": "Impossible to calculate amount and fees",
       "description": "Impossible to calculate amount and fees"
-    },
-    "InvalidHotKey": {
-      "title": "The principal ID is invalid"
     },
     "InvalidRecipientForTokenTransfer": {
       "title": "Invalid recipient for token transfer, supported account types for token transfer: [f0, f4, 0x]"
@@ -6641,6 +6635,15 @@
     },
     "ICPNeuronNotFound": {
       "title": "The neuron was not found."
+    },
+    "ICPInvalidHotKey": {
+      "title": "The principal ID is invalid"
+    },
+    "ICPHotKeyAlreadyExists": {
+      "title": "The hot key already exists"
+    },
+    "ICPSplitNotAllowed": {
+      "title": "The split amount is more than the maximum allowed"
     }
   },
   "cryptoOrg": {

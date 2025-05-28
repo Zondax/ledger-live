@@ -33,9 +33,14 @@ export const ICPNeuronNotFound = createCustomErrorClass("ICPNeuronNotFound");
 /*
  * When the hot key is invalid
  */
-export const InvalidHotKey = createCustomErrorClass("InvalidHotKey");
+export const ICPInvalidHotKey = createCustomErrorClass("ICPInvalidHotKey");
 
 /*
  * When the hot key already exists
  */
-export const HotKeyAlreadyExists = createCustomErrorClass("HotKeyAlreadyExists");
+export const ICPHotKeyAlreadyExists = createCustomErrorClass("ICPHotKeyAlreadyExists");
+
+/*
+ * When the split amount is not allowed
+ */
+export const ICPSplitNotAllowed = createCustomErrorClass("ICPSplitNotAllowed");

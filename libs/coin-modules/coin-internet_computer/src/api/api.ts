@@ -2,7 +2,6 @@ import { log } from "@ledgerhq/logs";
 import {
   FETCH_TXNS_LIMIT,
   MAINNET_INDEX_CANISTER_ID,
-  // MAINNET_INDEX_CANISTER_ID,
   MAINNET_LEDGER_CANISTER_ID,
 } from "../consts";
 import { HttpAgent, Cbor, Certificate, bufFromBufLike, lookupResultToBuffer } from "@dfinity/agent";
@@ -15,8 +14,8 @@ import { IDL } from "@dfinity/candid";
 import { fromNullable } from "@dfinity/utils";
 import invariant from "invariant";
 
-// const ICP_NETWORK_URL = "https://ic0.app";
-const ICP_NETWORK_URL = "http://localhost:8080";
+const ICP_NETWORK_URL = "https://ic0.app";
+// const ICP_NETWORK_URL = "http://localhost:8080";
 export const getAgent = async () => {
   return await HttpAgent.create({ host: ICP_NETWORK_URL, shouldFetchRootKey: true });
 };

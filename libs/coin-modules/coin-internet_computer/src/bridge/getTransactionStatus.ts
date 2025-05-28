@@ -27,8 +27,9 @@ import {
   InvalidMemoICP,
   ICPNeuronNotFound,
   NotEnoughTransferAmount,
-  InvalidHotKey,
-  HotKeyAlreadyExists,
+  ICPInvalidHotKey,
+  ICPHotKeyAlreadyExists,
+  ICPSplitNotAllowed,
 } from "../errors";
 import {
   ICP_FEES,
@@ -37,6 +38,7 @@ import {
   MIN_DISSOLVE_DELAY,
 } from "../consts";
 import { getNeuronDissolveDurationSeconds } from "../neurons";
+import { maxAllowedSplitAmount } from "../common-logic/neuron";
 
 export const getTransactionStatus: AccountBridge<
   Transaction,
@@ -96,6 +98,9 @@ export const getTransactionStatus: AccountBridge<
             account.currency.ticker,
         });
       }
+      if (amount.gt(maxAllowedSplitAmount(neuron))) {
+        errors.splitNeuron = new ICPSplitNotAllowed();
+      }
     }
   }
 
@@ -146,11 +151,11 @@ export const getTransactionStatus: AccountBridge<
 
   if (transaction.type === "add_hot_key" && transaction.hotKeyToAdd) {
     if (!validatePrincipal(transaction.hotKeyToAdd).isValid) {
-      errors.addHotKey = new InvalidHotKey();
+      errors.addHotKey = new ICPInvalidHotKey();
     }
 
     if (neuron?.hot_keys.map(hotKey => hotKey.toString()).includes(transaction.hotKeyToAdd)) {
-      errors.addHotKey = new HotKeyAlreadyExists();
+      errors.addHotKey = new ICPHotKeyAlreadyExists();
     }
   }
 

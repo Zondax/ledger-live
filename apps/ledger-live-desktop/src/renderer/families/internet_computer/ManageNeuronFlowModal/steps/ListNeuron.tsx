@@ -128,7 +128,6 @@ export function StepListNeuronFooter({
   neurons,
   onChangeTransaction,
   setLastManageAction,
-  lastManageAction,
   error,
 }: StepProps) {
   const { t } = useTranslation();
@@ -159,8 +158,7 @@ export function StepListNeuronFooter({
           {t("common.close")}
         </Button>
         <Button
-          outline={lastManageAction === "list_neurons"}
-          primary={lastManageAction !== "list_neurons"}
+          outline
           ml={2}
           event={`Manage Neurons ${currencyName} Flow Step 3 Sync Neurons Clicked`}
           onClick={error ? onRetry : onClickSync}

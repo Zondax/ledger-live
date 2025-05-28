@@ -15,6 +15,7 @@ import {
   getDissolveDelayMultiplier,
   getNeuronDissolveDurationSeconds,
 } from "../neurons";
+import BigNumber from "bignumber.js";
 
 const votingPowerNeedsRefresh = (
   account: ICPAccount,
@@ -186,4 +187,8 @@ export const canSpawnNeuron = (neuron: ICPNeuron) => {
 
 export const canStakeMaturity = (neuron: ICPNeuron) => {
   return neuron.maturity_e8s_equivalent > BigInt(0);
+};
+
+export const maxAllowedSplitAmount = (neuron: ICPNeuron) => {
+  return BigNumber(neuron.cached_neuron_stake_e8s.toString()).minus(ICP_MIN_STAKING_AMOUNT);
 };

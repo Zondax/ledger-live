@@ -8,7 +8,7 @@ import { formatCurrencyUnit } from "@ledgerhq/live-common/currencies/index";
 import { BigNumber } from "bignumber.js";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import TrackPage from "~/renderer/analytics/TrackPage";
-import { ICP_FEES } from "@ledgerhq/live-common/families/internet_computer/consts";
+import { maxAllowedSplitAmount } from "@ledgerhq/live-common/families/internet_computer/utils";
 
 export function SplitNeuron({
   manageNeuronIndex,
@@ -44,12 +44,11 @@ export function SplitNeuron({
 
   const handleMax = useCallback(() => {
     onChangeAmount(
-      neuronBalance
-        .minus(ICP_FEES)
+      maxAllowedSplitAmount(neuron)
         .div(10 ** unit.magnitude)
         .toString(),
     );
-  }, [neuronBalance, onChangeAmount, unit.magnitude]);
+  }, [neuron, onChangeAmount, unit.magnitude]);
 
   const onClickConfirmSplit = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);

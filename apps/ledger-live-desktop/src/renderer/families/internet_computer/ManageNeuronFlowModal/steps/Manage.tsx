@@ -272,6 +272,7 @@ export default function StepManage({
               {
                 label: "Increase Stake",
                 onClick: onClickIncreaseStake,
+                outline: true,
               },
             ]}
             value={
@@ -298,6 +299,7 @@ export default function StepManage({
                   neuron.dissolveState === "Unlocked"
                     ? onClickDisburseStake
                     : onClickStartStopDissolving,
+                outline: true,
               },
             ]}
             value={neuron.dissolveState}
@@ -309,6 +311,7 @@ export default function StepManage({
               {
                 label: `${neuron.dissolveState !== "Unlocked" ? "Increase" : "Set"} Dissolve Delay`,
                 onClick: () => transitionTo("setDissolveDelay"),
+                outline: true,
               },
             ]}
             value={`Dissolve Delay: ${neuron.dissolveState === "Unlocked" ? "0" : getNeuronDissolveDuration(neuron)}`}
@@ -325,6 +328,7 @@ export default function StepManage({
               {
                 label: "Confirm Following",
                 onClick: () => onClickConfirmFollowing(neuron),
+                outline: true,
               },
             ]}
             // TODO: get correct status
