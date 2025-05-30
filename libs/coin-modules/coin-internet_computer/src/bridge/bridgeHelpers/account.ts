@@ -124,10 +124,6 @@ const mapTxToOps = (
       type = "IN";
     }
 
-    if (neuronsAddresses.includes(fromAccount)) {
-      type = "DISBURSE_NEURON";
-    }
-
     if (neuronsAddresses.includes(toAccount)) {
       type = BigNumber(memo ?? "0").gt(0) ? "STAKE_NEURON" : "TOP_UP_NEURON";
     }

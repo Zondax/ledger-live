@@ -204,8 +204,7 @@
       "SENDING": "Sending",
       "BURN": "Burned",
       "STAKE_NEURON": "Staked",
-      "TOP_UP_NEURON": "Topped up",
-      "DISBURSE_NEURON": "Disbursed"
+      "TOP_UP_NEURON": "Topped up"
     },
     "edit": {
       "title": "Speed up or Cancel",

@@ -157,13 +157,7 @@ export function flattenOperationWithInternalsAndNfts(op: Operation): Operation[]
   return ops;
 }
 
-export const OPERATION_TYPE_IN_FAMILY = [
-  "IN",
-  "REWARD",
-  "REWARD_PAYOUT",
-  "WITHDRAW",
-  "DISBURSE_NEURON",
-];
+export const OPERATION_TYPE_IN_FAMILY = ["IN", "REWARD", "REWARD_PAYOUT", "WITHDRAW"];
 export const OPERATION_TYPE_OUT_FAMILY = [
   "OUT",
   "REVEAL",

@@ -116,11 +116,6 @@ export const reassignOperationType = (
   neuronAddresses: string[],
 ) => {
   return operations.map(op => {
-    if (neuronAddresses.includes(op.senders[0])) {
-      const type: OperationType = "DISBURSE_NEURON";
-      return { ...op, id: encodeOperationId(op.accountId, op.hash, type), type };
-    }
-
     if (neuronAddresses.includes(op.recipients[0])) {
       const type: OperationType = BigNumber(op.extra.memo ?? "0").gt(0)
         ? "STAKE_NEURON"

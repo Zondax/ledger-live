@@ -34,12 +34,17 @@ import {
   ManageModalSection,
   ManageModalActionElement,
 } from "../../components/ManageModalComponents";
-import { ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/types";
+import {
+  ICPNeuron,
+  InternetComputerOperation,
+} from "@ledgerhq/live-common/families/internet_computer/types";
 import {
   KNOWN_TOPICS,
   KNOWN_NEURON_IDS,
 } from "@ledgerhq/live-common/families/internet_computer/consts";
 import WarnBox from "~/renderer/components/WarnBox";
+import { updateAccountWithUpdater } from "~/renderer/actions/accounts";
+import { addPendingOperation } from "@ledgerhq/live-common/account/index";
 
 const Container = styled(Box).attrs(() => ({
   alignItems: "center",
@@ -85,7 +90,15 @@ export default function StepManage({
     dispatch(
       openModal("MODAL_SEND", {
         stepId: "amount",
-        onConfirmationHandler: () =>
+        onConfirmationHandler: (optimisticOperation: InternetComputerOperation) => {
+          dispatch(
+            updateAccountWithUpdater(account.id, account => {
+              if (optimisticOperation.type !== "NONE") {
+                account = addPendingOperation(account, optimisticOperation);
+              }
+              return account;
+            }),
+          );
           dispatch(
             openModal("MODAL_ICP_LIST_NEURONS", {
               account,
@@ -93,7 +106,8 @@ export default function StepManage({
               neuronIndex: manageNeuronIndex,
               stepId: "confirmation",
             }),
-          ),
+          );
+        },
         account,
         transaction: {
           ...initTx,
@@ -231,8 +245,8 @@ export default function StepManage({
               <Text ff="Inter|SemiBold" fontSize={8}>
                 <FormattedVal val={Number(neuron.cached_neuron_stake_e8s)} unit={unit} showCode />
               </Text>
-              <BoxWithBackground>
-                {!isDeviceControlled && (
+              {!isDeviceControlled && (
+                <BoxWithBackground>
                   <Box horizontal alignItems="center">
                     <Text ff="Inter|Bold" fontSize={3} mr={1} color="palette.text.shade60">
                       Hotkey Control
@@ -241,8 +255,8 @@ export default function StepManage({
                       <StyledIconInfo size={14} />
                     </Tooltip>
                   </Box>
-                )}
-              </BoxWithBackground>
+                </BoxWithBackground>
+              )}
             </Box>
             <Box horizontal alignItems="center">
               <Text ff="Inter|Regular" fontSize={3} color="palette.text.shade60" mr={2}>
