@@ -1,6 +1,6 @@
 import { ICPAccount, ICPNeuron } from "../types";
 import { fromNullable } from "@dfinity/utils";
-import { getTimeUntil, nowInSeconds } from "./utils";
+import { derivePrincipalFromPubkey, getTimeUntil, nowInSeconds } from "./utils";
 import {
   ICP_FEES,
   ICP_MIN_STAKING_AMOUNT,
@@ -16,6 +16,7 @@ import {
   getNeuronDissolveDurationSeconds,
 } from "../neurons";
 import BigNumber from "bignumber.js";
+import invariant from "invariant";
 
 const votingPowerNeedsRefresh = (
   account: ICPAccount,
@@ -191,4 +192,14 @@ export const canStakeMaturity = (neuron: ICPNeuron) => {
 
 export const maxAllowedSplitAmount = (neuron: ICPNeuron) => {
   return BigNumber(neuron.cached_neuron_stake_e8s.toString()).minus(ICP_MIN_STAKING_AMOUNT);
+};
+
+export const isDeviceControlledNeuron = (neuron: ICPNeuron, account: ICPAccount) => {
+  invariant(account.xpub, "[ICP](isDeviceControlledNeuron) account.xpub is required");
+
+  const principal = derivePrincipalFromPubkey(account.xpub);
+  const controller = fromNullable(neuron.controller);
+  invariant(controller, "[ICP](isDeviceControlledNeuron) controller is required");
+
+  return controller.toString() === principal.toString();
 };

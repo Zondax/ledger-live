@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Text from "~/renderer/components/Text";
 import Button from "~/renderer/components/Button";
 import Box from "~/renderer/components/Box";
-import IconInfo from "~/renderer/icons/InfoCircle";
+import { StyledIconInfo } from "./StyledIconInfo";
 import Tooltip from "~/renderer/components/Tooltip";
 import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
 
@@ -38,10 +38,6 @@ const Element = styled(Box)`
   align-items: center;
   padding: 8px 0;
   justify-content: space-between;
-`;
-
-const StyledIconInfo = styled(IconInfo)`
-  color: ${p => p.theme.colors.palette.text.shade60};
 `;
 
 type ManageModalSectionProps = {

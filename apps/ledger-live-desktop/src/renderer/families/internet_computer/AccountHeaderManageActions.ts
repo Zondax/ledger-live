@@ -1,6 +1,11 @@
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
-import { ICPAccount } from "@ledgerhq/live-common/families/internet_computer/types";
+import {
+  ICPAccount,
+  InternetComputerOperation,
+} from "@ledgerhq/live-common/families/internet_computer/types";
+import { addPendingOperation } from "@ledgerhq/live-common/account/index";
 import { TokenAccount } from "@ledgerhq/types-live";
+import { updateAccountWithUpdater } from "~/renderer/actions/accounts";
 import { useCallback } from "react";
 // import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
@@ -36,7 +41,20 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
       openModal("MODAL_SEND", {
         stepId: "amount",
         account,
-        onConfirmationHandler: () =>
+        disableBacks: ["amount"],
+        transaction: {
+          ...initTx,
+          type: "create_neuron",
+        },
+        onConfirmationHandler: (optimisticOperation: InternetComputerOperation) => {
+          dispatch(
+            updateAccountWithUpdater(account.id, account => {
+              if (optimisticOperation.type !== "NONE") {
+                account = addPendingOperation(account, optimisticOperation);
+              }
+              return account;
+            }),
+          );
           dispatch(
             openModal("MODAL_ICP_LIST_NEURONS", {
               account,
@@ -44,11 +62,7 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
               lastManageAction: "create_neuron",
               stepId: "confirmation",
             }),
-          ),
-        disableBacks: ["amount"],
-        transaction: {
-          ...initTx,
-          type: "create_neuron",
+          );
         },
       }),
     );

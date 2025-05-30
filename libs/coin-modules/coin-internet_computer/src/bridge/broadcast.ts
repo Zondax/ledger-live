@@ -8,7 +8,7 @@ import {
   Transaction,
   TransactionStatus,
 } from "../types";
-import { ListNeuronsResponse } from "@dfinity/nns/dist/candid/governance";
+import { ListNeuronsResponse, ManageNeuronResponse } from "@dfinity/nns/dist/candid/governance";
 import { log } from "@ledgerhq/logs";
 import invariant from "invariant";
 import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "../consts";
@@ -120,11 +120,13 @@ export const broadcast: AccountBridge<
     rawDataTyped.requestId &&
     manageNeuronTypes.includes(rawDataTyped.methodName)
   ) {
-    await pollForReadState(
+    const reply = await pollForReadState(
       Buffer.from(rawDataTyped.encodedSignedReadStateBlob, "hex"),
       MAINNET_GOVERNANCE_CANISTER_ID,
       rawDataTyped.requestId,
     );
+
+    log("debug", `[ICP](broadcast) manageNeuron reply: ${reply}`);
     const manageNeuronIdlFunc = idlFactoryGovernance({ IDL })._fields.find(
       func => func[0] === "manage_neuron",
     );
@@ -133,6 +135,24 @@ export const broadcast: AccountBridge<
       manageNeuronIdlFunc,
       `[ICP](broadcast) Missing manageNeuronIdlFunc with methodName: ${rawDataTyped.methodName}`,
     );
+
+    const [manageNeuronResponse]: [ManageNeuronResponse] = IDL.decode(
+      manageNeuronIdlFunc[1].retTypes,
+      reply,
+    ) as any;
+
+    if (
+      manageNeuronResponse.command.length > 0 &&
+      manageNeuronResponse.command[0] &&
+      "Error" in manageNeuronResponse.command[0]
+    ) {
+      throw new Error(
+        manageNeuronResponse.command[0].Error.error_message ||
+          `Unknown error when attempting to ${rawDataTyped.methodName} on ${rawDataTyped.neuronId}`,
+      );
+    }
+
+    log("debug", `[ICP](broadcast) manageNeuronResponse: ${manageNeuronResponse}`);
 
     return operation;
   }
