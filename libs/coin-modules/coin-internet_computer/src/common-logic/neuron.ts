@@ -144,4 +144,7 @@ export const isDeviceControlledNeuron = (neuron: ICPNeuron, account: ICPAccount)
 export {
   neuronPotentialVotingPower,
   getNeuronDissolveDuration,
+  getSecondsTillVotingPowerExpires,
+  getNeuronVotingPower,
+  getNeuronAgeBonus,
 } from "@zondax/ledger-live-icp/neurons";
