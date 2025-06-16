@@ -1,10 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { MAX_MEMO_VALUE } from "../consts";
-import { Secp256k1PublicKey } from "@dfinity/identity-secp256k1";
-import { Principal } from "@dfinity/principal";
-import { AccountIdentifier } from "@dfinity/ledger-icp";
-import { log } from "@ledgerhq/logs";
-import { DerEncodedPublicKey } from "@dfinity/agent";
+import { secondsToDuration } from "@zondax/ledger-live-icp/utils";
 import { InternetComputerOperation, Transaction } from "../types";
 import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
 import { OperationType } from "@ledgerhq/types-live";
@@ -90,27 +86,6 @@ export function getRandomTransferID(): string {
   return randomIntFromInterval(0, MAX_MEMO_VALUE);
 }
 
-export const deriveAddressFromPubkey = (publicKey: string): string => {
-  log("debug", `[ICP] Deriving address from public key: ${publicKey}`);
-  const pubkey = Secp256k1PublicKey.fromRaw(new Uint8Array(Buffer.from(publicKey, "hex")));
-  const principal = Principal.selfAuthenticating(new Uint8Array(pubkey.toDer()));
-  log("debug", `[ICP] Derived principal: ${principal.toText()}`);
-  const address = AccountIdentifier.fromPrincipal({ principal: principal });
-  log("debug", `[ICP] Derived address: ${address.toHex()}`);
-
-  return address.toHex();
-};
-
-export const derivePrincipalFromPubkey = (publicKey: string): Principal => {
-  const pubkey = Secp256k1PublicKey.fromRaw(new Uint8Array(Buffer.from(publicKey, "hex")));
-  return Principal.selfAuthenticating(new Uint8Array(pubkey.toDer()));
-};
-
-export const pubkeyToDer = (publicKey: string): DerEncodedPublicKey => {
-  const pubkey = Secp256k1PublicKey.fromRaw(new Uint8Array(Buffer.from(publicKey, "hex")));
-  return pubkey.toDer();
-};
-
 export const reassignOperationType = (
   operations: InternetComputerOperation[],
   neuronAddresses: string[],
@@ -127,26 +102,6 @@ export const reassignOperationType = (
   });
 };
 
-export const nowInSeconds = (): number => Math.round(Date.now() / 1000);
-
-export const getTimeUntil = (
-  futureTimestampInSeconds: number,
-  diffFromNow: boolean = true,
-): {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-} => {
-  let diff = futureTimestampInSeconds;
-  if (diffFromNow) {
-    const now = nowInSeconds();
-    diff = Math.abs(futureTimestampInSeconds - now);
-  }
-  return {
-    days: Math.floor(diff / (24 * 60 * 60)),
-    hours: Math.floor((diff % (24 * 60 * 60)) / (60 * 60)),
-    minutes: Math.floor((diff % (60 * 60)) / 60),
-    seconds: diff % 60,
-  };
+export const secondsToDurationString = (seconds: string) => {
+  return secondsToDuration({ seconds: BigInt(parseInt(seconds)) });
 };

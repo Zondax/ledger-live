@@ -2,6 +2,7 @@ import { Observable } from "rxjs";
 import { Account, AccountBridge, DeviceId } from "@ledgerhq/types-live";
 import { getAddress } from "./bridgeHelpers/addresses";
 import { buildOptimisticSendOperation as buildOptimisticOperation } from "./buildOptimisticOperation";
+import { hashTransaction, pubkeyToDer } from "@zondax/ledger-live-icp/utils";
 import {
   ICPAccount,
   ICPAccountRaw,
@@ -10,437 +11,19 @@ import {
   Transaction,
   TransactionStatus,
 } from "../types";
-import {
-  derivePrincipalFromPubkey,
-  getPath,
-  nowInSeconds,
-  pubkeyToDer,
-} from "../common-logic/utils";
+import { getPath } from "../common-logic/utils";
 import { log } from "@ledgerhq/logs";
-import { AccountIdentifier } from "@dfinity/ledger-icp";
-import { idlFactory as idlFactoryLedger } from "@dfinity/ledger-icp/dist/candid/ledger.idl";
-import { idlFactory as idlFactoryGovernanceOld } from "@dfinity/nns/dist/candid/old_list_neurons_service.certified.idl";
-import { idlFactory as idlFactoryGovernance } from "@dfinity/nns/dist/candid/governance.idl";
-import { IDL } from "@dfinity/candid";
 import invariant from "invariant";
-import { Principal } from "@dfinity/principal";
-import {
-  Cbor,
-  Expiry,
-  ReadRequest,
-  ReadRequestType,
-  requestIdOf,
-  SubmitRequestType,
-} from "@dfinity/agent";
-import {
-  DEFAULT_INGRESS_EXPIRY_DELTA_IN_MSECS,
-  ICP_FEES,
-  MAINNET_GOVERNANCE_CANISTER_ID,
-  MAINNET_LEDGER_CANISTER_ID,
-} from "../consts";
-import { hashTransaction } from "./bridgeHelpers/hash";
-import { toNullable } from "@dfinity/utils";
+import { Cbor } from "@zondax/ledger-live-icp/agent";
 import { SignerContext } from "@ledgerhq/coin-framework/lib/signer";
-
-interface UnsignedTransaction extends Record<string, any> {
-  request_type: SubmitRequestType;
-  canister_id: Principal;
-  method_name: string;
-  arg: ArrayBuffer;
-  sender: Principal;
-  ingress_expiry: Expiry;
-}
-
-interface TransferRawRequest {
-  to: Uint8Array;
-  amount: { e8s: bigint };
-  memo: bigint;
-  fee: { e8s: bigint };
-  created_at_time: [{ timestamp_nanos: bigint }];
-  from_subaccount: [];
-}
-
-interface DisburseCommand {
-  Disburse: { to_account: string[]; amount: [{ e8s: bigint }] };
-}
-
-interface StakeMaturityCommand {
-  StakeMaturity: {
-    percentage_to_stake: [number] | [];
-  };
-}
-
-interface SpawnNeuronCommand {
-  Spawn: {
-    percentage_to_spawn: [number] | [];
-    new_controller: [Principal] | [];
-    nonce: [bigint] | [];
-  };
-}
-
-interface RefreshVotingPowerCommand {
-  RefreshVotingPower: object;
-}
-
-interface SplitNeuronCommand {
-  Split: {
-    memo: bigint;
-    amount_e8s: bigint;
-  };
-}
-
-interface ManageNeuronFollowRequestCommand {
-  Follow: {
-    topic: number;
-    followees: { id: bigint }[];
-  };
-}
-
-// Neuron configuration commands
-interface IncreaseDissolveDelayConfig {
-  IncreaseDissolveDelay: {
-    additional_dissolve_delay_seconds: number;
-  };
-}
-
-interface SetDissolveDelayConfig {
-  SetDissolveTimestamp: {
-    dissolve_timestamp_seconds: bigint;
-  };
-}
-
-interface StartDissolvingConfig {
-  StartDissolving: object;
-}
-
-interface StopDissolvingConfig {
-  StopDissolving: object;
-}
-
-interface RemoveHotKeyConfig {
-  RemoveHotKey: {
-    hot_key_to_remove: [Principal];
-  };
-}
-
-interface AddHotKeyConfig {
-  AddHotKey: {
-    new_hot_key: [Principal];
-  };
-}
-
-interface ChangeAutoStakeMaturityConfig {
-  ChangeAutoStakeMaturity: {
-    requested_setting_for_auto_stake_maturity: boolean;
-  };
-}
-
-interface ConfigureOperationCommand {
-  Configure: {
-    operation: [
-      | StartDissolvingConfig
-      | StopDissolvingConfig
-      | IncreaseDissolveDelayConfig
-      | SetDissolveDelayConfig
-      | ChangeAutoStakeMaturityConfig
-      | RemoveHotKeyConfig
-      | AddHotKeyConfig,
-    ];
-  };
-}
-
-export interface NeuronCommandRawRequest<
-  T extends
-    | DisburseCommand
-    | ConfigureOperationCommand
-    | StakeMaturityCommand
-    | SpawnNeuronCommand
-    | RefreshVotingPowerCommand
-    | SplitNeuronCommand
-    | ManageNeuronFollowRequestCommand,
-> {
-  id: [{ id: bigint }];
-  command: T[];
-  neuron_id_or_subaccount: [];
-}
-
-interface ListNeuronsRawRequest {
-  include_public_neurons_in_full_neurons: [boolean] | [];
-  neuron_ids: BigUint64Array;
-  include_empty_neurons_readable_by_caller: [boolean] | [];
-  include_neurons_readable_by_caller: boolean;
-}
-
-const createUnsignedListNeuronsTransaction = (
-  account: Account,
-): { unsignedTransaction: UnsignedTransaction; listNeuronsRawRequest: ListNeuronsRawRequest } => {
-  const listNeuronsRawRequest: ListNeuronsRawRequest = {
-    include_public_neurons_in_full_neurons: toNullable(false),
-    neuron_ids: BigUint64Array.from([]),
-    include_empty_neurons_readable_by_caller: toNullable(true),
-    include_neurons_readable_by_caller: true,
-  };
-
-  const p = idlFactoryGovernanceOld({ IDL })._fields.find(f => f[0] === "list_neurons");
-  invariant(p, "[ICP](createUnsignedListNeuronsTransaction) Method not found");
-  const args = IDL.encode(p[1].argTypes, [listNeuronsRawRequest]);
-
-  invariant(account.xpub, "[ICP](createUnsignedListNeuronsTransaction) Account xpub is required");
-  const canisterID = Principal.from(MAINNET_GOVERNANCE_CANISTER_ID);
-  const unsignedTransaction: UnsignedTransaction = {
-    request_type: SubmitRequestType.Call,
-    canister_id: canisterID,
-    method_name: "list_neurons",
-    arg: args,
-    sender: derivePrincipalFromPubkey(account.xpub),
-    ingress_expiry: new Expiry(DEFAULT_INGRESS_EXPIRY_DELTA_IN_MSECS),
-  };
-
-  return { unsignedTransaction, listNeuronsRawRequest };
-};
-
-const createCommandConfigOperation = (
-  op:
-    | StartDissolvingConfig
-    | StopDissolvingConfig
-    | IncreaseDissolveDelayConfig
-    | SetDissolveDelayConfig
-    | ChangeAutoStakeMaturityConfig
-    | RemoveHotKeyConfig
-    | AddHotKeyConfig,
-): ConfigureOperationCommand => {
-  return {
-    Configure: {
-      operation: [op],
-    },
-  };
-};
-
-// Generic function to create an unsigned transaction for a neuron command
-const createUnsignedNeuronCommandTransaction = (
-  transaction: Transaction,
-  account: Account,
-): {
-  unsignedTransaction: UnsignedTransaction;
-  neuronCommandRawRequest: NeuronCommandRawRequest<
-    | DisburseCommand
-    | ConfigureOperationCommand
-    | StakeMaturityCommand
-    | SpawnNeuronCommand
-    | RefreshVotingPowerCommand
-    | SplitNeuronCommand
-    | ManageNeuronFollowRequestCommand
-  >;
-} => {
-  const {
-    neuronId,
-    amount,
-    dissolveDelay,
-    additionalDissolveDelay,
-    autoStakeMaturity,
-    hotKeyToRemove,
-    hotKeyToAdd,
-    followTopic,
-    followeesIds,
-    percentageToStake,
-  } = transaction;
-  invariant(neuronId, "[ICP](createUnsignedNeuronCommandTransaction) Neuron ID is required");
-
-  const rawCommand: NeuronCommandRawRequest<
-    | DisburseCommand
-    | ConfigureOperationCommand
-    | StakeMaturityCommand
-    | SpawnNeuronCommand
-    | RefreshVotingPowerCommand
-    | SplitNeuronCommand
-    | ManageNeuronFollowRequestCommand
-  > = {
-    id: [{ id: BigInt(neuronId) }],
-    neuron_id_or_subaccount: [],
-    command: [],
-  };
-
-  switch (transaction.type) {
-    case "disburse":
-      rawCommand.command = [
-        {
-          Disburse: {
-            to_account: [],
-            amount: [{ e8s: BigInt(amount.toString()) }],
-          },
-        },
-      ];
-      break;
-    case "start_dissolving":
-      rawCommand.command = [createCommandConfigOperation({ StartDissolving: {} })];
-      break;
-    case "stop_dissolving":
-      rawCommand.command = [createCommandConfigOperation({ StopDissolving: {} })];
-      break;
-    case "stake_maturity":
-      rawCommand.command = [
-        {
-          StakeMaturity: { percentage_to_stake: [Number(percentageToStake)] },
-        },
-      ];
-      break;
-    case "spawn_neuron":
-      rawCommand.command = [
-        {
-          Spawn: { percentage_to_spawn: [100], new_controller: [], nonce: [] },
-        },
-      ];
-      break;
-    case "refresh_voting_power":
-      rawCommand.command = [
-        {
-          RefreshVotingPower: {},
-        },
-      ];
-      break;
-    case "increase_dissolve_delay":
-      invariant(
-        additionalDissolveDelay,
-        "[ICP](createUnsignedNeuronCommandTransaction) Additional dissolve delay is required",
-      );
-      rawCommand.command = [
-        createCommandConfigOperation({
-          IncreaseDissolveDelay: {
-            additional_dissolve_delay_seconds: Number(additionalDissolveDelay),
-          },
-        }),
-      ];
-      break;
-    case "set_dissolve_delay":
-      invariant(
-        dissolveDelay,
-        "[ICP](createUnsignedNeuronCommandTransaction) Dissolve delay is required",
-      );
-      rawCommand.command = [
-        createCommandConfigOperation({
-          SetDissolveTimestamp: {
-            dissolve_timestamp_seconds: BigInt(dissolveDelay) + BigInt(nowInSeconds()),
-          },
-        }),
-      ];
-      break;
-    case "auto_stake_maturity":
-      invariant(
-        autoStakeMaturity !== undefined,
-        "[ICP](createUnsignedNeuronCommandTransaction) Auto stake maturity is required",
-      );
-      rawCommand.command = [
-        createCommandConfigOperation({
-          ChangeAutoStakeMaturity: {
-            requested_setting_for_auto_stake_maturity: autoStakeMaturity,
-          },
-        }),
-      ];
-      break;
-    case "split_neuron":
-      rawCommand.command = [
-        {
-          Split: {
-            memo: BigInt(transaction.memo ?? 0),
-            amount_e8s: BigInt(amount.toString()),
-          },
-        },
-      ];
-      break;
-    case "remove_hot_key":
-      invariant(
-        hotKeyToRemove,
-        "[ICP](createUnsignedNeuronCommandTransaction) Hot key to remove is required",
-      );
-      rawCommand.command = [
-        createCommandConfigOperation({
-          RemoveHotKey: { hot_key_to_remove: [Principal.fromText(hotKeyToRemove)] },
-        }),
-      ];
-      break;
-    case "add_hot_key":
-      invariant(
-        hotKeyToAdd,
-        "[ICP](createUnsignedNeuronCommandTransaction) Hot key to add is required",
-      );
-      rawCommand.command = [
-        createCommandConfigOperation({
-          AddHotKey: { new_hot_key: [Principal.fromText(hotKeyToAdd)] },
-        }),
-      ];
-      break;
-    case "follow":
-      invariant(
-        followTopic !== undefined,
-        "[ICP](createUnsignedNeuronCommandTransaction) Follow topic is required",
-      );
-      invariant(
-        followeesIds,
-        "[ICP](createUnsignedNeuronCommandTransaction) Followees IDs are required",
-      );
-      rawCommand.command = [
-        {
-          Follow: {
-            topic: followTopic,
-            followees: followeesIds.map(id => ({ id: BigInt(id) })),
-          },
-        },
-      ];
-      break;
-  }
-
-  const disburseIDLMethod = idlFactoryGovernance({ IDL })._fields.find(
-    f => f[0] === "manage_neuron",
-  );
-  invariant(disburseIDLMethod, "[ICP](createUnsignedNeuronCommandTransaction) Method not found");
-  const args = IDL.encode(disburseIDLMethod[1].argTypes, [rawCommand]);
-
-  const canisterID = Principal.from(MAINNET_GOVERNANCE_CANISTER_ID);
-  invariant(account.xpub, "[ICP](createUnsignedTransaction) Account xpub is required");
-  const unsignedTransaction: UnsignedTransaction = {
-    request_type: SubmitRequestType.Call,
-    canister_id: canisterID,
-    method_name: "manage_neuron",
-    arg: args,
-    sender: derivePrincipalFromPubkey(account.xpub),
-    ingress_expiry: new Expiry(DEFAULT_INGRESS_EXPIRY_DELTA_IN_MSECS),
-  };
-
-  return { unsignedTransaction, neuronCommandRawRequest: rawCommand };
-};
-
-const createUnsignedSendTransaction = (
-  transaction: Transaction,
-  account: Account,
-): { unsignedTransaction: UnsignedTransaction; transferRawRequest: TransferRawRequest } => {
-  const toAccount = AccountIdentifier.fromHex(transaction.recipient);
-
-  const transferRawRequest: TransferRawRequest = {
-    to: toAccount.toUint8Array(),
-    amount: { e8s: BigInt(transaction.amount.toString()) },
-    memo: BigInt(transaction.memo ?? 0),
-    fee: { e8s: BigInt(ICP_FEES) },
-    created_at_time: [{ timestamp_nanos: BigInt(new Date().getTime() * 1000000) }],
-    from_subaccount: [],
-  };
-
-  const transferIDLMethod = idlFactoryLedger({ IDL })._fields.find(f => f[0] === "transfer");
-  invariant(transferIDLMethod, "[ICP](createUnsignedTransaction) Method not found");
-  const args = IDL.encode(transferIDLMethod[1].argTypes, [transferRawRequest]);
-
-  const canisterID = Principal.from(MAINNET_LEDGER_CANISTER_ID);
-  invariant(account.xpub, "[ICP](createUnsignedTransaction) Account xpub is required");
-  const unsignedTransaction: UnsignedTransaction = {
-    request_type: SubmitRequestType.Call,
-    canister_id: canisterID,
-    method_name: "transfer",
-    arg: args,
-    sender: derivePrincipalFromPubkey(account.xpub),
-    ingress_expiry: new Expiry(DEFAULT_INGRESS_EXPIRY_DELTA_IN_MSECS),
-  };
-
-  return { unsignedTransaction, transferRawRequest };
-};
+import {
+  UnsignedTransaction,
+  TransferRawRequest,
+  createReadStateRequest,
+  createUnsignedSendTransaction,
+  createUnsignedListNeuronsTransaction,
+  createUnsignedNeuronCommandTransaction,
+} from "@zondax/ledger-live-icp/utils";
 
 const signICPTransaction = async (
   unsignedTxn: UnsignedTransaction,
@@ -465,21 +48,6 @@ const signICPTransaction = async (
       sender_pubkey: pubkeyToDer(account.xpub),
       sender_sig: signatures.signatureRS,
     },
-  };
-};
-
-const createReadStateRequest = async (body: UnsignedTransaction) => {
-  const requestId = await requestIdOf(body);
-  const paths = [[new TextEncoder().encode("request_status"), requestId]];
-  const readStateBody: ReadRequest = {
-    request_type: ReadRequestType.ReadState,
-    paths,
-    ingress_expiry: body.ingress_expiry,
-    sender: body.sender,
-  };
-  return {
-    readStateBody,
-    requestId,
   };
 };
 
@@ -552,12 +120,15 @@ export const buildSignOperation =
         if (sendTypes.includes(transaction.type)) {
           ({ unsignedTransaction, transferRawRequest } = createUnsignedSendTransaction(
             transaction,
-            account,
+            account.xpub,
           ));
         } else if (transaction.type === "list_neurons") {
-          ({ unsignedTransaction } = createUnsignedListNeuronsTransaction(account));
+          ({ unsignedTransaction } = createUnsignedListNeuronsTransaction(account.xpub));
         } else {
-          ({ unsignedTransaction } = createUnsignedNeuronCommandTransaction(transaction, account));
+          ({ unsignedTransaction } = createUnsignedNeuronCommandTransaction(
+            transaction,
+            account.xpub,
+          ));
         }
 
         o.next({

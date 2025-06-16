@@ -7,12 +7,8 @@ import {
 } from "@ledgerhq/errors";
 import BigNumber from "bignumber.js";
 import { AccountBridge } from "@ledgerhq/types-live";
-import {
-  getAddress,
-  validateAddress,
-  validateMemo,
-  validatePrincipal,
-} from "../bridge/bridgeHelpers/addresses";
+import { validateAddress, validateMemo, validatePrincipal } from "@zondax/ledger-live-icp/utils";
+import { getAddress } from "./bridgeHelpers/addresses";
 import {
   ICPAccount,
   ICPAccountRaw,
@@ -30,6 +26,8 @@ import {
   ICPInvalidHotKey,
   ICPHotKeyAlreadyExists,
   ICPSplitNotAllowed,
+  ICPIncreaseStakeWarning,
+  ICPCreateNeuronWarning,
 } from "../errors";
 import {
   ICP_FEES,
@@ -37,7 +35,7 @@ import {
   MAX_DISSOLVE_DELAY,
   MIN_DISSOLVE_DELAY,
 } from "../consts";
-import { getNeuronDissolveDurationSeconds } from "../neurons";
+import { getNeuronDissolveDurationSeconds } from "@zondax/ledger-live-icp/neurons";
 import { maxAllowedSplitAmount } from "../common-logic/neuron";
 
 export const getTransactionStatus: AccountBridge<
@@ -58,9 +56,11 @@ export const getTransactionStatus: AccountBridge<
     neuron => neuron.id[0]?.id.toString() === neuronId,
   );
 
+  // If the transaction is a set dissolve delay, we need to validate the dissolve delay
   if (type === "set_dissolve_delay" && !!dissolveDelayStr) {
     const dissolveDelay = new BigNumber(dissolveDelayStr);
 
+    // If the neuron is not found, add an error
     if (!neuron) {
       errors.neuron = new ICPNeuronNotFound();
     } else {
@@ -69,17 +69,21 @@ export const getTransactionStatus: AccountBridge<
         errors.dissolveDelay = new ICPDissolveDelayLTCurrent();
       }
     }
+
+    // If the dissolve delay is less than the minimum dissolve delay, add an error
     if (dissolveDelay.lt(MIN_DISSOLVE_DELAY)) {
       errors.dissolveDelay = new ICPDissolveDelayLTMin(undefined, {
         min: "182.5 days",
       });
     } else if (dissolveDelay.gt(MAX_DISSOLVE_DELAY)) {
+      // If the dissolve delay is greater than the maximum dissolve delay, add an error
       errors.dissolveDelay = new ICPDissolveDelayGTMax(undefined, {
         max: "8 years",
       });
     }
   }
 
+  // If the transaction is a split neuron, we need to validate the neuron
   if (type === "split_neuron") {
     if (!neuron) {
       errors.neuron = new ICPNeuronNotFound();
@@ -104,32 +108,35 @@ export const getTransactionStatus: AccountBridge<
     }
   }
 
+  // If the recipient is invalid, add an error
   if (!recipient) {
     errors.recipient = new RecipientRequired();
   } else if (!(await validateAddress(recipient)).isValid) {
+    // If the recipient is invalid, add an error
     errors.recipient = new InvalidAddress("", {
       currencyName: account.currency.name,
     });
   } else if (recipient.toLowerCase() === address.toLowerCase()) {
+    // If the recipient is the same as the sender, add an error
     errors.recipient = new InvalidAddressBecauseDestinationIsAlsoSource();
   }
 
+  // If the sender address is invalid, add an error
   if (!(await validateAddress(address)).isValid) {
     errors.sender = new InvalidAddress("", {
       currencyName: account.currency.name,
     });
   }
 
+  // If the memo is invalid, add an error
   if (!validateMemo(transaction.memo).isValid) {
     errors.transaction = new InvalidMemoICP();
   }
 
-  // This is also be true if topup existing neuron and amount is less than min staking amount
-  // TODO: Check if this is the best way to check for topup
+  // If the transaction is a create neuron, add a warning
+  // If the amount is less than the minimum staking amount, add an error
   if (transaction.type === "create_neuron") {
-    warnings.staking = new Error(
-      "This operation will transfer the amount to a new neuron. Upon successful confirmation, the neuron will be available for further operations.",
-    );
+    warnings.staking = new ICPCreateNeuronWarning();
     if (transaction.amount.lt(ICP_MIN_STAKING_AMOUNT)) {
       errors.amount = new NotEnoughTransferAmount("", {
         purpose: "stake",
@@ -143,12 +150,12 @@ export const getTransactionStatus: AccountBridge<
     }
   }
 
+  // If the transaction is an increase stake, add a warning
   if (transaction.type === "increase_stake") {
-    warnings.staking = new Error(
-      "This operation will transfer the amount to increase the stake of an existing neuron.",
-    );
+    warnings.staking = new ICPIncreaseStakeWarning();
   }
 
+  // If the transaction is an add hot key, we need to validate the hot key
   if (transaction.type === "add_hot_key" && transaction.hotKeyToAdd) {
     if (!validatePrincipal(transaction.hotKeyToAdd).isValid) {
       errors.addHotKey = new ICPInvalidHotKey();
@@ -164,6 +171,8 @@ export const getTransactionStatus: AccountBridge<
 
   let totalSpent: BigNumber;
 
+  // If useAllAmount is true, we use the spendable balance as the total spent
+  // If useAllAmount is false, we use the amount as the total spent
   if (useAllAmount) {
     totalSpent = account.spendableBalance;
     amount = totalSpent.minus(estimatedFees);
@@ -178,8 +187,6 @@ export const getTransactionStatus: AccountBridge<
       errors.amount = new NotEnoughBalance();
     }
   }
-
-  // log("debug", "[getTransactionStatus] finish fn");
 
   return {
     errors,

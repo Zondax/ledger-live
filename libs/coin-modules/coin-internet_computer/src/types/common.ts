@@ -1,4 +1,3 @@
-import { NeuronInfo, Neuron as NNSNeuron } from "@dfinity/nns/dist/candid/governance";
 import {
   Account,
   AccountRaw,
@@ -9,8 +8,8 @@ import {
   TransactionStatusCommonRaw,
 } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
-import { NeuronsData } from "../neurons";
 import { KNOWN_TOPICS } from "../consts";
+import { NeuronsData } from "@zondax/ledger-live-icp/neurons";
 
 type FamilyType = "internet_computer";
 export interface ICPAccount extends Account {
@@ -97,16 +96,5 @@ export type InternetComputerOperationExtra = {
   methodName?: string;
 };
 
-export interface ICPNeuron extends NNSNeuron {
-  accountIdentifier: string;
-  dissolveState: "Unlocked" | "Locked" | "Dissolving" | "Unknown" | "Spawning";
-  dissolveDelaySeconds: string;
-  whenDissolvedTimestampSeconds: string;
-  modFollowees: {
-    [neuronId: string]: (keyof typeof KNOWN_TOPICS)[];
-  };
-
-  neuronInfo: NeuronInfo;
-}
-
 export const ICPOperationTypeListNeuron = "LIST_NEURONS";
+export type { ICPNeuron } from "@zondax/ledger-live-icp/neurons";

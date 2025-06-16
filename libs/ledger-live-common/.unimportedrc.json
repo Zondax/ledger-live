@@ -295,12 +295,7 @@
     "src/wallet-api/version.ts",
     "src/walletConnect/index.ts"
   ],
-  "extensions": [
-    ".ts",
-    ".js",
-    ".jsx",
-    ".tsx"
-  ],
+  "extensions": [".ts", ".js", ".jsx", ".tsx"],
   "ignorePatterns": [
     "**/node_modules/**",
     "**/__tests__/**",
@@ -370,7 +365,6 @@
     "src/market/hooks/useLargeMoverDataProvider.ts"
   ],
   "ignoreUnused": [
-    "@dfinity/agent",
     "@ledgerhq/hw-app-eth",
     "@ledgerhq/hw-transport-mocker",
     "@tanstack/react-query",

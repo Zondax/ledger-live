@@ -44,3 +44,13 @@ export const ICPHotKeyAlreadyExists = createCustomErrorClass("ICPHotKeyAlreadyEx
  * When the split amount is not allowed
  */
 export const ICPSplitNotAllowed = createCustomErrorClass("ICPSplitNotAllowed");
+
+/*
+ * Increase stake general warning
+ */
+export const ICPIncreaseStakeWarning = createCustomErrorClass("ICPIncreaseStakeWarning");
+
+/*
+ * Create neuron general warning
+ */
+export const ICPCreateNeuronWarning = createCustomErrorClass("ICPCreateNeuronWarning");

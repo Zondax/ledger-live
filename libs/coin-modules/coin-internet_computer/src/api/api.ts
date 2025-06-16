@@ -1,24 +1,23 @@
 import { log } from "@ledgerhq/logs";
-import {
-  FETCH_TXNS_LIMIT,
-  MAINNET_INDEX_CANISTER_ID,
-  MAINNET_LEDGER_CANISTER_ID,
-} from "../consts";
-import { HttpAgent, Cbor, Certificate, bufFromBufLike, lookupResultToBuffer } from "@dfinity/agent";
-import { idlFactory as ledgerIdlFactory } from "@dfinity/ledger-icp/dist/candid/ledger.idl";
-import { idlFactory as indexIdlFactory } from "@dfinity/ledger-icp/dist/candid/index.idl";
-import { GetAccountIdentifierTransactionsResponse, TransactionWithId } from "@dfinity/ledger-icp";
-import BigNumber from "bignumber.js";
-import { Principal } from "@dfinity/principal";
-import { IDL } from "@dfinity/candid";
-import { fromNullable } from "@dfinity/utils";
-import invariant from "invariant";
+import { FETCH_TXNS_LIMIT, MAINNET_INDEX_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "../consts";
 
-const ICP_NETWORK_URL = "https://ic0.app";
-// const ICP_NETWORK_URL = "http://localhost:8080";
-export const getAgent = async () => {
-  return await HttpAgent.create({ host: ICP_NETWORK_URL, shouldFetchRootKey: true });
-};
+import {
+  ledgerIdlFactory as ledgerIdlFactory,
+  indexIdlFactory as indexIdlFactory,
+  getCanisterIdlFunc,
+  Principal,
+  encodeCanisterIdlFunc,
+  decodeCanisterIdlFunc,
+} from "@zondax/ledger-live-icp";
+import {
+  GetAccountIdentifierTransactionsResponse,
+  TransactionWithId,
+} from "@zondax/ledger-live-icp";
+import BigNumber from "bignumber.js";
+import { fromNullable } from "@zondax/ledger-live-icp/utils";
+import { getAgent } from "@zondax/ledger-live-icp/agent";
+import invariant from "invariant";
+import { ICP_NETWORK_URL } from "../consts";
 
 export const fetchBlockHeight = async (): Promise<BigNumber> => {
   const canisterId = Principal.fromText(MAINNET_LEDGER_CANISTER_ID);
@@ -27,11 +26,10 @@ export const fetchBlockHeight = async (): Promise<BigNumber> => {
     length: BigInt(1),
   };
 
-  const queryBlocksIdlFunc = ledgerIdlFactory({ IDL })._fields.find(f => f[0] === "query_blocks");
-  invariant(queryBlocksIdlFunc, "[ICP](fetchBlockHeight) Method not found");
-  const queryBlocksargs = IDL.encode(queryBlocksIdlFunc[1].argTypes, [queryBlocksRawRequest]);
+  const queryBlocksIdlFunc = getCanisterIdlFunc(ledgerIdlFactory, "query_blocks");
+  const queryBlocksargs = encodeCanisterIdlFunc(queryBlocksIdlFunc, [queryBlocksRawRequest]);
 
-  const agent = await getAgent();
+  const agent = await getAgent(ICP_NETWORK_URL);
   const blockHeightRes = await agent.query(canisterId, {
     arg: queryBlocksargs,
     methodName: "query_blocks",
@@ -39,10 +37,10 @@ export const fetchBlockHeight = async (): Promise<BigNumber> => {
 
   invariant(blockHeightRes.status === "replied", "[ICP](fetchBlockHeight) Query failed");
 
-  const decodedIdl: [{ chain_length: bigint }] = IDL.decode(
-    queryBlocksIdlFunc[1].retTypes,
+  const decodedIdl = decodeCanisterIdlFunc<[{ chain_length: bigint }]>(
+    queryBlocksIdlFunc,
     blockHeightRes.reply.arg,
-  ) as any;
+  );
   const decoded = fromNullable(decodedIdl);
   invariant(decoded, "[ICP](fetchBlockHeight) Decoding failed");
 
@@ -71,79 +69,11 @@ export const broadcastTxn = async (
   return await res.arrayBuffer();
 };
 
-export const pollForReadState = async (payload: Buffer, canisterId: string, requestId: string) => {
-  let reply: ArrayBuffer | undefined = undefined;
-  for (let i = 0; i < 15; i++) {
-    const readStateResponse = await broadcastTxn(payload, canisterId, "read_state");
-    const readStateData: any = Cbor.decode(readStateResponse);
-    const agent = await getAgent();
-    // console.log("readStateData", readStateData);
-
-    const encodedCertificate = readStateData.certificate;
-    const cert = Uint8Array.from(Buffer.from(encodedCertificate, "hex"));
-    const certificate = await Certificate.create({
-      certificate: bufFromBufLike(cert),
-      rootKey: agent.rootKey,
-      maxAgeInMinutes: 100,
-      canisterId: Principal.from(canisterId),
-    });
-
-    // console.log("requestId: ", Buffer.from(requestId).toString("hex"));
-    const path = [
-      new TextEncoder().encode("request_status"),
-      Uint8Array.from(Buffer.from(requestId, "hex")),
-    ];
-    const status = new TextDecoder().decode(
-      lookupResultToBuffer(certificate.lookup([...path, "status"])),
-    );
-
-    switch (status) {
-      case "rejected":
-        {
-          const rejectCode = new Uint8Array(
-            lookupResultToBuffer(certificate.lookup([...path, "reject_code"]))!,
-          )[0];
-          const rejectMessage = new TextDecoder().decode(
-            lookupResultToBuffer(certificate.lookup([...path, "reject_message"]))!,
-          );
-          const error_code_buf = lookupResultToBuffer(certificate.lookup([...path, "error_code"]));
-          const error_code = error_code_buf ? new TextDecoder().decode(error_code_buf) : undefined;
-
-          log(
-            "error",
-            `[ICP](pollForReadState) Rejected: rejectCode: ${rejectCode}, rejectMessage: ${rejectMessage}, error_code: ${error_code}`,
-          );
-          throw new Error(
-            `[ICP](pollForReadState) Rejected: rejectCode: ${rejectCode}, rejectMessage: ${rejectMessage}, error_code: ${error_code}`,
-          );
-        }
-        break;
-      case "replied":
-        reply = lookupResultToBuffer(certificate.lookup([...path, "reply"]));
-        // console.log("reply: ", reply);
-        break;
-    }
-
-    if (!reply) {
-      // wait 1 second
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-  }
-
-  if (!reply) {
-    throw new Error(`[ICP](pollForReadState) Reply not found`);
-  }
-  return reply;
-};
-
 export const fetchBalance = async (address: string): Promise<BigNumber> => {
-  const agent = await getAgent();
+  const agent = await getAgent(ICP_NETWORK_URL);
   const indexCanister = Principal.fromText(MAINNET_INDEX_CANISTER_ID);
-  const getBalanceIdlFunc = indexIdlFactory({ IDL })._fields.find(
-    f => f[0] === "get_account_identifier_balance",
-  );
-  invariant(getBalanceIdlFunc, "[ICP](fetchBalance) Method not found");
-  const getBalanceArgs = IDL.encode(getBalanceIdlFunc[1].argTypes, [address]);
+  const getBalanceIdlFunc = getCanisterIdlFunc(indexIdlFactory, "get_account_identifier_balance");
+  const getBalanceArgs = encodeCanisterIdlFunc(getBalanceIdlFunc, [address]);
 
   const balanceRes = await agent.query(indexCanister, {
     arg: getBalanceArgs,
@@ -155,7 +85,7 @@ export const fetchBalance = async (address: string): Promise<BigNumber> => {
     return BigNumber(0);
   }
 
-  const decodedBalance = IDL.decode(getBalanceIdlFunc[1].retTypes, balanceRes.reply.arg) as any;
+  const decodedBalance = decodeCanisterIdlFunc<[bigint]>(getBalanceIdlFunc, balanceRes.reply.arg);
   const balance: bigint | undefined = fromNullable(decodedBalance);
   if (!balance) {
     return BigNumber(0);
@@ -173,7 +103,7 @@ export const fetchTxns = async (
     return [];
   }
 
-  const agent = await getAgent();
+  const agent = await getAgent(ICP_NETWORK_URL);
   const canisterId = Principal.fromText(MAINNET_INDEX_CANISTER_ID);
   const transactionsRawRequest = {
     account_identifier: address,
@@ -181,11 +111,11 @@ export const fetchTxns = async (
     max_results: BigInt(FETCH_TXNS_LIMIT),
   };
 
-  const getTransactionsIdlFunc = indexIdlFactory({ IDL })._fields.find(
-    f => f[0] === "get_account_identifier_transactions",
+  const getTransactionsIdlFunc = getCanisterIdlFunc(
+    indexIdlFactory,
+    "get_account_identifier_transactions",
   );
-  invariant(getTransactionsIdlFunc, "[ICP](fetchTxns) Method not found");
-  const getTransactionsArgs = IDL.encode(getTransactionsIdlFunc[1].argTypes, [
+  const getTransactionsArgs = encodeCanisterIdlFunc(getTransactionsIdlFunc, [
     transactionsRawRequest,
   ]);
 
@@ -195,10 +125,9 @@ export const fetchTxns = async (
   });
 
   invariant(transactionsRes.status === "replied", "[ICP](fetchTxns) Query failed");
-  const decodedTransactions: [{ Ok: GetAccountIdentifierTransactionsResponse }] = IDL.decode(
-    getTransactionsIdlFunc[1].retTypes,
-    transactionsRes.reply.arg,
-  ) as any;
+  const decodedTransactions = decodeCanisterIdlFunc<
+    [{ Ok: GetAccountIdentifierTransactionsResponse }]
+  >(getTransactionsIdlFunc, transactionsRes.reply.arg);
 
   const response = fromNullable(decodedTransactions);
   invariant(response, "[ICP](fetchTxns) Decoding failed");

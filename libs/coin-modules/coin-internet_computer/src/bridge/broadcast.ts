@@ -1,6 +1,5 @@
 import { AccountBridge } from "@ledgerhq/types-live";
-import { broadcastTxn, pollForReadState, getAgent } from "../api";
-import { GovernanceCanister } from "@dfinity/nns";
+import { broadcastTxn } from "../api";
 import {
   ICPAccount,
   ICPAccountRaw,
@@ -8,14 +7,24 @@ import {
   Transaction,
   TransactionStatus,
 } from "../types";
-import { ListNeuronsResponse, ManageNeuronResponse } from "@dfinity/nns/dist/candid/governance";
 import { log } from "@ledgerhq/logs";
 import invariant from "invariant";
-import { MAINNET_GOVERNANCE_CANISTER_ID, MAINNET_LEDGER_CANISTER_ID } from "../consts";
-import { idlFactory as idlFactoryGovernance } from "@dfinity/nns/dist/candid/governance.idl";
-import { IDL } from "@dfinity/candid";
-import { derivePrincipalFromPubkey } from "../common-logic/utils";
-import { NeuronsData } from "../neurons";
+import {
+  MAINNET_GOVERNANCE_CANISTER_ID,
+  MAINNET_LEDGER_CANISTER_ID,
+  ICP_NETWORK_URL,
+} from "../consts";
+import {
+  governanceIdlFactory as idlFactoryGovernance,
+  ListNeuronsResponse,
+  ManageNeuronResponse,
+  GovernanceCanister,
+  getCanisterIdlFunc,
+  decodeCanisterIdlFunc,
+} from "@zondax/ledger-live-icp";
+import { pollForReadState, getAgent } from "@zondax/ledger-live-icp/agent";
+import { NeuronsData } from "@zondax/ledger-live-icp/neurons";
+import { derivePrincipalFromPubkey } from "@zondax/ledger-live-icp/utils";
 
 // Interface to structure raw data for broadcasting transactions
 interface BroadcastRawData {
@@ -83,28 +92,23 @@ export const broadcast: AccountBridge<
     rawDataTyped.methodName === "list_neurons"
   ) {
     const reply = await pollForReadState(
+      ICP_NETWORK_URL,
       Buffer.from(rawDataTyped.encodedSignedReadStateBlob, "hex"),
       MAINNET_GOVERNANCE_CANISTER_ID,
       rawDataTyped.requestId,
     );
 
-    const listNeuronsIdlFunc = idlFactoryGovernance({ IDL })._fields.find(
-      func => func[0] === rawDataTyped.methodName,
-    );
-
-    invariant(
+    const listNeuronsIdlFunc = getCanisterIdlFunc(idlFactoryGovernance, rawDataTyped.methodName);
+    const [listNeuronsResponse] = decodeCanisterIdlFunc<[ListNeuronsResponse]>(
       listNeuronsIdlFunc,
-      `[ICP](broadcast) Missing listNeuronsIdlFunc with methodName: ${rawDataTyped.methodName}`,
-    );
-    const [listNeuronsResponse]: [ListNeuronsResponse] = IDL.decode(
-      listNeuronsIdlFunc[1].retTypes,
       reply,
-    ) as any;
+    );
 
     const neurons = new NeuronsData(
       listNeuronsResponse.full_neurons,
       listNeuronsResponse.neuron_infos,
       Date.now(),
+      MAINNET_GOVERNANCE_CANISTER_ID,
     );
     return {
       ...operation,
@@ -121,25 +125,19 @@ export const broadcast: AccountBridge<
     manageNeuronTypes.includes(rawDataTyped.methodName)
   ) {
     const reply = await pollForReadState(
+      ICP_NETWORK_URL,
       Buffer.from(rawDataTyped.encodedSignedReadStateBlob, "hex"),
       MAINNET_GOVERNANCE_CANISTER_ID,
       rawDataTyped.requestId,
     );
 
     log("debug", `[ICP](broadcast) manageNeuron reply: ${reply}`);
-    const manageNeuronIdlFunc = idlFactoryGovernance({ IDL })._fields.find(
-      func => func[0] === "manage_neuron",
-    );
+    const manageNeuronIdlFunc = getCanisterIdlFunc(idlFactoryGovernance, "manage_neuron");
 
-    invariant(
+    const [manageNeuronResponse] = decodeCanisterIdlFunc<[ManageNeuronResponse]>(
       manageNeuronIdlFunc,
-      `[ICP](broadcast) Missing manageNeuronIdlFunc with methodName: ${rawDataTyped.methodName}`,
-    );
-
-    const [manageNeuronResponse]: [ManageNeuronResponse] = IDL.decode(
-      manageNeuronIdlFunc[1].retTypes,
       reply,
-    ) as any;
+    );
 
     if (
       manageNeuronResponse.command.length > 0 &&
@@ -163,7 +161,7 @@ export const broadcast: AccountBridge<
   if (rawDataTyped.methodName === "create_neuron") {
     invariant(account.xpub, `[ICP](broadcast-${rawDataTyped.methodName}) Missing account xpub`);
 
-    const agent = await getAgent();
+    const agent = await getAgent(ICP_NETWORK_URL);
     const govCanister = GovernanceCanister.create({ agent });
 
     const memo = (operation as InternetComputerOperation).extra.memo;
@@ -199,7 +197,7 @@ export const broadcast: AccountBridge<
   if (rawDataTyped.methodName === "increase_stake") {
     invariant(account.xpub, `[ICP](broadcast-${rawDataTyped.methodName}) Missing account xpub`);
 
-    const agent = await getAgent();
+    const agent = await getAgent(ICP_NETWORK_URL);
     const govCanister = GovernanceCanister.create({ agent });
 
     invariant(

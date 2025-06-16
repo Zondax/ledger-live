@@ -6,12 +6,12 @@ import { Account, OperationType } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
 import { ICP_FEES } from "../../consts";
 import { encodeOperationId } from "@ledgerhq/coin-framework/operation";
-import { deriveAddressFromPubkey, normalizeEpochTimestamp } from "../../common-logic/utils";
-import { TransactionWithId } from "@dfinity/ledger-icp/dist/candid/index.d";
+import { normalizeEpochTimestamp } from "../../common-logic/utils";
+import { TransactionWithId } from "@zondax/ledger-live-icp";
 import { ICPAccount, InternetComputerOperation } from "../../types";
 import invariant from "invariant";
-import { hashTransaction } from "./hash";
-import { NeuronsData } from "../../neurons";
+import { NeuronsData } from "@zondax/ledger-live-icp/neurons";
+import { hashTransaction, deriveAddressFromPubkey } from "@zondax/ledger-live-icp/utils";
 
 export const getAccountShape: GetAccountShape<ICPAccount> = async info => {
   const { currency, derivationMode, rest = {}, initialAccount } = info;
@@ -45,7 +45,7 @@ export const getAccountShape: GetAccountShape<ICPAccount> = async info => {
     id: accountId,
     balance,
     spendableBalance: balance,
-    operations: flatMap(
+    operations: flatMap<TransactionWithId, InternetComputerOperation>(
       txns,
       mapTxToOps(
         accountId,

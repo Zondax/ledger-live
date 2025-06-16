@@ -172,6 +172,7 @@ export const OPERATION_TYPE_OUT_FAMILY = [
   "LOCK",
   "BURN",
   "TOP_UP_NEURON",
+  "STAKE_NEURON",
 ];
 export const OPERATION_TYPE_STAKE_FAMILY = [
   "FREEZE",
@@ -193,7 +194,6 @@ export const OPERATION_TYPE_STAKE_FAMILY = [
   "STAKE",
   "UNSTAKE",
   "WITHDRAW_UNSTAKED",
-  "STAKE_NEURON",
 ];
 
 export function getOperationAmountNumber(op: Operation): BigNumber {

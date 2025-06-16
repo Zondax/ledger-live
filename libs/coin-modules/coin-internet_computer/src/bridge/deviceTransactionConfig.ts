@@ -5,7 +5,8 @@ import { formatCurrencyUnit } from "@ledgerhq/coin-framework/currencies/index";
 import type { CommonDeviceTransactionField } from "@ledgerhq/coin-framework/transaction/common";
 
 import { Transaction, TransactionStatus } from "../types";
-import { methodToString, nowInSeconds } from "../common-logic/utils";
+import { methodToString } from "../common-logic/utils";
+import { nowInSeconds } from "@zondax/ledger-live-icp/utils";
 import { KNOWN_TOPICS } from "../consts";
 import BigNumber from "bignumber.js";
 

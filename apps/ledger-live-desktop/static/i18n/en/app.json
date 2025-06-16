@@ -6643,6 +6643,12 @@
     },
     "ICPSplitNotAllowed": {
       "title": "The split amount is more than the maximum allowed"
+    },
+    "ICPIncreaseStakeWarning": {
+      "title": "This operation will transfer the amount to increase the stake of an existing neuron"
+    },
+    "ICPCreateNeuronWarning": {
+      "title": "This operation will transfer the amount to a new neuron. Upon successful confirmation, the neuron will be available for further operations."
     }
   },
   "cryptoOrg": {

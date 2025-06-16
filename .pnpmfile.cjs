@@ -246,12 +246,6 @@ function readPackage(pkg, context) {
       addDependencies("documentation", {
         micromark: "*",
       }),
-      addDependencies("@dfinity/candid", {
-        "@dfinity/principal": "*",
-      }),
-      addDependencies("@dfinity/agent", {
-        buffer: "*",
-      }),
       addDependencies("@react-native-community/cli-tools", {
         execa: "5.0.0",
       }),

@@ -1,6 +1,10 @@
-import { ICPAccount, ICPNeuron } from "../types";
-import { fromNullable } from "@dfinity/utils";
-import { derivePrincipalFromPubkey, getTimeUntil, nowInSeconds } from "./utils";
+import { ICPAccount } from "../types";
+import {
+  fromNullable,
+  derivePrincipalFromPubkey,
+  getTimeUntil,
+} from "@zondax/ledger-live-icp/utils";
+
 import {
   ICP_FEES,
   ICP_MIN_STAKING_AMOUNT,
@@ -8,52 +12,16 @@ import {
   MIN_DISSOLVE_DELAY,
   SECONDS_IN_HALF_YEAR,
   SECONDS_IN_HOUR,
-  VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS,
 } from "../consts";
+
 import {
-  getAgeMultiplier,
   getDissolveDelayMultiplier,
   getNeuronDissolveDurationSeconds,
-} from "../neurons";
+  ICPNeuron,
+  votingPowerNeedsRefresh,
+} from "@zondax/ledger-live-icp/neurons";
 import BigNumber from "bignumber.js";
 import invariant from "invariant";
-
-const votingPowerNeedsRefresh = (
-  account: ICPAccount,
-): {
-  needsRefresh: boolean;
-  minDays: number;
-  minHours: number;
-  minMinutes: number;
-} => {
-  const filteredNeurons = account.neurons.fullNeurons.filter(
-    neuron => getNeuronVotingPower(neuron) > 0,
-  );
-
-  let minSeconds = Number.MAX_SAFE_INTEGER;
-  for (const neuron of filteredNeurons) {
-    const secondsTillVotingPowerExpires = getSecondsTillVotingPowerExpires(neuron);
-    if (secondsTillVotingPowerExpires <= 0) {
-      return {
-        needsRefresh: true,
-        minDays: 0,
-        minMinutes: 0,
-        minHours: 0,
-      };
-    }
-
-    minSeconds = Math.min(minSeconds, secondsTillVotingPowerExpires);
-  }
-
-  const { days, minutes, hours } = getTimeUntil(minSeconds, false);
-
-  return {
-    needsRefresh: days <= VOTING_POWER_REFRESH_THRESHOLD_IN_DAYS,
-    minDays: days,
-    minHours: hours,
-    minMinutes: minutes,
-  };
-};
 
 type BannerState =
   | "confirm_following"
@@ -71,7 +39,9 @@ interface getBannerStateReturn {
 }
 export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
   // Check Neuron Periodic Confirmation (Priority 1)
-  const { needsRefresh, minDays, minHours, minMinutes } = votingPowerNeedsRefresh(account);
+  const { needsRefresh, minDays, minHours, minMinutes } = votingPowerNeedsRefresh(
+    account.neurons.fullNeurons,
+  );
   if (needsRefresh) {
     return {
       state: "confirm_following",
@@ -135,39 +105,6 @@ export const getMinDissolveDelay = (neuron: ICPNeuron) => {
   return Math.max(MIN_DISSOLVE_DELAY, Number(currentDissolveDelay) + SECONDS_IN_HOUR);
 };
 
-export const getSecondsTillVotingPowerExpires = (neuron: ICPNeuron) => {
-  const votingPowerLastRefresh = fromNullable(
-    neuron.neuronInfo.voting_power_refreshed_timestamp_seconds,
-  );
-
-  if (!votingPowerLastRefresh) {
-    return 0;
-  }
-
-  const timeNow = nowInSeconds();
-  const timeSinceLastRefresh = timeNow - Number(votingPowerLastRefresh);
-
-  return SECONDS_IN_HALF_YEAR - timeSinceLastRefresh;
-};
-
-export const getNeuronVotingPower = (neuron: ICPNeuron) => {
-  if (getNeuronDissolveDurationSeconds(neuron) < SECONDS_IN_HALF_YEAR) {
-    return 0;
-  }
-
-  return Number(neuron.neuronInfo.voting_power);
-};
-
-export const getNeuronAgeBonus = (neuron: ICPNeuron) => {
-  const age = neuron.neuronInfo.age_seconds;
-  if (getNeuronDissolveDurationSeconds(neuron) < SECONDS_IN_HALF_YEAR) {
-    return 0;
-  }
-
-  const multiplier = getAgeMultiplier(BigInt(age));
-  return Math.round((multiplier + Number.EPSILON - 1) * 100);
-};
-
 export const getNeuronDissolveDelayBonus = (neuron: ICPNeuron) => {
   const dissolveDelay = getNeuronDissolveDurationSeconds(neuron);
   if (dissolveDelay < SECONDS_IN_HALF_YEAR) {
@@ -203,3 +140,8 @@ export const isDeviceControlledNeuron = (neuron: ICPNeuron, account: ICPAccount)
 
   return controller.toString() === principal.toString();
 };
+
+export {
+  neuronPotentialVotingPower,
+  getNeuronDissolveDuration,
+} from "@zondax/ledger-live-icp/neurons";

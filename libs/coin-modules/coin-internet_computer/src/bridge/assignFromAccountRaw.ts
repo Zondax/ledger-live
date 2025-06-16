@@ -6,7 +6,7 @@ import {
   Transaction,
   TransactionStatus,
 } from "../types";
-import { NeuronsData } from "../neurons";
+import { NeuronsData } from "@zondax/ledger-live-icp/neurons";
 import { log } from "@ledgerhq/logs";
 
 export const assignFromAccountRaw: AccountBridge<
