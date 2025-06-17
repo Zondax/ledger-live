@@ -330,8 +330,7 @@ export default function StepManage({
                   neuron.dissolveState === "Unlocked"
                     ? onClickDisburseStake
                     : onClickStartStopDissolving,
-                outline: isDeviceControlled,
-                disabled: !isDeviceControlled,
+                hidden: !isDeviceControlled,
               },
             ]}
             value={neuron.dissolveState}
@@ -343,8 +342,7 @@ export default function StepManage({
               {
                 label: `${neuron.dissolveState !== "Unlocked" ? "Increase" : "Set"} Dissolve Delay`,
                 onClick: () => transitionTo("setDissolveDelay"),
-                outline: isDeviceControlled,
-                disabled: !isDeviceControlled,
+                hidden: !isDeviceControlled,
               },
             ]}
             value={`Dissolve Delay: ${neuron.dissolveState === "Unlocked" ? "0" : getNeuronDissolveDuration(neuron)}`}
@@ -361,8 +359,7 @@ export default function StepManage({
               {
                 label: "Confirm Following",
                 onClick: () => onClickConfirmFollowing(neuron),
-                outline: isDeviceControlled,
-                disabled: !isDeviceControlled,
+                hidden: !isDeviceControlled,
               },
             ]}
             // TODO: get correct status
@@ -405,12 +402,14 @@ export default function StepManage({
               {
                 label: "Stake",
                 onClick: () => transitionTo("stakeMaturity"),
-                disabled: !canStakeMaturity(neuron) && !isDeviceControlled,
+                hidden: !isDeviceControlled,
+                disabled: !canStakeMaturity(neuron),
               },
               {
                 label: "Spawn Neuron",
                 onClick: onClickSpawnNeuron,
-                disabled: !canSpawnNeuron(neuron) && !isDeviceControlled,
+                hidden: !isDeviceControlled,
+                disabled: !canSpawnNeuron(neuron),
               },
             ]}
             value={
@@ -440,8 +439,7 @@ export default function StepManage({
                     label: "Remove",
                     onClick: () => onClickRemoveHotKey(val.toString()),
                     danger: false,
-                    outline: isDeviceControlled,
-                    disabled: !isDeviceControlled,
+                    hidden: !isDeviceControlled,
                   },
                 ]}
               />
@@ -449,7 +447,7 @@ export default function StepManage({
           })}
           {neuron.hot_keys.length === 0 && <ManageModalElement label="No HotKeys Found" />}
           <ManageModalActionElement
-            disabled={!isDeviceControlled}
+            hidden={!isDeviceControlled}
             label="Add Hot Key"
             onClick={onClickAddHotKey}
           />
@@ -489,7 +487,8 @@ export default function StepManage({
           />
 
           <ManageModalActionElement
-            disabled={!canSplitNeuron(neuron) || !isDeviceControlled}
+            hidden={!isDeviceControlled}
+            disabled={!canSplitNeuron(neuron)}
             label="Split Neuron"
             onClick={onClickSplitNeuron}
           />
@@ -497,7 +496,7 @@ export default function StepManage({
           <ManageModalActionElement
             label={`${neuron.auto_stake_maturity[0] ? "Stop" : "Start"} Automatic Stake Maturity`}
             onClick={() => onClickAutoStakeMaturity(!neuron.auto_stake_maturity[0])}
-            disabled={!isDeviceControlled}
+            hidden={!isDeviceControlled}
           />
         </ManageModalSection>
 

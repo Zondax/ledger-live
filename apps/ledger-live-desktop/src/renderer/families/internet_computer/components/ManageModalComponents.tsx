@@ -159,18 +159,22 @@ type ManageModalActionElementProps = {
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  hidden?: boolean;
 };
 
 export function ManageModalActionElement({
   label,
   onClick,
   disabled,
+  hidden,
 }: ManageModalActionElementProps) {
   return (
     <Box style={{ flexDirection: "row", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-      <Button key={label} primary onClick={onClick} disabled={disabled}>
-        {label}
-      </Button>
+      {hidden ? null : (
+        <Button key={label} primary onClick={onClick} disabled={disabled}>
+          {label}
+        </Button>
+      )}
     </Box>
   );
 }
@@ -184,6 +188,7 @@ type ManageModalElementWithIconProps = {
     label: string;
     onClick: () => void;
     disabled?: boolean;
+    hidden?: boolean;
     danger?: boolean;
     outline?: boolean;
   }[];
@@ -263,18 +268,20 @@ export function ManageModalElementWithAction({
       </Box>
       <Box style={{ flexDirection: "row", gap: 8 }}>
         {action &&
-          action.map(action => (
-            <Button
-              key={action.label}
-              primary={!action.outline}
-              onClick={action.onClick}
-              disabled={action.disabled}
-              danger={action.danger}
-              outline={action.outline}
-            >
-              {action.label}
-            </Button>
-          ))}
+          action.map(action =>
+            action.hidden ? null : (
+              <Button
+                key={action.label}
+                primary={!action.outline}
+                onClick={action.onClick}
+                disabled={action.disabled}
+                danger={action.danger}
+                outline={action.outline}
+              >
+                {action.label}
+              </Button>
+            ),
+          )}
       </Box>
     </Element>
   );
