@@ -1,27 +1,9 @@
 import { ICPAccount } from "../types";
-import {
-  fromNullable,
-  derivePrincipalFromPubkey,
-  getTimeUntil,
-} from "@zondax/ledger-live-icp/utils";
+import { getTimeUntil } from "@zondax/ledger-live-icp/utils";
 
-import {
-  ICP_FEES,
-  ICP_MIN_STAKING_AMOUNT,
-  LAST_SYNC_THRESHOLD_IN_DAYS,
-  MIN_DISSOLVE_DELAY,
-  SECONDS_IN_HALF_YEAR,
-  SECONDS_IN_HOUR,
-} from "../consts";
+import { LAST_SYNC_THRESHOLD_IN_DAYS } from "../consts";
 
-import {
-  getDissolveDelayMultiplier,
-  getNeuronDissolveDurationSeconds,
-  ICPNeuron,
-  votingPowerNeedsRefresh,
-} from "@zondax/ledger-live-icp/neurons";
-import BigNumber from "bignumber.js";
-import invariant from "invariant";
+import { votingPowerNeedsRefresh } from "@zondax/ledger-live-icp/neurons";
 
 type BannerState =
   | "confirm_following"
@@ -100,51 +82,18 @@ export const getBannerState = (account: ICPAccount): getBannerStateReturn => {
   };
 };
 
-export const getMinDissolveDelay = (neuron: ICPNeuron) => {
-  const currentDissolveDelay = getNeuronDissolveDurationSeconds(neuron);
-  return Math.max(MIN_DISSOLVE_DELAY, Number(currentDissolveDelay) + SECONDS_IN_HOUR);
-};
-
-export const getNeuronDissolveDelayBonus = (neuron: ICPNeuron) => {
-  const dissolveDelay = getNeuronDissolveDurationSeconds(neuron);
-  if (dissolveDelay < SECONDS_IN_HALF_YEAR) {
-    return 0;
-  }
-
-  const multiplier = getDissolveDelayMultiplier(BigInt(dissolveDelay));
-  return Math.round((multiplier + Number.EPSILON - 1) * 100);
-};
-
-export const canSplitNeuron = (neuron: ICPNeuron) => {
-  return neuron.cached_neuron_stake_e8s > BigInt(2 * ICP_MIN_STAKING_AMOUNT + ICP_FEES);
-};
-
-export const canSpawnNeuron = (neuron: ICPNeuron) => {
-  return neuron.maturity_e8s_equivalent > BigInt(ICP_MIN_STAKING_AMOUNT);
-};
-
-export const canStakeMaturity = (neuron: ICPNeuron) => {
-  return neuron.maturity_e8s_equivalent > BigInt(0);
-};
-
-export const maxAllowedSplitAmount = (neuron: ICPNeuron) => {
-  return BigNumber(neuron.cached_neuron_stake_e8s.toString()).minus(ICP_MIN_STAKING_AMOUNT);
-};
-
-export const isDeviceControlledNeuron = (neuron: ICPNeuron, account: ICPAccount) => {
-  invariant(account.xpub, "[ICP](isDeviceControlledNeuron) account.xpub is required");
-
-  const principal = derivePrincipalFromPubkey(account.xpub);
-  const controller = fromNullable(neuron.controller);
-  invariant(controller, "[ICP](isDeviceControlledNeuron) controller is required");
-
-  return controller.toString() === principal.toString();
-};
-
 export {
   neuronPotentialVotingPower,
   getNeuronDissolveDuration,
   getSecondsTillVotingPowerExpires,
   getNeuronVotingPower,
   getNeuronAgeBonus,
+  getMinDissolveDelay,
+  getNeuronDissolveDelayBonus,
+  canSplitNeuron,
+  canSpawnNeuron,
+  canStakeMaturity,
+  maxAllowedSplitAmount,
+  isDeviceControlledNeuron,
+  NeuronsData,
 } from "@zondax/ledger-live-icp/neurons";

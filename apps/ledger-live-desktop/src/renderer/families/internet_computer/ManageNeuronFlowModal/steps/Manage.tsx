@@ -81,7 +81,7 @@ export default function StepManage({
   const votingPower = getNeuronVotingPower(neuron);
   const ageBonus = getNeuronAgeBonus(neuron);
   const dissolveDelayBonus = getNeuronDissolveDelayBonus(neuron);
-  const isDeviceControlled = isDeviceControlledNeuron(neuron, account);
+  const isDeviceControlled = isDeviceControlledNeuron(neuron, account.xpub || "");
 
   const onClickIncreaseStake = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
