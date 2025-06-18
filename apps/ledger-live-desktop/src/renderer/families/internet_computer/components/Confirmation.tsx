@@ -72,12 +72,19 @@ export default function StepConfirmation({
       <Flex flexDirection="column" alignItems="center" flex={1} justifyContent="center">
         <SuccessIcon size={64} />
 
-        <ActionText mt={6} mb={2} color={colors.positiveGreen}>
-          {t(`internetComputer.manageNeuron.actions.${lastManageAction}`)} was successful
+        <ActionText
+          style={{ fontSize: 14, fontWeight: 600 }}
+          mt={6}
+          mb={2}
+          color={colors.positiveGreen}
+        >
+          {t("internetComputer.confirmation.success", {
+            action: t(`internetComputer.manageNeuron.actions.${lastManageAction}`),
+          })}
         </ActionText>
 
         <Text variant="paragraph" color="neutral.c70" textAlign="center">
-          Please synchronize your accounts to see the updated changes
+          {t("internetComputer.confirmation.syncAccounts")}
         </Text>
       </Flex>
     </Container>

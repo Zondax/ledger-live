@@ -6,6 +6,7 @@ import Input from "~/renderer/components/Input";
 import { StepProps } from "../types";
 import { formatCurrencyUnit } from "@ledgerhq/live-common/currencies/index";
 import { BigNumber } from "bignumber.js";
+import { Trans, useTranslation } from "react-i18next";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import {
   SECONDS_IN_DAY,
@@ -26,6 +27,7 @@ export function SetDissolveDelay({
   setLastManageAction,
   transitionTo,
 }: StepProps) {
+  const { t } = useTranslation();
   const neuron = neurons.fullNeurons[manageNeuronIndex];
   const minDissolveDelay = (getMinDissolveDelay(neuron) / SECONDS_IN_DAY).toPrecision(4);
   const maxDissolveDelay = (MAX_DISSOLVE_DELAY / SECONDS_IN_DAY).toPrecision(4);
@@ -67,12 +69,12 @@ export function SetDissolveDelay({
   return (
     <Box p={20}>
       <Text ff="Inter|SemiBold" fontSize={22} mb={10}>
-        Set Dissolve Delay
+        <Trans i18nKey="internetComputer.manageNeuronFlow.setDissolveDelay.title" />
       </Text>
 
       <Box mb={10}>
         <Text ff="Inter|SemiBold" fontSize={14}>
-          Neuron ID
+          <Trans i18nKey="internetComputer.common.neuronId" />
         </Text>
         <Text ff="Inter|Regular" fontSize={14} color="palette.text.shade80">
           {neuron.id[0]?.id.toString()}
@@ -81,7 +83,7 @@ export function SetDissolveDelay({
 
       <Box mb={10}>
         <Text ff="Inter|SemiBold" fontSize={14}>
-          Balance
+          <Trans i18nKey="internetComputer.common.balance" />
         </Text>
         <Text ff="Inter|Regular" fontSize={14} color="palette.text.shade80">
           {formatCurrencyUnit(
@@ -97,22 +99,20 @@ export function SetDissolveDelay({
 
       <Box mb={10}>
         <Text ff="Inter|SemiBold" fontSize={14}>
-          Dissolve Delay
+          <Trans i18nKey="internetComputer.manageNeuronFlow.setDissolveDelay.dissolveDelay" />
         </Text>
         <Text ff="Inter|Regular" fontSize={14} color="palette.text.shade60" mb={2}>
-          Dissolve delay is the minimum amount of time you have to wait for the neuron to unlock,
-          and ICP to be available again. Note, that dissolve delay only decreases when the neuron is
-          in a dissolving state.
+          <Trans i18nKey="internetComputer.manageNeuronFlow.setDissolveDelay.dissolveDelayTooltip" />
         </Text>
 
         <Text ff="Inter|Regular" fontSize={14} color="palette.text.shade60">
-          Voting power is given to neurons with a dissolve delay of at least 6 months.
+          <Trans i18nKey="internetComputer.manageNeuronFlow.setDissolveDelay.votingPowerDescription" />
         </Text>
       </Box>
 
       <Box mb={10}>
         <Text ff="Inter|SemiBold" fontSize={14} mb={2}>
-          Dissolve Delay (in days)
+          <Trans i18nKey="internetComputer.manageNeuronFlow.setDissolveDelay.dissolveDelayInput" />
         </Text>
 
         <Box horizontal justifyContent="space-between">
@@ -127,7 +127,7 @@ export function SetDissolveDelay({
           value={dissolveDelay}
           onChange={onChangeDissolveDelay}
           error={errors.dissolveDelay}
-          placeholder="Enter dissolve delay"
+          placeholder={t("internetComputer.manageNeuronFlow.setDissolveDelay.inputPlaceholder")}
           type="number"
           min="0"
         />
@@ -140,7 +140,7 @@ export function SetDissolveDelay({
                 : "0"}
             </Text>
             <Text ff="Inter|SemiBold" fontSize={12} color="palette.text.shade60">
-              Dissolve Delay
+              <Trans i18nKey="internetComputer.manageNeuronFlow.setDissolveDelay.dissolveDelay" />
             </Text>
           </Box>
           <Box alignItems="center">
@@ -156,7 +156,7 @@ export function SetDissolveDelay({
                 : "0"}
             </Text>
             <Text ff="Inter|SemiBold" fontSize={12} color="palette.text.shade60">
-              Voting Power
+              <Trans i18nKey="internetComputer.common.votingPower" />
             </Text>
           </Box>
         </Box>
@@ -164,14 +164,14 @@ export function SetDissolveDelay({
 
       <Box horizontal justifyContent="flex-end">
         <Button mr={2} onClick={() => transitionTo("manage")}>
-          Cancel
+          {t("common.cancel")}
         </Button>
         <Button
           primary
           onClick={onClickIncreaseDissolveDelay}
           disabled={!dissolveDelay || isNaN(parseFloat(dissolveDelay)) || errors.dissolveDelay}
         >
-          Update Delay
+          <Trans i18nKey="internetComputer.manageNeuronFlow.setDissolveDelay.updateDelay" />
         </Button>
       </Box>
     </Box>

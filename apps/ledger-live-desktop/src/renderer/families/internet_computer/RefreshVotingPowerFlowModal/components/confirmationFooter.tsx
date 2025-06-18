@@ -42,12 +42,12 @@ export function ConfirmationFooter({
           {t("common.close")}
         </Button>
         <Button
-          primary
           ml={2}
           event={`Manage Neurons ${currencyName} Flow Step 3 Sync Neurons Clicked`}
           onClick={error ? onRetry : onClickSync}
+          outline={true}
         >
-          {error ? "Retry" : "Sync"}
+          {error ? t("common.retry") : t("internetComputer.sync")}
         </Button>
       </Box>
     </Box>

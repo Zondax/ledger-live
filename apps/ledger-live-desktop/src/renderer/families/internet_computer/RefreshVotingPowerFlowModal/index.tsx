@@ -18,11 +18,16 @@ export default function RefreshVotingPowerModal() {
   }, []);
   const isModalLocked = ["device", "confirmation"].includes(stepId);
   const modalName = "MODAL_ICP_REFRESH_VOTING_POWER";
+  let width: number | undefined;
+  if (stepId === "listNeuron") {
+    width = 650;
+  }
+
   return (
     <Modal
       name={modalName}
       centered
-      width={800}
+      width={width}
       onHide={onHide}
       preventBackdropClick={isModalLocked}
       render={({ onClose, data }) => (

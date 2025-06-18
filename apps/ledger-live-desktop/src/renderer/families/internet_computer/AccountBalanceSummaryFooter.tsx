@@ -18,6 +18,7 @@ import { useAccountUnit } from "~/renderer/hooks/useAccountUnit";
 import { AccountLike } from "@ledgerhq/types-live";
 import { BigNumber } from "bignumber.js";
 import { ICPAccount } from "@ledgerhq/live-common/families/internet_computer/types";
+import { useTranslation } from "react-i18next";
 
 const Wrapper = styled(Box).attrs(() => ({
   horizontal: true,
@@ -99,6 +100,7 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
   account,
   discreetMode,
 }) => {
+  const { t } = useTranslation();
   const locale = useSelector(localeSelector);
   const unit = useAccountUnit(account);
   const counterValue = useSelector(counterValueCurrencySelector);
@@ -148,9 +150,9 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
       <Box style={{ display: "flex", flexDirection: "row", gap: 30 }}>
         {neurons.totalStaked.gt(0) && (
           <BalanceDetail>
-            <ToolTip content="The total amount of ICP tokens currently staked in neurons. Staked ICP earns voting rewards and can be used for governance.">
+            <ToolTip content={t("internetComputer.summaryFooter.stakedBalanceTooltip")}>
               <TitleWrapper>
-                <Title>Staked balance</Title>
+                <Title>{t("internetComputer.summaryFooter.stakedBalance")}</Title>
                 <InfoCircle size={13} />
               </TitleWrapper>
             </ToolTip>
@@ -168,9 +170,9 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
 
         {neurons.totalMaturity.gt(0) && (
           <BalanceDetail>
-            <ToolTip content="The total accumulated rewards from staking, including both staked and liquid maturity. These rewards can be either staked again or claimed as liquid ICP.">
+            <ToolTip content={t("internetComputer.summaryFooter.totalMaturityTooltip")}>
               <TitleWrapper>
-                <Title>Total Maturity</Title>
+                <Title>{t("internetComputer.summaryFooter.totalMaturity")}</Title>
                 <InfoCircle size={13} />
               </TitleWrapper>
             </ToolTip>
@@ -181,9 +183,9 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
         )}
         {neurons.totalMaturityStaked.gt(0) && (
           <BalanceDetail>
-            <ToolTip content="The portion of maturity rewards that has been automatically re-staked into neurons, continuing to earn additional rewards.">
+            <ToolTip content={t("internetComputer.summaryFooter.stakedMaturityTooltip")}>
               <TitleWrapper>
-                <Title>Staked Maturity</Title>
+                <Title>{t("internetComputer.summaryFooter.stakedMaturity")}</Title>
                 <InfoCircle size={13} />
               </TitleWrapper>
             </ToolTip>
@@ -194,9 +196,9 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
         )}
         {neurons.totalMaturity.gt(0) && (
           <BalanceDetail>
-            <ToolTip content="The portion of maturity rewards that is available to be claimed as liquid ICP tokens or can be staked into neurons.">
+            <ToolTip content={t("internetComputer.summaryFooter.liquidMaturityTooltip")}>
               <TitleWrapper>
-                <Title>Liquid Maturity</Title>
+                <Title>{t("internetComputer.summaryFooter.liquidMaturity")}</Title>
                 <InfoCircle size={13} />
               </TitleWrapper>
             </ToolTip>
@@ -213,7 +215,7 @@ const AccountBalanceSummaryFooter: InternetComputerFamily["AccountBalanceSummary
           fontSize={4}
           color="palette.text.shade60"
         >
-          {`Last Synced: ${new Date(neurons.lastUpdatedMSecs).toLocaleString()}`}
+          {`${t("internetComputer.lastSynced")}: ${new Date(neurons.lastUpdatedMSecs).toLocaleString()}`}
         </Box>
       )}
     </Wrapper>

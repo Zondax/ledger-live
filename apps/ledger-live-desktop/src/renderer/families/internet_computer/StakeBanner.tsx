@@ -2,12 +2,14 @@ import useFeature from "@ledgerhq/live-common/featureFlags/useFeature";
 import { AccountBanner } from "~/renderer/screens/account/AccountBanner";
 import React, { useCallback, useState } from "react";
 import { ICPAccount } from "@ledgerhq/live-common/families/internet_computer/types";
+import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { openModal } from "~/renderer/actions/modals";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import { getBannerState } from "@ledgerhq/live-common/families/internet_computer/utils";
 
 const StakeBanner: React.FC<{ account: ICPAccount }> = ({ account }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const stakeAccountBanner = useFeature("stakeAccountBanner");
   const [bannerState, setBannerState] = useState(getBannerState(account));
@@ -69,40 +71,45 @@ const StakeBanner: React.FC<{ account: ICPAccount }> = ({ account }) => {
 
   const bannerContent = {
     confirm_following: {
-      title: "Confirm Your Following",
+      title: t("internetComputer.stakeBanner.confirmFollowing.title"),
       description:
         data?.days || data?.minutes
-          ? `Your neuron's following needs to be confirmed in ${data.days} days and ${data.hours} hours`
-          : "You are losing rewards, confirm neuron following to continue earning",
-      cta: "Confirm Following",
+          ? t("internetComputer.stakeBanner.confirmFollowing.description1", {
+              days: data.days,
+              hours: data.hours,
+            })
+          : t("internetComputer.stakeBanner.confirmFollowing.description2"),
+      cta: t("internetComputer.stakeBanner.confirmFollowing.cta"),
       action: onClickConfirmFollowing,
     },
     sync_neurons: {
-      title: "Sync Your Staked ICP",
+      title: t("internetComputer.stakeBanner.syncNeurons.title"),
       description: data
-        ? `Your staked ICP has last been synced ${data.days} days and ${data.hours} hours ago. If you want to see the latest details, we recommend you sync often.`
-        : "We recommend syncing your neurons to see the latest details",
-      cta: "Sync Neurons",
+        ? t("internetComputer.stakeBanner.syncNeurons.description1", {
+            days: data.days,
+            hours: data.hours,
+          })
+        : t("internetComputer.stakeBanner.syncNeurons.description2"),
+      cta: t("internetComputer.stakeBanner.syncNeurons.cta"),
       action: () => onClickManageNeurons(true),
     },
     lock_neurons: {
-      title: "Lock Neurons",
-      description:
-        "One or more of your neurons are not locked. If you don't lock them you can't get rewards. This is because neurons earn rewards by participating in the governance of ICP, and only neurons locked more than six months are eligible to vote.",
-      cta: "Manage Neurons",
-      action: () => onClickManageNeurons(false),
+      title: t("internetComputer.stakeBanner.lockNeurons.title"),
+      description: t("internetComputer.stakeBanner.lockNeurons.description"),
+      cta: t("internetComputer.stakeBanner.lockNeurons.cta"),
+      // action: () => onClickManageNeurons(false),
+      action: () => onClickConfirmFollowing(),
     },
     add_followees: {
-      title: "Add Followees",
-      description:
-        "One or more of your neurons have no followees. Without followees you might not get rewards. To get rewards, neurons must vote directly (for example, with NNS Dapp) or follow neurons that do.",
-      cta: "Manage Neurons",
+      title: t("internetComputer.stakeBanner.addFollowees.title"),
+      description: t("internetComputer.stakeBanner.addFollowees.description"),
+      cta: t("internetComputer.stakeBanner.addFollowees.cta"),
       action: () => onClickManageNeurons(false),
     },
     stake_icp: {
-      title: "Stake ICP",
-      description: "Stake ICP and gain rewards by participating in its governance.",
-      cta: "Stake ICP",
+      title: t("internetComputer.stakeBanner.stakeICP.title"),
+      description: t("internetComputer.stakeBanner.stakeICP.description"),
+      cta: t("internetComputer.stakeBanner.stakeICP.cta"),
       action: () => onClickStakeIcp(),
     },
   };
@@ -116,7 +123,7 @@ const StakeBanner: React.FC<{ account: ICPAccount }> = ({ account }) => {
       cta={content.cta}
       onClick={content.action}
       display={true}
-      linkText="Learn more..."
+      linkText={t("common.learnMoreWithEllipsis")}
       linkUrl="https://internetcomputer.org/docs/current/developer-docs/daos/nns/concepts/neurons/staking-voting-rewards"
     />
   );

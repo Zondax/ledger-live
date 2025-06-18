@@ -12,6 +12,7 @@ import {
   getSecondsTillVotingPowerExpires,
 } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { Unit } from "@ledgerhq/types-cryptoassets";
+import { useTranslation } from "react-i18next";
 
 const TableWrapper = styled.div`
   max-height: 500px;
@@ -33,8 +34,8 @@ const Th = styled.th`
   white-space: nowrap;
 `;
 
-const Tr = styled.tr`
-  cursor: pointer;
+const Tr = styled.tr<{ pointer?: boolean }>`
+  cursor: ${p => (p.pointer ? "pointer" : "default")};
   &:hover {
     background: ${p => p.theme.colors.palette.background.default};
   }
@@ -65,14 +66,11 @@ export function List({
   onClickManage,
   onClickConfirmFollowing,
 }: ListProps) {
+  const { t } = useTranslation();
   if (!neurons.fullNeurons.length) {
     return (
       <Box>
-        <WarnBox>
-          {
-            "No neurons found, try syncing existing neurons created through NNS dapp or stake to create new neurons."
-          }
-        </WarnBox>
+        <WarnBox>{t("internetComputer.listNeurons.warnbox")}</WarnBox>
       </Box>
     );
   }
@@ -83,19 +81,21 @@ export function List({
         <StyledTable>
           <thead>
             <tr>
-              <Th style={{ width: "25%" }}>Neuron Ids</Th>
+              <Th style={{ width: "25%" }}>{t("internetComputer.common.neuronIds")}</Th>
               {modalName === "MODAL_ICP_LIST_NEURONS" && (
                 <>
-                  <Th style={{ width: "20%" }}>Stake</Th>
-                  <Th style={{ width: "20%" }}>Maturity</Th>
-                  <Th style={{ width: "20%" }}>Dissolve Delay</Th>
-                  <Th style={{ width: "15%" }}>State</Th>
+                  <Th style={{ width: "20%" }}>{t("internetComputer.common.stake")}</Th>
+                  <Th style={{ width: "20%" }}>{t("internetComputer.common.maturity")}</Th>
+                  <Th style={{ width: "20%" }}>{t("internetComputer.common.dissolveDelay")}</Th>
+                  <Th style={{ width: "15%" }}>{t("internetComputer.common.state")}</Th>
                 </>
               )}
               {modalName === "MODAL_ICP_REFRESH_VOTING_POWER" && (
                 <>
-                  <Th style={{ width: "50%" }}>Time Until Reward Loss</Th>
-                  <Th style={{ width: "25%" }}>Action</Th>
+                  <Th style={{ width: "50%" }}>
+                    {t("internetComputer.listNeurons.timeUntilRewardLoss")}
+                  </Th>
+                  <Th style={{ width: "25%" }}>{t("internetComputer.common.action")}</Th>
                 </>
               )}
             </tr>
@@ -107,6 +107,7 @@ export function List({
                   neuron.maturity_e8s_equivalent > 0) && (
                   <Tr
                     key={neuron.id[0]?.id}
+                    pointer={modalName === "MODAL_ICP_LIST_NEURONS" && !!onClickManage}
                     onClick={() => {
                       if (modalName === "MODAL_ICP_LIST_NEURONS" && onClickManage) {
                         onClickManage(index);
@@ -168,7 +169,7 @@ export function List({
                                     )
                                   ) : (
                                     <Text ff="Inter|Regular" fontSize={3}>
-                                      Inactive neuron
+                                      {t("internetComputer.common.inactiveNeuron")}
                                     </Text>
                                   )}
                                 </Text>
@@ -176,7 +177,7 @@ export function List({
                               <Td>
                                 {onClickConfirmFollowing && (
                                   <Button primary onClick={() => onClickConfirmFollowing(neuron)}>
-                                    Confirm Following
+                                    {t("internetComputer.common.confirmFollowing")}
                                   </Button>
                                 )}
                               </Td>

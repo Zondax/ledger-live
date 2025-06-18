@@ -11,6 +11,7 @@ import WarnBox from "~/renderer/components/WarnBox";
 import List from "../../components/List";
 import { StepProps } from "../types";
 import Button from "~/renderer/components/Button";
+import { Trans } from "react-i18next";
 
 interface ContainerProps {
   shouldSpace?: boolean;
@@ -79,8 +80,7 @@ export default function StepListNeuron({
         />
         {neurons.fullNeurons.length > 0 ? (
           <WarnBox>
-            Select a neuron from the list below to manage its stake, maturity, and dissolve delay
-            settings.
+            <Trans i18nKey="internetComputer.manageNeuronFlow.listNeuron.warnbox" />
           </WarnBox>
         ) : null}
         <List
@@ -102,16 +102,14 @@ export default function StepListNeuron({
     return (
       <Container shouldSpace={signed}>
         <TrackPage
-          category="Undelegation Cosmos Flow"
+          category="Manage Neurons ICP Flow"
           name="Step Confirmation Error"
           flow="stake"
-          action="undelegation"
+          action="listNeurons"
           currency={currencyId}
         />
         {signed ? (
-          <BroadcastErrorDisclaimer
-            title={t("cosmos.undelegation.flow.steps.confirmation.broadcastError")}
-          />
+          <BroadcastErrorDisclaimer title={t("internetComputer.confirmation.broadcastError")} />
         ) : null}
         <ErrorDisplay error={error} withExportLogs />
       </Container>
@@ -130,7 +128,6 @@ export function StepListNeuronFooter({
   setLastManageAction,
   error,
 }: StepProps) {
-  const { t } = useTranslation();
   const currencyName = account.currency.name;
   const onClickSync = useCallback(() => {
     const bridge = getAccountBridge(account, undefined);
@@ -155,15 +152,15 @@ export function StepListNeuronFooter({
       </Box>
       <Box horizontal>
         <Button ml={2} onClick={onClose}>
-          {t("common.close")}
+          <Trans i18nKey="common.close" />
         </Button>
         <Button
           outline
           ml={2}
-          event={`Manage Neurons ${currencyName} Flow Step 3 Sync Neurons Clicked`}
+          event={`Manage Neurons ${currencyName} Manage Neurons Flow Step 2 Sync Neurons Clicked`}
           onClick={error ? onRetry : onClickSync}
         >
-          {error ? "Retry" : "Sync"}
+          {error ? <Trans i18nKey="common.retry" /> : <Trans i18nKey="internetComputer.sync" />}
         </Button>
       </Box>
     </Box>

@@ -102,13 +102,13 @@ export function StepSelectFollowees({
         </Text>
       </Box>
       <Box style={{ gap: 5 }}>
-        <Label>Followee&apos;s Neuron Id</Label>
+        <Label>{t("internetComputer.manageNeuronFlow.selectFollowees.title")}</Label>
         <Box style={{ gap: 5, justifyContent: "flex-end" }}>
           <Input
             value={followNeuronId}
             onChange={onChangeFollowNeuronId}
             error={error}
-            placeholder="Enter neuron ID"
+            placeholder={t("internetComputer.manageNeuronFlow.selectFollowees.placeholder")}
           />
           <Button
             onClick={() => onClickAddFollowee()}
@@ -116,14 +116,14 @@ export function StepSelectFollowees({
             style={{ marginLeft: "auto" }}
             primary
           >
-            Add
+            {t("common.add")}
           </Button>
         </Box>
       </Box>
       <Divider my={4} width={"100%"} />
       <Box style={{ gap: 10 }}>
         <Text ff="Inter|SemiBold" fontSize={14}>
-          Options For Following
+          {t("internetComputer.manageNeuronFlow.selectFollowees.options")}
         </Text>
         <Box style={{ gap: 15 }}>
           {Object.entries(KNOWN_NEURON_IDS).map(([key, value]) => (
@@ -132,7 +132,7 @@ export function StepSelectFollowees({
               style={{ gap: 10, flexDirection: "row", justifyContent: "space-between" }}
             >
               <Box>
-                <Text ff="Inter|Regular" fontSize={14}>
+                <Text ff="Inter|SemiBold" fontSize={14}>
                   {value}
                 </Text>
                 <CopiableField value={key}>
@@ -147,7 +147,7 @@ export function StepSelectFollowees({
                 style={{ boxShadow: "none" }}
                 primary
               >
-                Add
+                {t("common.add")}
               </Button>
             </Box>
           ))}
@@ -158,7 +158,7 @@ export function StepSelectFollowees({
           <Divider my={4} />
           <Box style={{ gap: 10 }}>
             <Text ff="Inter|SemiBold" fontSize={14}>
-              Followees ({followees.length})
+              {t("internetComputer.common.followees")} ({followees.length})
             </Text>
             <Box style={{ gap: 10 }}>
               {followees.map(followee => (
@@ -177,15 +177,15 @@ export function StepSelectFollowees({
             </Box>
             <Box horizontal justifyContent="flex-end">
               <Button mr={2} onClick={() => transitionTo("manage")}>
-                Cancel
+                {t("common.cancel")}
               </Button>
               {followees.length ? (
                 <Button onClick={onClickFollowNeuron} primary>
-                  Follow
+                  {t("common.follow")}
                 </Button>
               ) : (
                 <Button onClick={onClickFollowNeuron} primary>
-                  Set
+                  {t("common.set")}
                 </Button>
               )}
             </Box>

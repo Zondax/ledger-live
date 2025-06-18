@@ -6,6 +6,7 @@ import WarnBox from "~/renderer/components/WarnBox";
 import CollapsibleCard from "~/renderer/components/CollapsibleCard";
 import { StepProps } from "../types";
 import { useTranslation } from "react-i18next";
+import { Trans } from "react-i18next";
 import Button from "~/renderer/components/Button";
 
 export function StepFollowSelectTopics({ setFollowTopic, transitionTo }: StepProps) {
@@ -21,14 +22,11 @@ export function StepFollowSelectTopics({ setFollowTopic, transitionTo }: StepPro
   return (
     <Box>
       <WarnBox>
-        <Text ff="Inter|SemiBold" fontSize={14}>
-          Follow neurons to automate your voting, and receive the maximum voting rewards. You can
-          follow neurons on specific topics or all topics.
-        </Text>
+        <Trans i18nKey="internetComputer.manageNeuronFlow.selectTopics.warnbox" />
       </WarnBox>
       <Box>
         <Text ff="Inter|SemiBold" fontSize={14} mb={10}>
-          List of available topics to follow
+          <Trans i18nKey="internetComputer.manageNeuronFlow.selectTopics.listOfTopics" />
         </Text>
         <Box style={{ gap: 10 }}>
           {Object.entries(KNOWN_TOPICS).map(([key]) => (
@@ -42,10 +40,12 @@ export function StepFollowSelectTopics({ setFollowTopic, transitionTo }: StepPro
             >
               <CollapsibleCard
                 header={
-                  <Text ff="Inter|Regular" fontSize={14}>
+                  <Text ff="Inter|SemiBold" fontSize={14}>
                     {t(`internetComputer.manageNeuron.followTopic.${key}.title`)}
                   </Text>
                 }
+                bg="palette.background.default"
+                padding={10}
                 width="100%"
               >
                 <Box
@@ -64,7 +64,7 @@ export function StepFollowSelectTopics({ setFollowTopic, transitionTo }: StepPro
                     style={{ margin: "auto" }}
                     onClick={() => onClickSelectTopic(parseInt(key) as keyof typeof KNOWN_TOPICS)}
                   >
-                    Add Followee
+                    <Trans i18nKey="internetComputer.manageNeuronFlow.selectTopics.addAction" />
                   </Button>
                 </Box>
               </CollapsibleCard>

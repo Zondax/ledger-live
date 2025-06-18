@@ -1,6 +1,6 @@
 import invariant from "invariant";
 import React, { useCallback, useState } from "react";
-import { withTranslation } from "react-i18next";
+import { withTranslation, useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { compose } from "redux";
 import { connect, useDispatch } from "react-redux";
@@ -49,6 +49,7 @@ const mapDispatchToProps = {
   openModal,
 };
 function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal, device }: Props) {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [optimisticOperation, setOptimisticOperation] = useState<InternetComputerOperation | null>(
     null,
@@ -108,7 +109,7 @@ function Body({ account: accountProp, stepId, onChangeStepId, onClose, openModal
     errorSteps.push(0);
   }
   const stepperProps = {
-    title: "Refresh Voting Power",
+    title: t("internetComputer.refreshVotingPowerFlow.title"),
     device,
     account,
     transaction,

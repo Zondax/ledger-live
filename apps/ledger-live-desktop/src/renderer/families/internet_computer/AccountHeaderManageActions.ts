@@ -7,7 +7,7 @@ import { addPendingOperation } from "@ledgerhq/live-common/account/index";
 import { TokenAccount } from "@ledgerhq/types-live";
 import { updateAccountWithUpdater } from "~/renderer/actions/accounts";
 import { useCallback } from "react";
-// import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { openModal } from "~/renderer/actions/modals";
 import IconCoins from "~/renderer/icons/Coins";
@@ -19,6 +19,7 @@ type Props = {
 };
 
 const AccountHeaderActions = ({ account, parentAccount }: Props) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const onClickManageNeurons = useCallback(
     (refresh: boolean = false) => {
@@ -74,8 +75,8 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
       key: "stake-icp",
       onClick: onClickStakeIcp,
       icon: IconCoins,
-      label: "Stake ICP",
-      tooltip: "Create neurons to stake ICP",
+      label: t("internetComputer.headerManageActions.stakeICP.title"),
+      tooltip: t("internetComputer.headerManageActions.stakeICP.tooltip"),
       event: "stake_icp_button_clicked",
       eventProperties: {
         button: "stake_icp_button",
@@ -86,8 +87,8 @@ const AccountHeaderActions = ({ account, parentAccount }: Props) => {
       key: "manage-neurons",
       onClick: () => onClickManageNeurons(),
       icon: IconCoins,
-      label: "Manage Neurons",
-      tooltip: "Manage neurons for staking",
+      label: t("internetComputer.headerManageActions.manageNeurons.title"),
+      tooltip: t("internetComputer.headerManageActions.manageNeurons.tooltip"),
       event: "manage_neurons_dashboard_clicked",
       eventProperties: {
         button: "manage_neurons_button",

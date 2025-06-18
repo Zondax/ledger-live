@@ -7,11 +7,11 @@ import { useDispatch } from "react-redux";
 import { StepProps } from "../types";
 import { CopiableField } from "~/renderer/drawers/NFTViewerDrawer/CopiableField";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
-// import { closeModal, openModal } from "~/renderer/actions/modals";
 import BigNumber from "bignumber.js";
 import { useTranslation } from "react-i18next";
 import Text from "~/renderer/components/Text";
-import { Divider, Link } from "@ledgerhq/react-ui";
+import { Trans } from "react-i18next";
+import { Divider } from "@ledgerhq/react-ui";
 import {
   getNeuronDissolveDuration,
   secondsToDurationString,
@@ -144,9 +144,10 @@ export default function StepManage({
           neuronId: neuron.id[0]?.id.toString(),
         }),
       );
+      setLastManageAction("refresh_voting_power");
       transitionTo("manageAction");
     },
-    [account, onChangeTransaction, transitionTo],
+    [account, onChangeTransaction, transitionTo, setLastManageAction],
   );
 
   const onClickStartStopDissolving = useCallback(() => {
@@ -249,9 +250,13 @@ export default function StepManage({
                 <BoxWithBackground>
                   <Box horizontal alignItems="center">
                     <Text ff="Inter|Bold" fontSize={3} mr={1} color="palette.text.shade60">
-                      Hotkey Control
+                      <Trans i18nKey="internetComputer.manageNeuronFlow.manage.header.hotkeyControl" />
                     </Text>
-                    <Tooltip content="This neuron is controlled by a hotkey and has limited control from the Ledger Live interface.">
+                    <Tooltip
+                      content={t(
+                        "internetComputer.manageNeuronFlow.manage.header.hotkeyControlDescription",
+                      )}
+                    >
                       <StyledIconInfo size={14} />
                     </Tooltip>
                   </Box>
@@ -260,7 +265,7 @@ export default function StepManage({
             </Box>
             <Box horizontal alignItems="center">
               <Text ff="Inter|Regular" fontSize={3} color="palette.text.shade60" mr={2}>
-                Neuron ID:
+                <Trans i18nKey="internetComputer.common.neuronId" />:
               </Text>
               <CopiableField value={neuronId}>
                 <Text ff="Inter|SemiBold" fontSize={4}>
@@ -270,13 +275,13 @@ export default function StepManage({
             </Box>
             <Box horizontal alignItems="center">
               <Text ff="Inter|Regular" fontSize={3} color="palette.text.shade60" mr={2}>
-                Voting Power:
+                <Trans i18nKey="internetComputer.manageNeuronFlow.manage.header.votingPower" />:
               </Text>
               <Text ff="Inter|SemiBold" fontSize={4}>
                 {votingPower > 0 ? (
                   <FormattedVal val={votingPower} unit={unit} color="palette.text.shade100" />
                 ) : (
-                  "No voting power"
+                  <Trans i18nKey="internetComputer.manageNeuronFlow.manage.header.noVotingPower" />
                 )}
               </Text>
             </Box>
@@ -287,21 +292,21 @@ export default function StepManage({
 
         {/* Voting Power Section */}
         <ManageModalSection
-          title="Voting Power"
+          title={t("internetComputer.manageNeuronFlow.manage.votingPower.title")}
           value={
             votingPower > 0 ? (
               <FormattedVal color="palette.text.shade100" val={votingPower} unit={unit} />
             ) : (
-              "None"
+              <Trans i18nKey="common.none" />
             )
           }
-          titleTooltip="The dissolve delay must be at least 6 months for the neuron to have voting power."
+          titleTooltip={t("internetComputer.manageNeuronFlow.manage.votingPower.titleTooltip")}
         >
           <ManageModalElementWithAction
-            label="ICP Staked"
+            label={t("internetComputer.manageNeuronFlow.manage.votingPower.staked")}
             action={[
               {
-                label: "Increase Stake",
+                label: t("internetComputer.manageNeuronFlow.manage.votingPower.increaseStake"),
                 onClick: onClickIncreaseStake,
                 outline: true,
               },
@@ -316,54 +321,64 @@ export default function StepManage({
             }
           />
           <ManageModalElementWithAction
-            label={`Age bonus: +${ageBonus}%`}
-            valueTooltip="Your neuron can be locked, unlocked or dissolving. In a locked state, it is accruing age bonus, while its dissolve delay stays constant. If the neuron is in a dissolving state, its age bonus is set to 0, while dissolve delay decreases with time. After dissolve delay reaches 0, the neuron is unlocked, and ICP held in it can be sent to any ICP account."
+            label={`${t("internetComputer.manageNeuronFlow.manage.votingPower.ageBonus")}: +${ageBonus}%`}
+            valueTooltip={t("internetComputer.manageNeuronFlow.manage.votingPower.ageBonusTooltip")}
             action={[
               {
                 label:
                   neuron.dissolveState === "Unlocked"
-                    ? "Disburse"
+                    ? t("internetComputer.common.disburse")
                     : neuron.dissolveState === "Dissolving"
-                      ? "Stop Dissolving"
-                      : "Start Dissolving",
+                      ? t("internetComputer.common.stopDissolving")
+                      : t("internetComputer.common.startDissolving"),
                 onClick:
                   neuron.dissolveState === "Unlocked"
                     ? onClickDisburseStake
                     : onClickStartStopDissolving,
                 hidden: !isDeviceControlled,
+                outline: true,
               },
             ]}
             value={neuron.dissolveState}
           />
           <ManageModalElementWithAction
-            label={`Dissolve delay bonus: +${dissolveDelayBonus}%`}
-            valueTooltip="Dissolve delay is the minimum amount of time you have to wait for the neuron to unlock, and ICP to be available again. If your neuron is dissolving, your ICP will be available in 7 years, 365 days."
+            label={`${t("internetComputer.manageNeuronFlow.manage.votingPower.dissolveDelayBonus")}: +${dissolveDelayBonus}%`}
+            valueTooltip={t(
+              "internetComputer.manageNeuronFlow.manage.votingPower.dissolveDelayBonusTooltip",
+            )}
             action={[
               {
-                label: `${neuron.dissolveState !== "Unlocked" ? "Increase" : "Set"} Dissolve Delay`,
+                label: `${neuron.dissolveState !== "Unlocked" ? t("common.increase") : t("common.set")} ${t("internetComputer.common.dissolveDelay")}`,
                 onClick: () => transitionTo("setDissolveDelay"),
                 hidden: !isDeviceControlled,
+                outline: true,
               },
             ]}
-            value={`Dissolve Delay: ${neuron.dissolveState === "Unlocked" ? "0" : getNeuronDissolveDuration(neuron)}`}
+            value={`${t("internetComputer.common.dissolveDelay")}: ${neuron.dissolveState === "Unlocked" ? "0" : getNeuronDissolveDuration(neuron)}`}
           />
           <ManageModalElementWithAction
             hidden={votingPower === 0}
             label={
               secondsTillVotingPowerExpires.gt(0)
                 ? `${secondsToDurationString(secondsTillVotingPowerExpires.toString())} to confirm following`
-                : "Confirm following"
+                : t("internetComputer.manageNeuronFlow.manage.votingPower.confirmFollowing")
             }
-            valueTooltip="ICP neurons that are inactive for 6 months start missing voting rewards. To avoid missing rewards, vote manually, edit, or confirm your following."
+            valueTooltip={t(
+              "internetComputer.manageNeuronFlow.manage.votingPower.confirmFollowingTooltip",
+            )}
             action={[
               {
-                label: "Confirm Following",
+                label: t("internetComputer.manageNeuronFlow.manage.votingPower.confirmFollowing"),
                 onClick: () => onClickConfirmFollowing(neuron),
                 hidden: !isDeviceControlled,
+                outline: true,
               },
             ]}
-            // TODO: get correct status
-            value={secondsTillVotingPowerExpires.gt(0) ? "Active neuron" : "Inactive neuron"}
+            value={
+              secondsTillVotingPowerExpires.gt(0)
+                ? t("internetComputer.common.activeNeuron")
+                : t("internetComputer.common.inactiveNeuron")
+            }
           />
         </ManageModalSection>
 
@@ -371,8 +386,8 @@ export default function StepManage({
 
         {/* Maturity Section */}
         <ManageModalSection
-          title="Maturity"
-          description="Earn rewards by voting on proposals and/or following active neurons."
+          title={t("internetComputer.manageNeuronFlow.manage.maturity.title")}
+          description={t("internetComputer.manageNeuronFlow.manage.maturity.description")}
           value={
             <FormattedVal
               color="palette.text.shade100"
@@ -385,8 +400,8 @@ export default function StepManage({
           }
         >
           <ManageModalElementWithAction
-            label="Staked"
-            labelTooltip="Staked maturity contributes to the neuron's voting power, but cannot be spawned into a new neuron."
+            label={t("internetComputer.manageNeuronFlow.manage.maturity.staked")}
+            labelTooltip={t("internetComputer.manageNeuronFlow.manage.maturity.stakedTooltip")}
             value={
               <FormattedVal
                 color="palette.text.shade100"
@@ -396,20 +411,22 @@ export default function StepManage({
             }
           />
           <ManageModalElementWithAction
-            label="Available"
-            labelTooltip="Available maturity can be staked, or burned to spawn a neuron containing an amount of ICP that is subject to a non-deterministic process, called maturity modulation."
+            label={t("internetComputer.manageNeuronFlow.manage.maturity.available")}
+            labelTooltip={t("internetComputer.manageNeuronFlow.manage.maturity.availableTooltip")}
             action={[
               {
-                label: "Stake",
+                label: t("internetComputer.manageNeuronFlow.manage.maturity.stakeAction"),
                 onClick: () => transitionTo("stakeMaturity"),
                 hidden: !isDeviceControlled,
                 disabled: !canStakeMaturity(neuron),
+                outline: canStakeMaturity(neuron),
               },
               {
-                label: "Spawn Neuron",
+                label: t("internetComputer.manageNeuronFlow.manage.maturity.spawnNeuronAction"),
                 onClick: onClickSpawnNeuron,
                 hidden: !isDeviceControlled,
                 disabled: !canSpawnNeuron(neuron),
+                outline: canSpawnNeuron(neuron),
               },
             ]}
             value={
@@ -427,7 +444,7 @@ export default function StepManage({
         <Divider my={6} width={"100%"} />
 
         {/* HotKeys Section */}
-        <ManageModalSection title="HotKeys">
+        <ManageModalSection title={t("internetComputer.manageNeuronFlow.manage.hotKeys.title")}>
           {neuron.hot_keys.map((val, index) => {
             return (
               <ManageModalElementWithAction
@@ -436,19 +453,23 @@ export default function StepManage({
                 copiableLabel
                 action={[
                   {
-                    label: "Remove",
+                    label: t("internetComputer.manageNeuronFlow.manage.hotKeys.removeAction"),
                     onClick: () => onClickRemoveHotKey(val.toString()),
-                    danger: false,
                     hidden: !isDeviceControlled,
+                    outline: true,
                   },
                 ]}
               />
             );
           })}
-          {neuron.hot_keys.length === 0 && <ManageModalElement label="No HotKeys Found" />}
+          {neuron.hot_keys.length === 0 && (
+            <ManageModalElement
+              label={t("internetComputer.manageNeuronFlow.manage.hotKeys.noHotKeys")}
+            />
+          )}
           <ManageModalActionElement
             hidden={!isDeviceControlled}
-            label="Add Hot Key"
+            label={t("internetComputer.manageNeuronFlow.manage.hotKeys.addHotKey")}
             onClick={onClickAddHotKey}
           />
         </ManageModalSection>
@@ -457,10 +478,16 @@ export default function StepManage({
         <Divider my={6} width={"100%"} />
 
         {/* Advanced Details Section */}
-        <ManageModalSection title="Advanced Details & Settings">
-          <ManageModalElement label="Neuron ID" copiableValue value={neuronId} />
+        <ManageModalSection
+          title={t("internetComputer.manageNeuronFlow.manage.advancedDetails.title")}
+        >
           <ManageModalElement
-            label="Date Created"
+            label={t("internetComputer.common.neuronId")}
+            copiableValue
+            value={neuronId}
+          />
+          <ManageModalElement
+            label={t("internetComputer.manageNeuronFlow.manage.advancedDetails.dateCreated")}
             value={new Date(Number(neuron.created_timestamp_seconds) * 1000).toLocaleString(
               "en-US",
               {
@@ -470,7 +497,7 @@ export default function StepManage({
             )}
           />
           <ManageModalElement
-            label="Dissolve Date"
+            label={t("internetComputer.manageNeuronFlow.manage.advancedDetails.dissolveDate")}
             value={new Date(Number(neuron.whenDissolvedTimestampSeconds) * 1000).toLocaleString(
               "en-US",
               {
@@ -480,7 +507,7 @@ export default function StepManage({
             )}
           />
           <ManageModalElement
-            label="Neuron Account"
+            label={t("internetComputer.manageNeuronFlow.manage.advancedDetails.neuronAccount")}
             value={neuron.accountIdentifier}
             copiableValue
             ellipsis
@@ -489,12 +516,12 @@ export default function StepManage({
           <ManageModalActionElement
             hidden={!isDeviceControlled}
             disabled={!canSplitNeuron(neuron)}
-            label="Split Neuron"
+            label={t("internetComputer.manageNeuronFlow.manage.advancedDetails.splitNeuronAction")}
             onClick={onClickSplitNeuron}
           />
 
           <ManageModalActionElement
-            label={`${neuron.auto_stake_maturity[0] ? "Stop" : "Start"} Automatic Stake Maturity`}
+            label={`${neuron.auto_stake_maturity[0] ? t("common.stop") : t("common.start")} ${t("internetComputer.manageNeuronFlow.manage.advancedDetails.autoStakeMaturityAction")}`}
             onClick={() => onClickAutoStakeMaturity(!neuron.auto_stake_maturity[0])}
             hidden={!isDeviceControlled}
           />
@@ -506,17 +533,12 @@ export default function StepManage({
         {/* Following Section */}
         {neuron.followees.length === 0 && (
           <WarnBox>
-            <Text ff="Inter|SemiBold" fontSize={14}>
-              Without followees you might not get rewards. To get rewards, neurons must vote
-              directly (for example, with{" "}
-              <Link href="https://nns.ic0.app/proposals/">NNS Dapp</Link>) or follow neurons that
-              do.
-            </Text>
+            <Trans i18nKey="internetComputer.manageNeuronFlow.manage.following.warnbox" />
           </WarnBox>
         )}
         <ManageModalSection
-          title="Following"
-          titleTooltip="Following allows you to delegate your votes to another neuron holder. You still earn rewards if you delegate your voting rights. You can change your following at any time."
+          title={t("internetComputer.manageNeuronFlow.manage.following.title")}
+          titleTooltip={t("internetComputer.manageNeuronFlow.manage.following.description")}
         >
           {Object.entries(neuron.modFollowees).map(([neuronId, topics]) => {
             return (
@@ -534,7 +556,10 @@ export default function StepManage({
               />
             );
           })}
-          <ManageModalActionElement label="Follow Neurons" onClick={onClickFollow} />
+          <ManageModalActionElement
+            label={t("internetComputer.manageNeuronFlow.manage.following.followNeuronsAction")}
+            onClick={onClickFollow}
+          />
         </ManageModalSection>
       </Container>
     );

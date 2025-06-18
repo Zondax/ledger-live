@@ -1,6 +1,6 @@
 import invariant from "invariant";
 import React, { useCallback, useState } from "react";
-import { withTranslation } from "react-i18next";
+import { useTranslation, withTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { compose } from "redux";
 import { connect, useDispatch } from "react-redux";
@@ -65,6 +65,7 @@ function Body({
   device,
 }: Props) {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const [optimisticOperation, setOptimisticOperation] = useState<InternetComputerOperation | null>(
     null,
   );
@@ -128,7 +129,7 @@ function Body({
     errorSteps.push(0);
   }
   const stepperProps = {
-    title: "Manage Neurons",
+    title: t("internetComputer.manageNeuronFlow.title"),
     device,
     account,
     transaction,

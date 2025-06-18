@@ -93,7 +93,7 @@
     "@ledgerhq/logs": "workspace:^",
     "@ledgerhq/types-live": "workspace:^",
     "@noble/hashes": "^1.7.0",
-    "@zondax/ledger-live-icp": "link:/Users/prateek/work/zondax/ledger-live-icp/",
+    "@zondax/ledger-live-icp": "^1.0.0",
     "big-integer": "^1.6.52",
     "bignumber.js": "^9.1.2",
     "expect": "^29.7.0",

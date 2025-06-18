@@ -5,6 +5,7 @@ import Button from "~/renderer/components/Button";
 import Slider from "~/renderer/components/Slider";
 import { StepProps } from "../types";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
+import { Trans } from "react-i18next";
 
 export function StakeMaturity({
   manageNeuronIndex,
@@ -47,12 +48,12 @@ export function StakeMaturity({
   return (
     <Box p={20}>
       <Text ff="Inter|SemiBold" fontSize={22} mb={10}>
-        Stake Maturity
+        <Trans i18nKey="internetComputer.manageNeuronFlow.stakeMaturity.title" />
       </Text>
 
       <Box mb={10}>
         <Text ff="Inter|SemiBold" fontSize={14}>
-          Maturity available
+          <Trans i18nKey="internetComputer.manageNeuronFlow.stakeMaturity.maturityAvailable" />
         </Text>
         <Text ff="Inter|Regular" fontSize={14} color="palette.text.shade80">
           {availableMaturity}
@@ -61,7 +62,7 @@ export function StakeMaturity({
 
       <Box mb={10}>
         <Text ff="Inter|Regular" fontSize={14} color="palette.text.shade60" mb={2}>
-          Choose how much of the maturity available to stake into this neuron.
+          <Trans i18nKey="internetComputer.manageNeuronFlow.stakeMaturity.description" />
         </Text>
       </Box>
 
@@ -84,14 +85,14 @@ export function StakeMaturity({
 
       <Box horizontal justifyContent="flex-end" mt={4}>
         <Button mr={2} onClick={() => transitionTo("manage")}>
-          Cancel
+          <Trans i18nKey="common.cancel" />
         </Button>
         <Button
           primary
           onClick={onClickStakeMaturity}
           disabled={maturityPercentageToStake === 0 || errors.stakeMaturity}
         >
-          Stake
+          <Trans i18nKey="internetComputer.manageNeuronFlow.stakeMaturity.confirmStake" />
         </Button>
       </Box>
     </Box>

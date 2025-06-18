@@ -105,16 +105,14 @@ export default function StepListNeuron({
     return (
       <Container shouldSpace={signed}>
         <TrackPage
-          category="Undelegation Cosmos Flow"
+          category="Undelegation ICP Flow"
           name="Step Confirmation Error"
           flow="stake"
-          action="undelegation"
+          action="refreshVotingPower"
           currency={currencyId}
         />
         {signed ? (
-          <BroadcastErrorDisclaimer
-            title={t("cosmos.undelegation.flow.steps.confirmation.broadcastError")}
-          />
+          <BroadcastErrorDisclaimer title={t("internetComputer.confirmation.broadcastError")} />
         ) : null}
         <ErrorDisplay error={error} withExportLogs />
       </Container>

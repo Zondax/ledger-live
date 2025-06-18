@@ -8,6 +8,7 @@ import {
 } from "@ledgerhq/live-common/families/internet_computer/types";
 import MemoTagField from "LLD/features/MemoTag/components/MemoTagField";
 import WarnBox from "~/renderer/components/WarnBox";
+import { useTranslation } from "react-i18next";
 
 const MemoField = ({
   onChange,
@@ -22,6 +23,7 @@ const MemoField = ({
   status: TransactionStatus;
   autoFocus?: boolean;
 }) => {
+  const { t } = useTranslation();
   invariant(transaction.family === "internet_computer", "Memo: Internet Computer family expected");
 
   const bridge = getAccountBridge(account);
@@ -35,21 +37,11 @@ const MemoField = ({
   );
 
   if (transaction.type === "increase_stake") {
-    return (
-      <WarnBox>
-        This transaction will increase the stake of an existing neuron, input the desired amount to
-        be staked in the amount field above.
-      </WarnBox>
-    );
+    return <WarnBox>{t("internetComputer.memoField.increaseStake")}</WarnBox>;
   }
 
   if (transaction.type === "create_neuron") {
-    return (
-      <WarnBox>
-        This transaction will create a neuron with staked ICP, input the desired amount to be staked
-        in the amount field above.
-      </WarnBox>
-    );
+    return <WarnBox>{t("internetComputer.memoField.createNeuron")}</WarnBox>;
   }
 
   return (
@@ -60,7 +52,7 @@ const MemoField = ({
       onChange={onMemoFieldChange}
       spellCheck="false"
       autoFocus={autoFocus}
-      tooltipText="Internet Computer uses this to identify the transaction to stake the ICP into the neuron."
+      tooltipText={t("internetComputer.memoField.tooltip")}
     />
   );
 };

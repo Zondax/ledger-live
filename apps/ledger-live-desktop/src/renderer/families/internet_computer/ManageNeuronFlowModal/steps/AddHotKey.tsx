@@ -6,6 +6,7 @@ import Input from "~/renderer/components/Input";
 import { StepProps } from "../types";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import TrackPage from "~/renderer/analytics/TrackPage";
+import { Trans } from "react-i18next";
 
 export function AddHotKey({
   manageNeuronIndex,
@@ -63,7 +64,7 @@ export function AddHotKey({
       />
 
       <Text ff="Inter|SemiBold" fontSize={22} mb={12}>
-        Add Hot Key
+        <Trans i18nKey="internetComputer.manageNeuronFlow.addHotKey.title" />
       </Text>
 
       <Box mb={12}>
@@ -78,10 +79,10 @@ export function AddHotKey({
 
       <Box horizontal justifyContent="flex-end">
         <Button mr={2} onClick={() => transitionTo("manage")}>
-          Cancel
+          <Trans i18nKey="common.cancel" />
         </Button>
         <Button primary onClick={onClickConfirmAddHotKey} disabled={!hotKey || !!errors.addHotKey}>
-          Confirm
+          <Trans i18nKey="common.confirm" />
         </Button>
       </Box>
     </Box>

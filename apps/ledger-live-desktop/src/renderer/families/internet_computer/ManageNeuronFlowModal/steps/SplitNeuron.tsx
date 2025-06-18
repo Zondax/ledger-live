@@ -9,6 +9,7 @@ import { BigNumber } from "bignumber.js";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import TrackPage from "~/renderer/analytics/TrackPage";
 import { maxAllowedSplitAmount } from "@ledgerhq/live-common/families/internet_computer/utils";
+import { Trans, useTranslation } from "react-i18next";
 
 export function SplitNeuron({
   manageNeuronIndex,
@@ -19,6 +20,7 @@ export function SplitNeuron({
   setLastManageAction,
   transitionTo,
 }: StepProps) {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState("");
   const neuron = neurons.fullNeurons[manageNeuronIndex];
   const { errors } = status;
@@ -95,13 +97,13 @@ export function SplitNeuron({
       />
 
       <Text ff="Inter|SemiBold" fontSize={22} mb={12}>
-        Split Neuron
+        <Trans i18nKey="internetComputer.manageNeuronFlow.splitNeuron.title" />
       </Text>
 
       <Box mb={12}>
         <Box horizontal alignItems="center">
           <Text ff="Inter|Regular" fontSize={14}>
-            Neuron ID:
+            <Trans i18nKey="internetComputer.common.neuronId" />
           </Text>
           <Text ml={1} ff="Inter|SemiBold" fontSize={16}>
             {neuron.id[0]?.id.toString()}
@@ -109,7 +111,7 @@ export function SplitNeuron({
         </Box>
         <Box horizontal alignItems="center" mb={12}>
           <Text ff="Inter|Regular" fontSize={14}>
-            Current balance:
+            <Trans i18nKey="internetComputer.common.currentBalance" />
           </Text>
           <Text ml={1} ff="Inter|SemiBold" fontSize={16}>
             {formattedBalance}
@@ -118,10 +120,10 @@ export function SplitNeuron({
 
         <Box horizontal justifyContent="space-between" alignItems="center">
           <Text ff="Inter|Medium" fontSize={14}>
-            Amount
+            <Trans i18nKey="internetComputer.common.amount" />
           </Text>
           <Button onClick={handleMax} small>
-            Max
+            <Trans i18nKey="common.max" />
           </Button>
         </Box>
 
@@ -129,7 +131,7 @@ export function SplitNeuron({
           value={amount}
           onChange={onChangeAmount}
           error={!!amount && errors.splitNeuron}
-          placeholder="Amount"
+          placeholder="0"
           type="number"
         />
       </Box>
@@ -137,7 +139,7 @@ export function SplitNeuron({
       <Box mb={24}>
         <Box>
           <Text ff="Inter|Regular" fontSize={12} color="palette.text.shade80">
-            Transaction Fee:{" "}
+            <Trans i18nKey="internetComputer.manageNeuronFlow.splitNeuron.transactionFee" />:{" "}
             <Text ff="Inter|Bold" fontSize={12} color="palette.text.shade80">
               {formattedFee}
             </Text>
@@ -147,10 +149,10 @@ export function SplitNeuron({
 
       <Box horizontal justifyContent="flex-end">
         <Button mr={2} onClick={() => transitionTo("manage")}>
-          Cancel
+          {t("common.cancel")}
         </Button>
         <Button primary onClick={onClickConfirmSplit} disabled={!!errors.splitNeuron}>
-          Confirm Split
+          <Trans i18nKey="internetComputer.manageNeuronFlow.splitNeuron.confirmSplit" />
         </Button>
       </Box>
     </Box>
