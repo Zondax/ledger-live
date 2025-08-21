@@ -37,7 +37,7 @@ export enum DeviceLabels {
   CONNECT_WITH = "Connect with",
   MAKE_SURE_TO_USE = "Make sure to use",
   YOUR_CRYPTO_ACCOUNTS = "Your crypto accounts",
-  TURN_ON_SYNC = "Turn on sync?",
+  TURN_ON_SYNC = "Turn on sync",
   NEW_ORDINARY = "New ordinary",
   SEND_TO_ADDRESS_2 = "Send to address (2/2)",
   REVIEW_OPERATION = "Review",
@@ -49,4 +49,8 @@ export enum DeviceLabels {
   CONTRACT_DATA = "Contract data",
   REMOVE_PHONE_OR_COMPUTER = "Remove phone or",
   AFTER_REMOVING = "After removing, you",
+  VERIFY_ETHEREUM = "Verify Ethereum",
+  VERIFY_BSC = "Verify BSC",
+  SIGN_TRANSACTION = "Sign transaction",
+  VERIFY_POLYGON = "Verify Polygon",
 }

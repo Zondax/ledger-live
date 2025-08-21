@@ -87,6 +87,9 @@ setSupportedCurrencies([
   "base_sepolia",
   "stacks",
   "telos_evm",
+  "sei_network_evm",
+  "berachain",
+  "hyperevm",
   "coreum",
   "injective",
   "vechain",
@@ -113,6 +116,8 @@ setSupportedCurrencies([
   "sonic_blaze",
   "mina",
   "babylon",
+  "kadena",
+  "canton_network",
 ]);
 LiveConfig.setConfig(liveConfig);
 

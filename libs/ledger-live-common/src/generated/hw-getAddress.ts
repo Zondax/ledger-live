@@ -3,6 +3,7 @@ import { resolver as aptos } from "../families/aptos/setup";
 import { resolver as bitcoin } from "../families/bitcoin/setup";
 import { resolver as cardano } from "../families/cardano/setup";
 import { resolver as casper } from "../families/casper/setup";
+import { resolver as canton } from "../families/canton/setup";
 import { resolver as celo } from "../families/celo/setup";
 import { resolver as cosmos } from "../families/cosmos/setup";
 import { resolver as evm } from "../families/evm/setup";
@@ -23,6 +24,7 @@ import { resolver as vechain } from "../families/vechain/setup";
 import { resolver as xrp } from "../families/xrp/setup";
 import { resolver as sui } from "../families/sui/setup";
 import { resolver as mina } from "../families/mina/setup";
+import { resolver as kadena } from "../families/kadena/setup";
 
 export default {
   algorand,
@@ -30,6 +32,7 @@ export default {
   bitcoin,
   cardano,
   casper,
+  canton,
   celo,
   cosmos,
   evm,
@@ -50,4 +53,5 @@ export default {
   xrp,
   sui,
   mina,
+  kadena,
 };

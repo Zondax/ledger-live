@@ -1,5 +1,9 @@
 import type { Transaction as EvmTransaction, GasOptions } from "@ledgerhq/coin-evm/types/index";
-import { ExchangeRate, SwapDataType } from "@ledgerhq/live-common/exchange/swap/types";
+import {
+  ExchangeRate,
+  SwapDataType,
+  SwapLiveError,
+} from "@ledgerhq/live-common/exchange/swap/types";
 import { Transaction } from "@ledgerhq/live-common/generated/types";
 import { CryptoCurrency, TokenCurrency } from "@ledgerhq/types-cryptoassets";
 
@@ -23,6 +27,7 @@ import {
 } from "@ledgerhq/live-common/families/cosmos/types";
 import { Transaction as HederaTransaction } from "@ledgerhq/live-common/families/hedera/types";
 import type { Transaction as ICPTransaction } from "@ledgerhq/live-common/families/internet_computer/types";
+import { Transaction as KadenaTransaction } from "@ledgerhq/live-common/families/kadena/types";
 import {
   SolanaAccount,
   Transaction as SolanaTransaction,
@@ -40,7 +45,7 @@ import { NavigatorName, ScreenName } from "~/const";
 import type {
   DefaultAccountSwapParamList,
   DetailsSwapParamList,
-  SwapOperation,
+  SwapOperationDetails,
   SwapPendingOperation,
   SwapSelectCurrency,
 } from "../../../screens/Swap/types";
@@ -88,7 +93,7 @@ export type SwapNavigatorParamList = {
   [ScreenName.SwapHistory]: undefined;
   [ScreenName.SwapPendingOperation]: SwapPendingOperation;
   [ScreenName.SwapOperationDetails]: {
-    swapOperation: SwapOperation;
+    swapOperation: SwapOperationDetails;
     fromPendingOperation?: true;
   };
   [ScreenName.AlgorandEditMemo]: {
@@ -312,4 +317,34 @@ export type SwapNavigatorParamList = {
   [NavigatorName.AssetSelection]?: Partial<
     NavigatorScreenParams<AssetSelectionNavigatorParamsList>
   >;
+  [ScreenName.KadenaEditReceiverChainId]: {
+    accountId: string;
+    account: Account;
+    parentId?: string;
+    transaction: KadenaTransaction;
+    currentNavigation:
+      | ScreenName.SignTransactionSummary
+      | ScreenName.SendSummary
+      | ScreenName.SwapForm;
+    nextNavigation:
+      | ScreenName.SignTransactionSelectDevice
+      | ScreenName.SendSelectDevice
+      | ScreenName.SwapForm;
+  };
+  [ScreenName.KadenaEditSenderChainId]: {
+    accountId: string;
+    account: Account;
+    parentId?: string;
+    transaction: KadenaTransaction;
+    currentNavigation:
+      | ScreenName.SignTransactionSummary
+      | ScreenName.SendSummary
+      | ScreenName.SwapForm;
+    nextNavigation:
+      | ScreenName.SignTransactionSelectDevice
+      | ScreenName.SendSelectDevice
+      | ScreenName.SwapForm;
+  [ScreenName.SwapCustomError]: {
+    error?: SwapLiveError | Error;
+  };
 };

@@ -3,6 +3,7 @@ import { cliTools as aptos } from "../families/aptos/setup";
 import { cliTools as bitcoin } from "../families/bitcoin/setup";
 import { cliTools as cardano } from "../families/cardano/setup";
 import { cliTools as casper } from "../families/casper/setup";
+import { cliTools as canton } from "../families/canton/setup";
 import { cliTools as celo } from "../families/celo/setup";
 import { cliTools as cosmos } from "../families/cosmos/setup";
 import { cliTools as evm } from "../families/evm/setup";
@@ -23,6 +24,7 @@ import { cliTools as vechain } from "../families/vechain/setup";
 import { cliTools as xrp } from "../families/xrp/setup";
 import { cliTools as sui } from "../families/sui/setup";
 import { cliTools as mina } from "../families/mina/setup";
+import { cliTools as kadena } from "../families/kadena/setup";
 
 export default {
   algorand,
@@ -30,6 +32,7 @@ export default {
   bitcoin,
   cardano,
   casper,
+  canton,
   celo,
   cosmos,
   evm,
@@ -50,4 +53,5 @@ export default {
   xrp,
   sui,
   mina,
+  kadena,
 };

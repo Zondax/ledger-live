@@ -84,6 +84,10 @@ setSupportedCurrencies([
   "base_sepolia",
   "stacks",
   "telos_evm",
+  "sei_network_evm",
+  "berachain",
+  "hyperevm",
+  "canton_network",
   "coreum",
   "injective",
   "casper",
@@ -107,4 +111,5 @@ setSupportedCurrencies([
   "sonic_blaze",
   "mina",
   "babylon",
+  "kadena",
 ]);
