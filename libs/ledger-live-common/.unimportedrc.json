@@ -446,7 +446,7 @@
     "src/walletSync/getEnvironmentParams.ts"
   ],
   "ignoreUnused": [
-    "@dfinity/agent",
+    "ethers",
     "@ledgerhq/hw-app-eth",
     "@ledgerhq/hw-transport-mocker",
     "@reduxjs/toolkit",
