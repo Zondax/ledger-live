@@ -108,17 +108,21 @@ export const getTransactionStatus: AccountBridge<
     }
   }
 
-  // If the recipient is invalid, add an error
-  if (!recipient) {
-    errors.recipient = new RecipientRequired();
-  } else if (!validateAddress(recipient).isValid) {
-    // If the recipient is invalid, add an error
-    errors.recipient = new InvalidAddress("", {
-      currencyName: account.currency.name,
-    });
-  } else if (recipient.toLowerCase() === address.toLowerCase()) {
-    // If the recipient is the same as the sender, add an error
-    errors.recipient = new InvalidAddressBecauseDestinationIsAlsoSource();
+  // Only validate recipient for transaction types that require it
+  const requiresRecipient = type === "send" || type === "create_neuron" || type === "increase_stake";
+
+  if (requiresRecipient) {
+    if (!recipient) {
+      errors.recipient = new RecipientRequired();
+    } else if (!validateAddress(recipient).isValid) {
+      // If the recipient is invalid, add an error
+      errors.recipient = new InvalidAddress("", {
+        currencyName: account.currency.name,
+      });
+    } else if (recipient.toLowerCase() === address.toLowerCase()) {
+      // If the recipient is the same as the sender, add an error
+      errors.recipient = new InvalidAddressBecauseDestinationIsAlsoSource();
+    }
   }
 
   if (!(await validateAddress(address)).isValid) {
@@ -170,6 +174,16 @@ export const getTransactionStatus: AccountBridge<
 
   let totalSpent: BigNumber;
 
+  // Transaction types that require an amount
+  const requiresAmount =
+    type === "send" ||
+    type === "create_neuron" ||
+    type === "increase_stake" ||
+    type === "disburse" ||
+    type === "split_neuron" ||
+    type === "stake_maturity" ||
+    type === "spawn_neuron";
+
   // If useAllAmount is true, we use the spendable balance as the total spent
   // If useAllAmount is false, we use the amount as the total spent
   if (useAllAmount) {
@@ -178,13 +192,16 @@ export const getTransactionStatus: AccountBridge<
     if (amount.lte(0) || totalSpent.gt(balance)) {
       errors.amount = new NotEnoughBalance();
     }
-  } else {
+  } else if (requiresAmount) {
     totalSpent = amount.plus(estimatedFees);
     if (amount.eq(0)) {
       errors.amount = new AmountRequired();
     } else if (totalSpent.gt(account.spendableBalance)) {
       errors.amount = new NotEnoughBalance();
     }
+  } else {
+    // For transactions that don't require amount, just set totalSpent to fees
+    totalSpent = estimatedFees;
   }
 
   return {
