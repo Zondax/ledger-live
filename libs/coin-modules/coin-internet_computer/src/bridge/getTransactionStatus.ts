@@ -174,15 +174,14 @@ export const getTransactionStatus: AccountBridge<
 
   let totalSpent: BigNumber;
 
-  // Transaction types that require an amount
+  // Transaction types that require an amount from the account balance
+  // Note: stake_maturity and spawn_neuron use neuron maturity, not account balance
   const requiresAmount =
     type === "send" ||
     type === "create_neuron" ||
     type === "increase_stake" ||
     type === "disburse" ||
-    type === "split_neuron" ||
-    type === "stake_maturity" ||
-    type === "spawn_neuron";
+    type === "split_neuron";
 
   // If useAllAmount is true, we use the spendable balance as the total spent
   // If useAllAmount is false, we use the amount as the total spent

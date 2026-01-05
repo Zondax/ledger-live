@@ -9,7 +9,6 @@ import { getStackNavigatorConfig } from "~/navigation/navigatorConfig";
 import SelectDevice from "~/screens/SelectDevice";
 import ConnectDevice from "./ConnectDevice";
 import NeuronList from "./NeuronList";
-import NeuronManage from "./NeuronManage";
 import NeuronAction from "./NeuronAction";
 import SetDissolveDelay from "./SetDissolveDelay";
 import AddHotKey from "./AddHotKey";
@@ -41,13 +40,6 @@ function NeuronManageFlow() {
         component={NeuronList}
         options={{
           headerTitle: () => <StepHeader title={t("icp.neuronManage.list.title")} />,
-        }}
-      />
-      <Stack.Screen
-        name={ScreenName.InternetComputerNeuronManage}
-        component={NeuronManage}
-        options={{
-          headerTitle: () => <StepHeader title={t("icp.neuronManage.manage.title")} />,
         }}
       />
       <Stack.Screen

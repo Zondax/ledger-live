@@ -22,10 +22,17 @@ import DelegationDrawer from "~/components/DelegationDrawer";
 import LText from "~/components/LText";
 import { NavigatorName, ScreenName } from "~/const";
 import IlluRewards from "~/icons/images/Rewards";
+import Coins from "~/icons/Coins";
+import Clock from "~/icons/Clock";
+import Pause from "~/icons/Pause";
+import Withdraw from "~/icons/Withdraw";
+import Plus from "~/icons/Plus";
+import Vote from "~/icons/Vote";
 import UndelegateIcon from "~/icons/Undelegate";
 import { urls } from "~/utils/urls";
 import { rgba } from "../../../colors";
-import { getDissolveDelayDisplay, getNeuronStateDisplay } from "../utils";
+import { getDissolveDelayDisplay, getNeuronStateDisplay, getNeuronStateInfo } from "../utils";
+import type { NeuronActionType } from "../NeuronManageFlow/types";
 import LabelRight from "./LabelRight";
 import NeuronRow from "./NeuronRow";
 import StakeBanners from "./StakeBanners";
@@ -77,19 +84,60 @@ function StakingPositions({ account }: Props) {
     });
   }, [onNavigate, neurons.length]);
 
-  const onManageNeuron = useCallback(() => {
-    if (!selectedNeuron) return;
-    const neuronId = selectedNeuron.id?.[0]?.id?.toString();
-    if (!neuronId) return;
+  const onNeuronAction = useCallback(
+    (actionType: NeuronActionType) => {
+      if (!selectedNeuron) return;
+      const neuronId = selectedNeuron.id?.[0]?.id?.toString();
+      if (!neuronId) return;
 
-    onNavigate({
-      route: NavigatorName.InternetComputerNeuronManageFlow,
-      screen: ScreenName.InternetComputerNeuronManage,
-      params: {
-        neuronId,
-      },
-    });
-  }, [onNavigate, selectedNeuron]);
+      const baseParams = { neuronId, accountId: account.id };
+
+      switch (actionType) {
+        case "set_dissolve_delay":
+          onNavigate({
+            route: NavigatorName.InternetComputerNeuronManageFlow,
+            screen: ScreenName.InternetComputerNeuronSetDissolveDelay,
+            params: baseParams,
+          });
+          break;
+        case "add_hot_key":
+          onNavigate({
+            route: NavigatorName.InternetComputerNeuronManageFlow,
+            screen: ScreenName.InternetComputerNeuronAddHotKey,
+            params: baseParams,
+          });
+          break;
+        case "stake_maturity":
+          onNavigate({
+            route: NavigatorName.InternetComputerNeuronManageFlow,
+            screen: ScreenName.InternetComputerNeuronStakeMaturity,
+            params: baseParams,
+          });
+          break;
+        case "remove_hot_key":
+          onNavigate({
+            route: NavigatorName.InternetComputerNeuronManageFlow,
+            screen: ScreenName.InternetComputerNeuronRemoveHotKey,
+            params: baseParams,
+          });
+          break;
+        case "follow":
+          onNavigate({
+            route: NavigatorName.InternetComputerNeuronManageFlow,
+            screen: ScreenName.InternetComputerNeuronFollowSelectTopic,
+            params: baseParams,
+          });
+          break;
+        default:
+          onNavigate({
+            route: NavigatorName.InternetComputerNeuronManageFlow,
+            screen: ScreenName.InternetComputerNeuronAction,
+            params: { ...baseParams, actionType },
+          });
+      }
+    },
+    [onNavigate, selectedNeuron, account.id],
+  );
 
   const onCloseDrawer = useCallback(() => setSelectedNeuron(null), []);
 
@@ -140,20 +188,181 @@ function StakingPositions({ account }: Props) {
   const actions = useMemo<DelegationDrawerActions>(() => {
     if (!selectedNeuron) return [];
 
-    return [
+    const {
+      canDisburse,
+      canStartDissolving,
+      canStopDissolving,
+      canSetDissolveDelay,
+      canSplitNeuron,
+    } = getNeuronStateInfo(selectedNeuron);
+
+    const maturity = new BigNumber(selectedNeuron.maturity_e8s_equivalent?.toString() || "0");
+    const hasMaturity = maturity.gt(0);
+    const hasHotKeys = selectedNeuron.hot_keys && selectedNeuron.hot_keys.length > 0;
+    const iconSize = 24;
+
+    const actionsList: DelegationDrawerActions = [
       {
-        label: t("icp.staking.actions.manage"),
+        label: t("icp.neuronManage.actions.increaseStake"),
         Icon: (props: IconProps) => (
           <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-            <UndelegateIcon color={colors.primary} />
+            <Plus size={iconSize} color={colors.primary} />
           </Circle>
         ),
         disabled: false,
-        onPress: onManageNeuron,
-        event: "ICPStakingActionManage",
+        onPress: () => onNeuronAction("increase_stake"),
+        event: "ICPNeuronActionIncreaseStake",
       },
     ];
-  }, [selectedNeuron, t, onManageNeuron, colors.primary]);
+
+    if (canStartDissolving) {
+      actionsList.push({
+        label: t("icp.neuronManage.actions.startDissolving"),
+        Icon: (props: IconProps) => (
+          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+            <Clock size={iconSize} color={colors.primary} />
+          </Circle>
+        ),
+        disabled: false,
+        onPress: () => onNeuronAction("start_dissolving"),
+        event: "ICPNeuronActionStartDissolving",
+      });
+    }
+
+    if (canStopDissolving) {
+      actionsList.push({
+        label: t("icp.neuronManage.actions.stopDissolving"),
+        Icon: (props: IconProps) => (
+          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+            <Pause size={iconSize} color={colors.primary} />
+          </Circle>
+        ),
+        disabled: false,
+        onPress: () => onNeuronAction("stop_dissolving"),
+        event: "ICPNeuronActionStopDissolving",
+      });
+    }
+
+    if (canDisburse) {
+      actionsList.push({
+        label: t("icp.neuronManage.actions.disburse"),
+        Icon: (props: IconProps) => (
+          <Circle {...props} bg={rgba(colors.green, 0.2)}>
+            <Withdraw size={iconSize} color={colors.green} />
+          </Circle>
+        ),
+        disabled: false,
+        onPress: () => onNeuronAction("disburse"),
+        event: "ICPNeuronActionDisburse",
+      });
+    }
+
+    if (canSetDissolveDelay) {
+      actionsList.push({
+        label: t("icp.neuronManage.actions.setDissolveDelay"),
+        Icon: (props: IconProps) => (
+          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+            <Clock size={iconSize} color={colors.primary} />
+          </Circle>
+        ),
+        disabled: false,
+        onPress: () => onNeuronAction("set_dissolve_delay"),
+        event: "ICPNeuronActionSetDissolveDelay",
+      });
+    }
+
+    if (canSplitNeuron) {
+      actionsList.push({
+        label: t("icp.neuronManage.actions.splitNeuron"),
+        Icon: (props: IconProps) => (
+          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+            <UndelegateIcon size={iconSize} color={colors.primary} />
+          </Circle>
+        ),
+        disabled: false,
+        onPress: () => onNeuronAction("split_neuron"),
+        event: "ICPNeuronActionSplitNeuron",
+      });
+    }
+
+    if (hasMaturity) {
+      actionsList.push({
+        label: t("icp.neuronManage.actions.stakeMaturity"),
+        Icon: (props: IconProps) => (
+          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+            <Coins size={iconSize} color={colors.primary} />
+          </Circle>
+        ),
+        disabled: false,
+        onPress: () => onNeuronAction("stake_maturity"),
+        event: "ICPNeuronActionStakeMaturity",
+      });
+
+      actionsList.push({
+        label: t("icp.neuronManage.actions.spawnNeuron"),
+        Icon: (props: IconProps) => (
+          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+            <Plus size={iconSize} color={colors.primary} />
+          </Circle>
+        ),
+        disabled: false,
+        onPress: () => onNeuronAction("spawn_neuron"),
+        event: "ICPNeuronActionSpawnNeuron",
+      });
+    }
+
+    actionsList.push({
+      label: t("icp.neuronManage.actions.addHotKey"),
+      Icon: (props: IconProps) => (
+        <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+          <Plus size={iconSize} color={colors.primary} />
+        </Circle>
+      ),
+      disabled: false,
+      onPress: () => onNeuronAction("add_hot_key"),
+      event: "ICPNeuronActionAddHotKey",
+    });
+
+    if (hasHotKeys) {
+      actionsList.push({
+        label: t("icp.neuronManage.actions.removeHotKey"),
+        Icon: (props: IconProps) => (
+          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+            <UndelegateIcon size={iconSize} color={colors.primary} />
+          </Circle>
+        ),
+        disabled: false,
+        onPress: () => onNeuronAction("remove_hot_key"),
+        event: "ICPNeuronActionRemoveHotKey",
+      });
+    }
+
+    actionsList.push({
+      label: t("icp.neuronManage.actions.follow"),
+      Icon: (props: IconProps) => (
+        <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+          <Vote size={iconSize} color={colors.primary} />
+        </Circle>
+      ),
+      disabled: false,
+      onPress: () => onNeuronAction("follow"),
+      event: "ICPNeuronActionFollow",
+    });
+
+    actionsList.push({
+      label: t("icp.neuronManage.actions.refreshVotingPower"),
+      Icon: (props: IconProps) => (
+        <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+          <Vote size={iconSize} color={colors.primary} />
+        </Circle>
+      ),
+      disabled: false,
+      onPress: () => onNeuronAction("refresh_voting_power"),
+      event: "ICPNeuronActionRefreshVotingPower",
+    });
+
+    return actionsList;
+  }, [selectedNeuron, t, onNeuronAction, colors.primary, colors.green]);
 
   const canStakeMore = useMemo(() => {
     const spendable = mainAccount.spendableBalance.minus(ICP_FEES);

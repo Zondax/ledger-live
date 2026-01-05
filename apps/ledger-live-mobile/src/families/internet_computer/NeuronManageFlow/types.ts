@@ -30,11 +30,6 @@ export type InternetComputerNeuronManageFlowParamList = {
     accountId: string;
     source?: RouteProp<ParamListBase, ScreenName>;
   };
-  [ScreenName.InternetComputerNeuronManage]: {
-    accountId: string;
-    neuronId: string;
-    source?: RouteProp<ParamListBase, ScreenName>;
-  };
   [ScreenName.InternetComputerNeuronAction]: {
     accountId: string;
     neuronId: string;

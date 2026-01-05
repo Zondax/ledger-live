@@ -275,7 +275,6 @@ export enum ScreenName {
   InternetComputerStakingValidationSuccess = "InternetComputerStakingValidationSuccess",
   // ICP Neuron Management Flow
   InternetComputerNeuronList = "InternetComputerNeuronList",
-  InternetComputerNeuronManage = "InternetComputerNeuronManage",
   InternetComputerNeuronAction = "InternetComputerNeuronAction",
   InternetComputerNeuronSetDissolveDelay = "InternetComputerNeuronSetDissolveDelay",
   InternetComputerNeuronAddHotKey = "InternetComputerNeuronAddHotKey",

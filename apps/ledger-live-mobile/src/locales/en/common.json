@@ -6745,7 +6745,7 @@
       },
       "success": {
         "title": "{{action}} was successful",
-        "description": "Your neuron action has been completed successfully."
+        "description": "Please synchronize your accounts to see the updated changes."
       },
       "actionText": {
         "increase_stake": "Increasing Stake",
