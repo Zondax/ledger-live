@@ -1,42 +1,31 @@
 import { getAccountCurrency, getMainAccount } from "@ledgerhq/live-common/account/index";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import useBridgeTransaction from "@ledgerhq/live-common/bridge/useBridgeTransaction";
-import { formatCurrencyUnit } from "@ledgerhq/live-common/currencies/index";
 import type { ICPAccount, ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/types";
-import { Button, Text } from "@ledgerhq/native-ui";
+import { Text } from "@ledgerhq/native-ui";
 import { useTheme } from "@react-navigation/native";
 import { BigNumber } from "bignumber.js";
 import invariant from "invariant";
-import { formatAddress } from "LLM/features/Accounts/utils/formatAddress";
 import { useAccountUnit } from "LLM/hooks/useAccountUnit";
 import React, { useCallback, useMemo, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, Linking, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import { TrackScreen, track } from "~/analytics";
 import Circle from "~/components/Circle";
-import type { IconProps } from "~/components/DelegationDrawer";
 import DelegationDrawer from "~/components/DelegationDrawer";
 import LText from "~/components/LText";
-import type { BaseNavigatorStackParamList } from "~/components/RootNavigator/types/BaseNavigator";
-import type {
-  BaseComposite,
-  StackNavigatorNavigation,
-  StackNavigatorProps,
-} from "~/components/RootNavigator/types/helpers";
+import type { BaseComposite, StackNavigatorProps } from "~/components/RootNavigator/types/helpers";
 import { ScreenName } from "~/const";
-import Clock from "~/icons/Clock";
-import Coins from "~/icons/Coins";
-import Pause from "~/icons/Pause";
-import Plus from "~/icons/Plus";
-import UndelegateIcon from "~/icons/Undelegate";
-import Vote from "~/icons/Vote";
-import Withdraw from "~/icons/Withdraw";
+import ExternalLink from "~/icons/ExternalLink";
+import IlluRewards from "~/icons/images/Rewards";
 import { accountScreenSelector } from "~/reducers/accounts";
+import { urls } from "~/utils/urls";
 import { rgba } from "../../../colors";
+import SyncFooter from "../components/SyncFooter";
+import { useNeuronDrawerActions, useNeuronDrawerData } from "../components/useNeuronDrawer";
 import NeuronRow from "../Staking/NeuronRow";
-import { formatLastSyncDate, getDissolveDelayDisplay, getNeuronStateDisplay, getNeuronStateInfo } from "../utils";
 import type { InternetComputerNeuronManageFlowParamList, NeuronActionType } from "./types";
 
 type Props = BaseComposite<
@@ -45,9 +34,6 @@ type Props = BaseComposite<
     ScreenName.InternetComputerNeuronList
   >
 >;
-
-type DelegationDrawerProps = React.ComponentProps<typeof DelegationDrawer>;
-type DelegationDrawerActions = DelegationDrawerProps["actions"];
 
 export default function NeuronList({ navigation, route }: Props) {
   const { colors } = useTheme();
@@ -88,14 +74,8 @@ export default function NeuronList({ navigation, route }: Props) {
     });
   }, [navigation, route.params, transaction, status]);
 
-  const onClose = useCallback(() => {
-    navigation.getParent<StackNavigatorNavigation<BaseNavigatorStackParamList>>().pop();
-  }, [navigation]);
-
-  const onCloseDrawer = useCallback(() => setSelectedNeuron(null), []);
-
   const onNeuronAction = useCallback(
-    (actionType: NeuronActionType) => {
+    (actionType: NeuronActionType, params?: { autoStakeMaturity?: boolean }) => {
       if (!selectedNeuron) return;
       const neuronId = selectedNeuron.id?.[0]?.id?.toString();
       if (!neuronId) return;
@@ -124,234 +104,28 @@ export default function NeuronList({ navigation, route }: Props) {
           navigation.navigate(ScreenName.InternetComputerNeuronAction, {
             ...baseParams,
             actionType,
+            ...params,
           });
       }
     },
     [navigation, route.params, selectedNeuron],
   );
 
-  const drawerData = useMemo<DelegationDrawerProps["data"]>(() => {
-    if (!selectedNeuron) return [];
+  // Use reusable hooks for drawer data and actions
+  const { drawerData, resetCopiedState } = useNeuronDrawerData({
+    neuron: selectedNeuron,
+    unit,
+  });
 
-    const neuronId = selectedNeuron.id?.[0]?.id?.toString() || "-";
-    const maturity = new BigNumber(selectedNeuron.maturity_e8s_equivalent?.toString() || "0");
-    const { label: stateLabel, color: stateColor } = getNeuronStateDisplay(selectedNeuron);
-    const dissolveDelay = getDissolveDelayDisplay(selectedNeuron);
+  const actions = useNeuronDrawerActions({
+    neuron: selectedNeuron,
+    onNeuronAction,
+  });
 
-    return [
-      {
-        label: t("icp.staking.drawer.neuronId"),
-        Component: (
-          <LText numberOfLines={1} semiBold ellipsizeMode="middle" style={styles.valueText}>
-            {formatAddress(neuronId)}
-          </LText>
-        ),
-      },
-      {
-        label: t("icp.staking.drawer.status"),
-        Component: (
-          <LText numberOfLines={1} semiBold style={styles.valueText} color={stateColor}>
-            {stateLabel}
-          </LText>
-        ),
-      },
-      {
-        label: t("icp.staking.drawer.dissolveDelay"),
-        Component: (
-          <LText numberOfLines={1} semiBold style={styles.valueText}>
-            {dissolveDelay}
-          </LText>
-        ),
-      },
-      {
-        label: t("icp.staking.drawer.maturity"),
-        Component: (
-          <LText numberOfLines={1} semiBold style={styles.valueText}>
-            {formatCurrencyUnit(unit, maturity, { showCode: true })}
-          </LText>
-        ),
-      },
-    ];
-  }, [selectedNeuron, t, unit]);
-
-  const actions = useMemo<DelegationDrawerActions>(() => {
-    if (!selectedNeuron) return [];
-
-    const {
-      canDisburse,
-      canStartDissolving,
-      canStopDissolving,
-      canSetDissolveDelay,
-      canSplitNeuron,
-    } = getNeuronStateInfo(selectedNeuron);
-
-    const maturity = new BigNumber(selectedNeuron.maturity_e8s_equivalent?.toString() || "0");
-    const hasMaturity = maturity.gt(0);
-    const hasHotKeys = selectedNeuron.hot_keys && selectedNeuron.hot_keys.length > 0;
-    const iconSize = 24;
-
-    const actionsList: DelegationDrawerActions = [
-      {
-        label: t("icp.neuronManage.actions.increaseStake"),
-        Icon: (props: IconProps) => (
-          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-            <Plus size={iconSize} color={colors.primary} />
-          </Circle>
-        ),
-        disabled: false,
-        onPress: () => onNeuronAction("increase_stake"),
-        event: "ICPNeuronActionIncreaseStake",
-      },
-    ];
-
-    if (canStartDissolving) {
-      actionsList.push({
-        label: t("icp.neuronManage.actions.startDissolving"),
-        Icon: (props: IconProps) => (
-          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-            <Clock size={iconSize} color={colors.primary} />
-          </Circle>
-        ),
-        disabled: false,
-        onPress: () => onNeuronAction("start_dissolving"),
-        event: "ICPNeuronActionStartDissolving",
-      });
-    }
-
-    if (canStopDissolving) {
-      actionsList.push({
-        label: t("icp.neuronManage.actions.stopDissolving"),
-        Icon: (props: IconProps) => (
-          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-            <Pause size={iconSize} color={colors.primary} />
-          </Circle>
-        ),
-        disabled: false,
-        onPress: () => onNeuronAction("stop_dissolving"),
-        event: "ICPNeuronActionStopDissolving",
-      });
-    }
-
-    if (canDisburse) {
-      actionsList.push({
-        label: t("icp.neuronManage.actions.disburse"),
-        Icon: (props: IconProps) => (
-          <Circle {...props} bg={rgba(colors.green, 0.2)}>
-            <Withdraw size={iconSize} color={colors.green} />
-          </Circle>
-        ),
-        disabled: false,
-        onPress: () => onNeuronAction("disburse"),
-        event: "ICPNeuronActionDisburse",
-      });
-    }
-
-    if (canSetDissolveDelay) {
-      actionsList.push({
-        label: t("icp.neuronManage.actions.setDissolveDelay"),
-        Icon: (props: IconProps) => (
-          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-            <Clock size={iconSize} color={colors.primary} />
-          </Circle>
-        ),
-        disabled: false,
-        onPress: () => onNeuronAction("set_dissolve_delay"),
-        event: "ICPNeuronActionSetDissolveDelay",
-      });
-    }
-
-    if (canSplitNeuron) {
-      actionsList.push({
-        label: t("icp.neuronManage.actions.splitNeuron"),
-        Icon: (props: IconProps) => (
-          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-            <UndelegateIcon size={iconSize} color={colors.primary} />
-          </Circle>
-        ),
-        disabled: false,
-        onPress: () => onNeuronAction("split_neuron"),
-        event: "ICPNeuronActionSplitNeuron",
-      });
-    }
-
-    if (hasMaturity) {
-      actionsList.push({
-        label: t("icp.neuronManage.actions.stakeMaturity"),
-        Icon: (props: IconProps) => (
-          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-            <Coins size={iconSize} color={colors.primary} />
-          </Circle>
-        ),
-        disabled: false,
-        onPress: () => onNeuronAction("stake_maturity"),
-        event: "ICPNeuronActionStakeMaturity",
-      });
-
-      actionsList.push({
-        label: t("icp.neuronManage.actions.spawnNeuron"),
-        Icon: (props: IconProps) => (
-          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-            <Plus size={iconSize} color={colors.primary} />
-          </Circle>
-        ),
-        disabled: false,
-        onPress: () => onNeuronAction("spawn_neuron"),
-        event: "ICPNeuronActionSpawnNeuron",
-      });
-    }
-
-    actionsList.push({
-      label: t("icp.neuronManage.actions.addHotKey"),
-      Icon: (props: IconProps) => (
-        <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-          <Plus size={iconSize} color={colors.primary} />
-        </Circle>
-      ),
-      disabled: false,
-      onPress: () => onNeuronAction("add_hot_key"),
-      event: "ICPNeuronActionAddHotKey",
-    });
-
-    if (hasHotKeys) {
-      actionsList.push({
-        label: t("icp.neuronManage.actions.removeHotKey"),
-        Icon: (props: IconProps) => (
-          <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-            <UndelegateIcon size={iconSize} color={colors.primary} />
-          </Circle>
-        ),
-        disabled: false,
-        onPress: () => onNeuronAction("remove_hot_key"),
-        event: "ICPNeuronActionRemoveHotKey",
-      });
-    }
-
-    actionsList.push({
-      label: t("icp.neuronManage.actions.follow"),
-      Icon: (props: IconProps) => (
-        <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-          <Vote size={iconSize} color={colors.primary} />
-        </Circle>
-      ),
-      disabled: false,
-      onPress: () => onNeuronAction("follow"),
-      event: "ICPNeuronActionFollow",
-    });
-
-    actionsList.push({
-      label: t("icp.neuronManage.actions.refreshVotingPower"),
-      Icon: (props: IconProps) => (
-        <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-          <Vote size={iconSize} color={colors.primary} />
-        </Circle>
-      ),
-      disabled: false,
-      onPress: () => onNeuronAction("refresh_voting_power"),
-      event: "ICPNeuronActionRefreshVotingPower",
-    });
-
-    return actionsList;
-  }, [selectedNeuron, t, onNeuronAction, colors.primary, colors.green]);
+  const onCloseDrawer = useCallback(() => {
+    setSelectedNeuron(null);
+    resetCopiedState();
+  }, [resetCopiedState]);
 
   const renderItem = useCallback(
     ({ item, index }: { item: ICPNeuron; index: number }) => (
@@ -410,29 +184,27 @@ export default function NeuronList({ navigation, route }: Props) {
       />
 
       {neurons.length === 0 ? (
-        <View style={styles.emptyStateContainer}>
-          <View style={[styles.emptyStateCard, { backgroundColor: colors.card }]}>
-            <Text variant="body" color="neutral.c80" textAlign="center" mt={4}>
-              <Trans i18nKey="icp.neuronManage.list.emptyDescription" />
-            </Text>
+        <>
+          <View style={styles.emptyStateContainer}>
+            <IlluRewards style={styles.illustration} />
+            <LText semiBold style={styles.emptyStateTitle}>
+              {t("icp.neuronManage.list.emptyTitle")}
+            </LText>
+            <LText style={styles.emptyStateDescription} color="grey">
+              {t("icp.neuronManage.list.emptyDescription")}
+            </LText>
+            <TouchableOpacity
+              style={styles.infoLinkContainer}
+              onPress={() => Linking.openURL(urls.internetComputer.stakingRewards)}
+            >
+              <LText bold style={styles.infoLink} color="live">
+                {t("icp.neuronManage.list.learnMore")}
+              </LText>
+              <ExternalLink size={11} color={colors.live} />
+            </TouchableOpacity>
           </View>
-
-          <View style={styles.lastSyncContainer}>
-            <Text variant="small" color="neutral.c60">
-              <Trans i18nKey="icp.neuronManage.list.lastSync" />:{" "}
-              {formatLastSyncDate(lastUpdatedMSecs, t("icp.neuronManage.list.lastSyncNever"))}
-            </Text>
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <Button type="shade" outline onPress={onClose} style={styles.button}>
-              <Trans i18nKey="common.close" />
-            </Button>
-            <Button type="main" onPress={onSync} style={styles.button}>
-              <Trans i18nKey="icp.neuronManage.list.sync" />
-            </Button>
-          </View>
-        </View>
+          <SyncFooter lastUpdatedMSecs={lastUpdatedMSecs} onSync={onSync} />
+        </>
       ) : (
         <>
           <View style={styles.header}>
@@ -452,15 +224,7 @@ export default function NeuronList({ navigation, route }: Props) {
             contentContainerStyle={styles.listContent}
           />
 
-          <View style={[styles.footer, { borderTopColor: colors.border }]}>
-            <Text variant="small" color="neutral.c60">
-              <Trans i18nKey="icp.neuronManage.list.lastSync" />:{" "}
-              {formatLastSyncDate(lastUpdatedMSecs, t("icp.neuronManage.list.lastSyncNever"))}
-            </Text>
-            <Button type="shade" size="small" onPress={onSync}>
-              <Trans i18nKey="icp.neuronManage.list.sync" />
-            </Button>
-          </View>
+          <SyncFooter lastUpdatedMSecs={lastUpdatedMSecs} onSync={onSync} />
         </>
       )}
     </SafeAreaView>
@@ -485,34 +249,35 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 24,
+    alignItems: "center",
     justifyContent: "center",
   },
-  emptyStateCard: {
-    padding: 24,
-    borderRadius: 12,
-    alignItems: "center",
+  illustration: {
+    alignSelf: "center",
+    marginBottom: 16,
   },
-  lastSyncContainer: {
-    marginTop: 24,
-    alignItems: "center",
+  emptyStateTitle: {
+    fontSize: 18,
+    lineHeight: 22,
+    textAlign: "center",
+    paddingVertical: 4,
   },
-  buttonContainer: {
-    flexDirection: "row",
-    marginTop: 24,
-    gap: 12,
-  },
-  button: {
-    flex: 1,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-  },
-  valueText: {
+  emptyStateDescription: {
     fontSize: 14,
+    lineHeight: 17,
+    paddingVertical: 8,
+    textAlign: "center",
+  },
+  infoLinkContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  infoLink: {
+    fontSize: 13,
+    lineHeight: 22,
+    paddingVertical: 8,
+    textAlign: "center",
+    marginRight: 6,
   },
 });

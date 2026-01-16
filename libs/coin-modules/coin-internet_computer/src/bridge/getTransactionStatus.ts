@@ -5,10 +5,30 @@ import {
   NotEnoughBalance,
   RecipientRequired,
 } from "@ledgerhq/errors";
-import BigNumber from "bignumber.js";
 import { AccountBridge } from "@ledgerhq/types-live";
+import { getNeuronDissolveDurationSeconds } from "@zondax/ledger-live-icp/neurons";
 import { validateAddress, validateMemo, validatePrincipal } from "@zondax/ledger-live-icp/utils";
-import { getAddress } from "./bridgeHelpers/addresses";
+import BigNumber from "bignumber.js";
+import { maxAllowedSplitAmount } from "../common-logic/neuron";
+import {
+  ICP_FEES,
+  ICP_MIN_STAKING_AMOUNT,
+  MAX_DISSOLVE_DELAY,
+  MIN_DISSOLVE_DELAY,
+} from "../consts";
+import {
+  ICPCreateNeuronWarning,
+  ICPDissolveDelayGTMax,
+  ICPDissolveDelayLTCurrent,
+  ICPDissolveDelayLTMin,
+  ICPHotKeyAlreadyExists,
+  ICPIncreaseStakeWarning,
+  ICPInvalidHotKey,
+  ICPNeuronNotFound,
+  ICPSplitNotAllowed,
+  InvalidMemoICP,
+  NotEnoughTransferAmount,
+} from "../errors";
 import {
   ICPAccount,
   ICPAccountRaw,
@@ -16,27 +36,7 @@ import {
   Transaction,
   TransactionStatus,
 } from "../types";
-import {
-  ICPDissolveDelayGTMax,
-  ICPDissolveDelayLTCurrent,
-  ICPDissolveDelayLTMin,
-  InvalidMemoICP,
-  ICPNeuronNotFound,
-  NotEnoughTransferAmount,
-  ICPInvalidHotKey,
-  ICPHotKeyAlreadyExists,
-  ICPSplitNotAllowed,
-  ICPIncreaseStakeWarning,
-  ICPCreateNeuronWarning,
-} from "../errors";
-import {
-  ICP_FEES,
-  ICP_MIN_STAKING_AMOUNT,
-  MAX_DISSOLVE_DELAY,
-  MIN_DISSOLVE_DELAY,
-} from "../consts";
-import { getNeuronDissolveDurationSeconds } from "@zondax/ledger-live-icp/neurons";
-import { maxAllowedSplitAmount } from "../common-logic/neuron";
+import { getAddress } from "./bridgeHelpers/addresses";
 
 export const getTransactionStatus: AccountBridge<
   Transaction,
@@ -109,7 +109,8 @@ export const getTransactionStatus: AccountBridge<
   }
 
   // Only validate recipient for transaction types that require it
-  const requiresRecipient = type === "send" || type === "create_neuron" || type === "increase_stake";
+  const requiresRecipient =
+    type === "send" || type === "create_neuron" || type === "increase_stake";
 
   if (requiresRecipient) {
     if (!recipient) {
@@ -176,12 +177,7 @@ export const getTransactionStatus: AccountBridge<
 
   // Transaction types that require an amount from the account balance
   // Note: stake_maturity and spawn_neuron use neuron maturity, not account balance
-  const requiresAmount =
-    type === "send" ||
-    type === "create_neuron" ||
-    type === "increase_stake" ||
-    type === "disburse" ||
-    type === "split_neuron";
+  const requiresAmount = type === "send" || type === "create_neuron" || type === "increase_stake";
 
   // If useAllAmount is true, we use the spendable balance as the total spent
   // If useAllAmount is false, we use the amount as the total spent

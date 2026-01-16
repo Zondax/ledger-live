@@ -34,6 +34,7 @@ export type InternetComputerNeuronManageFlowParamList = {
     accountId: string;
     neuronId: string;
     actionType: NeuronActionType;
+    autoStakeMaturity?: boolean;
     transaction?: Transaction;
     source?: RouteProp<ParamListBase, ScreenName>;
   };

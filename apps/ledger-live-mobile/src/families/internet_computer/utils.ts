@@ -9,17 +9,6 @@ export type NeuronStateDisplay = {
 };
 
 /**
- * Extended neuron state info with action permissions
- */
-export type NeuronStateInfo = NeuronStateDisplay & {
-  canDisburse: boolean;
-  canStartDissolving: boolean;
-  canStopDissolving: boolean;
-  canSetDissolveDelay: boolean;
-  canSplitNeuron: boolean;
-};
-
-/**
  * Get basic neuron state display info (label and color)
  */
 export function getNeuronStateDisplay(neuron: ICPNeuron): NeuronStateDisplay {
@@ -37,59 +26,6 @@ export function getNeuronStateDisplay(neuron: ICPNeuron): NeuronStateDisplay {
       return { label: "Spawning", color: "orange" };
     default:
       return { label: "Unknown", color: "grey" };
-  }
-}
-
-/**
- * Get extended neuron state info with action permissions
- */
-export function getNeuronStateInfo(neuron: ICPNeuron): NeuronStateInfo {
-  const baseState: NeuronStateInfo = {
-    label: "Unknown",
-    color: "grey",
-    canDisburse: false,
-    canStartDissolving: false,
-    canStopDissolving: false,
-    canSetDissolveDelay: false,
-    canSplitNeuron: false,
-  };
-
-  const dissolveState = neuron.dissolveState;
-  if (!dissolveState) return baseState;
-
-  switch (dissolveState) {
-    case "Locked":
-      return {
-        ...baseState,
-        label: "Locked",
-        color: "darkBlue",
-        canStartDissolving: true,
-        canSetDissolveDelay: true,
-        canSplitNeuron: true,
-      };
-    case "Dissolving":
-      return {
-        ...baseState,
-        label: "Dissolving",
-        color: "orange",
-        canStopDissolving: true,
-        canSplitNeuron: true,
-      };
-    case "Unlocked":
-      return {
-        ...baseState,
-        label: "Unlocked",
-        color: "live",
-        canDisburse: true,
-      };
-    case "Spawning":
-      return {
-        ...baseState,
-        label: "Spawning",
-        color: "orange",
-      };
-    default:
-      return baseState;
   }
 }
 

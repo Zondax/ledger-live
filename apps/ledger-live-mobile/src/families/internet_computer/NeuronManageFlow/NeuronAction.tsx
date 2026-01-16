@@ -4,6 +4,7 @@ import useBridgeTransaction from "@ledgerhq/live-common/bridge/useBridgeTransact
 import { formatCurrencyUnit } from "@ledgerhq/live-common/currencies/index";
 import { ICP_FEES } from "@ledgerhq/live-common/families/internet_computer/consts";
 import type { ICPAccount } from "@ledgerhq/live-common/families/internet_computer/types";
+import { maxAllowedSplitAmount } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { Text } from "@ledgerhq/native-ui";
 import { useTheme } from "@react-navigation/native";
 import { BigNumber } from "bignumber.js";
@@ -72,7 +73,7 @@ export default function NeuronAction({ navigation, route }: Props) {
   const mainAccount = getMainAccount(account, parentAccount) as ICPAccount;
   const bridge = getAccountBridge(account);
   const unit = useAccountUnit(account);
-  const { neuronId, actionType } = route.params;
+  const { neuronId, actionType, autoStakeMaturity } = route.params;
 
   const neurons = mainAccount.neurons?.fullNeurons || [];
   const neuron = useMemo(
@@ -109,6 +110,11 @@ export default function NeuronAction({ navigation, route }: Props) {
         txUpdate.neuronAccountIdentifier = neuronAccountIdentifier;
       }
 
+      // For auto_stake_maturity, use the value passed from the drawer
+      if (actionType === "auto_stake_maturity" && autoStakeMaturity !== undefined) {
+        txUpdate.autoStakeMaturity = autoStakeMaturity;
+      }
+
       return {
         account,
         transaction: bridge.updateTransaction(t, txUpdate),
@@ -133,6 +139,12 @@ export default function NeuronAction({ navigation, route }: Props) {
     if (actionType === "disburse" && neuron) {
       const stake = new BigNumber(neuron.cached_neuron_stake_e8s?.toString() || "0");
       onChangeAmount(stake);
+    } else if (actionType === "split_neuron" && neuron) {
+      // Use maxAllowedSplitAmount from ledger-live-icp for proper calculation
+      const maxAmount = maxAllowedSplitAmount(neuron);
+      if (maxAmount.gt(0)) {
+        onChangeAmount(maxAmount);
+      }
     } else {
       const maxAmount = mainAccount.spendableBalance.minus(BigNumber(ICP_FEES));
       if (maxAmount.gt(0)) {
@@ -151,18 +163,14 @@ export default function NeuronAction({ navigation, route }: Props) {
     });
   }, [account.id, navigation, parentAccount?.id, route.params.source, status, transaction]);
 
-  const error =
-    (needsAmount && transaction.amount.eq(0)) || bridgePending
-      ? null
-      : getFirstStatusError(status, "errors");
+  const error = getFirstStatusError(status, "errors");
   const warning = getFirstStatusError(status, "warnings");
-  const hasErrors = hasStatusError(status);
 
   const isDisabled = useMemo(() => {
-    if (bridgePending || !!bridgeError || hasErrors) return true;
+    if (bridgePending || !!bridgeError || hasStatusError(status)) return true;
     if (needsAmount && transaction.amount.eq(0)) return true;
     return false;
-  }, [bridgePending, bridgeError, hasErrors, needsAmount, transaction.amount]);
+  }, [bridgePending, bridgeError, hasStatusError, needsAmount, transaction.amount]);
 
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: colors.background }]}>

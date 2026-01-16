@@ -21,7 +21,6 @@ import { ScreenName } from "~/const";
 import { accountScreenSelector } from "~/reducers/accounts";
 import { getFirstStatusError, hasStatusError } from "../../helpers";
 import ActionFooter from "../components/ActionFooter";
-import NeuronInfoCard from "../components/NeuronInfoCard";
 import type { InternetComputerNeuronManageFlowParamList } from "./types";
 
 type Props = BaseComposite<
@@ -144,8 +143,9 @@ export default function FollowSelectFollowees({ navigation, route }: Props) {
 
   const isDisabled = useMemo(() => {
     if (bridgePending || !!bridgeError || hasErrors) return true;
+    if (followees.length === 0) return true;
     return false;
-  }, [bridgePending, bridgeError, hasErrors]);
+  }, [bridgePending, bridgeError, hasErrors, followees.length]);
 
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: colors.background }]}>
@@ -231,13 +231,22 @@ export default function FollowSelectFollowees({ navigation, route }: Props) {
           ))}
         </View>
 
-        {/* Selected Followees List */}
-        {followees.length > 0 && (
-          <View style={styles.followeesSection}>
-            <Text variant="body" fontWeight="semiBold" mb={2}>
-              <Trans i18nKey="icp.neuronManage.followSelectFollowees.selectedFollowees" />
-            </Text>
-            {followees.map(id => (
+        {/* Selected Followees List - Always show section */}
+        <View style={styles.followeesSection}>
+          <Text variant="body" fontWeight="semiBold" mb={2}>
+            <Trans
+              i18nKey="icp.neuronManage.followSelectFollowees.selectedFollowees"
+              values={{ count: followees.length }}
+            />
+          </Text>
+          {followees.length === 0 ? (
+            <View style={[styles.emptyFollowees, { borderColor: colors.border }]}>
+              <Text variant="body" color="neutral.c70" textAlign="center">
+                <Trans i18nKey="icp.neuronManage.followSelectFollowees.noFollowees" />
+              </Text>
+            </View>
+          ) : (
+            followees.map(id => (
               <View key={id} style={[styles.followeeRow, { borderColor: colors.border }]}>
                 <View style={styles.followeeInfo}>
                   <Text variant="body" fontWeight="semiBold">
@@ -255,21 +264,9 @@ export default function FollowSelectFollowees({ navigation, route }: Props) {
                   </Text>
                 </TouchableOpacity>
               </View>
-            ))}
-          </View>
-        )}
-
-        {/* Info Card */}
-        <NeuronInfoCard
-          neuronId={neuronId}
-          unit={unit}
-          additionalInfo={[
-            {
-              labelKey: "icp.neuronManage.followSelectFollowees.topic",
-              value: topicName,
-            },
-          ]}
-        />
+            ))
+          )}
+        </View>
       </ScrollView>
 
       <ActionFooter
@@ -342,5 +339,11 @@ const styles = StyleSheet.create({
   followeeInfo: {
     flex: 1,
     marginRight: 12,
+  },
+  emptyFollowees: {
+    borderWidth: 1,
+    borderRadius: 8,
+    borderStyle: "dashed",
+    padding: 16,
   },
 });

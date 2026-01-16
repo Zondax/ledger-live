@@ -6520,9 +6520,18 @@
       },
       "drawer": {
         "neuronId": "Neuron ID",
-        "maturity": "Maturity",
+        "maturity": "Available Maturity",
+        "stakedMaturity": "Staked Maturity",
         "status": "Status",
-        "dissolveDelay": "Dissolve Delay"
+        "dissolveDelay": "Dissolve Delay",
+        "votingPower": "Voting Power",
+        "ageBonus": "Age Bonus",
+        "dissolveDelayBonus": "Dissolve Delay Bonus",
+        "dateCreated": "Date Created",
+        "dissolveDate": "Dissolve Date",
+        "neuronAccount": "Neuron Account",
+        "followees": "Followees",
+        "hotKeys": "Hot Keys"
       },
       "flow": {
         "steps": {
@@ -6564,7 +6573,9 @@
         "title": "Your Neurons",
         "subtitle": "Select a neuron to manage",
         "description": "Tap a neuron to view details and available actions",
-        "emptyDescription": "No neurons found, try syncing existing neurons created through NNS dapp or stake to create new neurons.",
+        "emptyTitle": "No neurons found",
+        "emptyDescription": "Sync to see neurons created through NNS dapp or start staking to create new neurons.",
+        "learnMore": "Learn about ICP staking",
         "lastSync": "Last Synced",
         "lastSyncNever": "Never",
         "sync": "Sync"
@@ -6588,9 +6599,12 @@
         "splitNeuron": "Split Neuron",
         "stakeMaturity": "Stake Maturity",
         "setDissolveDelay": "Set Dissolve Delay",
+        "increaseDissolveDelay": "Increase Dissolve Delay",
         "addHotKey": "Add HotKey",
         "removeHotKey": "Remove HotKey",
         "autoStakeMaturity": "Auto Stake Maturity",
+        "startAutoStakeMaturity": "Start Auto Stake Maturity",
+        "stopAutoStakeMaturity": "Stop Auto Stake Maturity",
         "refreshVotingPower": "Refresh Voting Power",
         "follow": "Manage Following"
       },
@@ -6672,7 +6686,8 @@
         "title": "Refresh Voting Power",
         "description": "ICP neurons that are inactive for 6 months start missing voting rewards. Confirm your following to maintain rewards.",
         "confirmButton": "Confirm",
-        "noNeurons": "No neurons need following confirmation at this time."
+        "noNeurons": "No neurons need following confirmation at this time.",
+        "inactiveNeuron": "Inactive Neuron"
       },
       "stakeMaturity": {
         "percentageLabel": "Percentage to Stake",
@@ -6693,7 +6708,8 @@
         "invalidNeuronId": "Invalid neuron ID. Please enter a valid numeric ID.",
         "alreadyAdded": "This neuron ID is already in the followees list.",
         "knownNeurons": "Known Neurons",
-        "selectedFollowees": "Selected Followees",
+        "selectedFollowees": "Followees ({{count}})",
+        "noFollowees": "No followees selected. Add neuron IDs to follow for this topic.",
         "topic": "Topic"
       },
       "followTopic": {
@@ -6741,6 +6757,18 @@
         },
         "14": {
           "description": "Proposals related to Service Nervous System decentralization."
+        },
+        "15": {
+          "description": "Proposals for API boundary node management and configuration."
+        },
+        "16": {
+          "description": "Proposals related to subnet rental on the ICP network."
+        },
+        "17": {
+          "description": "Proposals for protocol canister management and upgrades."
+        },
+        "18": {
+          "description": "Proposals for Service Nervous System management."
         }
       },
       "success": {
@@ -6776,22 +6804,23 @@
       }
     },
     "stakeBanner": {
+      "learnMore": "Learn more",
       "confirmFollowing": {
-        "description": "Your neuron's following needs to be confirmed in {{days}} days and {{hours}} hours",
+        "description": "Your neuron's following needs to be confirmed in {{days}} days and {{hours}} hours.",
         "urgentDescription": "Your neuron's following confirmation has expired. Confirm now to resume earning rewards.",
-        "altDescription": "You are losing rewards, confirm neuron following to continue earning",
+        "altDescription": "You are losing rewards, confirm neuron following to continue earning.",
         "cta": "Confirm Following"
       },
       "syncNeurons": {
-        "altDescription": "We recommend syncing your neurons to see the latest details",
+        "altDescription": "We recommend syncing your neurons to see the latest details.",
         "cta": "Sync Neurons"
       },
       "lockNeurons": {
-        "description": "One or more of your neurons are not locked. If you don't lock them you can't get rewards. This is because neurons earn rewards by participating in the governance of ICP, and only neurons locked more than six months are eligible to vote.",
+        "description": "One or more of your neurons are not locked. If you don't lock them you can't get rewards.",
         "cta": "Manage Neurons"
       },
       "addFollowees": {
-        "description": "One or more of your neurons have no followees. Without followees you might not get rewards. To get rewards, neurons must vote directly (for example, with NNS Dapp) or follow neurons that do.",
+        "description": "One or more of your neurons have no followees. Without followees you might not get rewards.",
         "cta": "Manage Neurons"
       },
       "stakeICP": {

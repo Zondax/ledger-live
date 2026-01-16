@@ -1,3 +1,4 @@
+import { formatCurrencyUnit } from "@ledgerhq/live-common/currencies/index";
 import type { ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/types";
 import { Text } from "@ledgerhq/native-ui";
 import { Currency } from "@ledgerhq/types-cryptoassets";
@@ -5,12 +6,10 @@ import { useTheme } from "@react-navigation/native";
 import { BigNumber } from "bignumber.js";
 import { formatAddress } from "LLM/features/Accounts/utils/formatAddress";
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Circle from "~/components/Circle";
 import CounterValue from "~/components/CounterValue";
 import LText from "~/components/LText";
-import ArrowRight from "~/icons/ArrowRight";
 import { rgba } from "../../../colors";
 import { getNeuronStateDisplay } from "../utils";
 
@@ -23,11 +22,11 @@ type Props = {
 
 export default function NeuronRow({ neuron, currency, onPress, isLast = false }: Props) {
   const { colors } = useTheme();
-  const { t } = useTranslation();
 
   const neuronId = neuron.id?.[0]?.id?.toString() || "-";
   const stake = new BigNumber(neuron.cached_neuron_stake_e8s?.toString() || "0");
   const { label: stateLabel, color: stateColor } = getNeuronStateDisplay(neuron);
+  const unit = currency.units[0];
 
   return (
     <TouchableOpacity
@@ -60,6 +59,12 @@ export default function NeuronRow({ neuron, currency, onPress, isLast = false }:
 
       <View style={styles.rightWrapper}>
         <Text variant="body" fontWeight="semiBold">
+          {formatCurrencyUnit(unit, stake, {
+            showCode: true,
+            disableRounding: true,
+          })}
+        </Text>
+        <Text variant="small" color="neutral.c70">
           <CounterValue
             currency={currency}
             showCode
@@ -68,13 +73,6 @@ export default function NeuronRow({ neuron, currency, onPress, isLast = false }:
             withPlaceholder
           />
         </Text>
-
-        <View style={styles.row}>
-          <Text variant="small" color="live">
-            {t("common.seeMore")}
-          </Text>
-          <ArrowRight color={colors.live} size={14} />
-        </View>
       </View>
     </TouchableOpacity>
   );

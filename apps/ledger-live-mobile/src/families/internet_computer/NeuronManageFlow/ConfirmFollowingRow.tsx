@@ -1,8 +1,9 @@
 import type { ICPNeuron } from "@ledgerhq/live-common/families/internet_computer/types";
+import { secondsToDurationString } from "@ledgerhq/live-common/families/internet_computer/utils";
 import { Text } from "@ledgerhq/native-ui";
 import { useTheme } from "@react-navigation/native";
 import React from "react";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Circle from "~/components/Circle";
 import LText from "~/components/LText";
@@ -17,18 +18,6 @@ type Props = {
   isLast?: boolean;
 };
 
-function formatTimeUntilLoss(seconds: number): string {
-  if (seconds <= 0) return "Expired";
-
-  const days = Math.floor(seconds / (24 * 60 * 60));
-  const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
-
-  if (days > 0) {
-    return `${days}d ${hours}h`;
-  }
-  return `${hours}h`;
-}
-
 export default function ConfirmFollowingRow({
   neuron,
   secondsTillExpires,
@@ -36,10 +25,11 @@ export default function ConfirmFollowingRow({
   isLast = false,
 }: Props) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   const neuronId = neuron.id?.[0]?.id?.toString() || "-";
   const isUrgent = secondsTillExpires < 7 * 24 * 60 * 60; // Less than 7 days
-  const isExpired = secondsTillExpires <= 0;
+  const isInactive = secondsTillExpires <= 0;
 
   return (
     <TouchableOpacity
@@ -65,9 +55,11 @@ export default function ConfirmFollowingRow({
         <Text
           variant="small"
           fontWeight="medium"
-          color={isExpired ? "error.c50" : isUrgent ? "warning.c50" : "neutral.c70"}
+          color={isInactive ? "error.c50" : isUrgent ? "warning.c50" : "neutral.c70"}
         >
-          {formatTimeUntilLoss(secondsTillExpires)}
+          {secondsTillExpires > 0
+            ? secondsToDurationString(secondsTillExpires.toString())
+            : t("icp.neuronManage.confirmFollowing.inactiveNeuron")}
         </Text>
       </View>
 

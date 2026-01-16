@@ -5,9 +5,10 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, View } from "react-native";
+import { Linking, StyleSheet, Text, View } from "react-native";
 import Button from "~/components/wrappedUi/Button";
 import { NavigatorName, ScreenName } from "~/const";
+import { urls } from "~/utils/urls";
 
 type BannerState = "confirmFollowing" | "syncNeurons" | "lockNeurons" | "addFollowees" | "stakeICP";
 
@@ -84,6 +85,10 @@ export default function StakeBanners({ account }: Props) {
     return "icp.stakeBanner.confirmFollowing.description";
   }, [bannerState?.data]);
 
+  const onLearnMore = useCallback(() => {
+    Linking.openURL(urls.internetComputer.stakingRewards);
+  }, []);
+
   const bannerConfigs = useMemo<Record<BannerState, BannerConfig>>(
     () => ({
       confirmFollowing: {
@@ -138,7 +143,12 @@ export default function StakeBanners({ account }: Props) {
       <Alert type="info" showIcon={false}>
         <Flex flexDirection="column" alignItems="center" style={styles.banner}>
           <Flex flex={1} mr={3}>
-            <Alert.BodyText>{description}</Alert.BodyText>
+            <Alert.BodyText>
+              {description}{" "}
+              <Text style={styles.learnMore} onPress={onLearnMore}>
+                {t("icp.stakeBanner.learnMore")}
+              </Text>
+            </Alert.BodyText>
           </Flex>
           <Button type="color" size="small" onPress={config.onPress}>
             {t(config.ctaKey)}
@@ -156,5 +166,9 @@ const styles = StyleSheet.create({
   banner: {
     gap: 16,
     alignItems: "flex-end",
+  },
+  learnMore: {
+    color: "#6E56CF",
+    textDecorationLine: "underline",
   },
 });

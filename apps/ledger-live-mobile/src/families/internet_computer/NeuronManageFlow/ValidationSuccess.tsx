@@ -1,4 +1,6 @@
 import { getAccountCurrency, getMainAccount } from "@ledgerhq/live-common/account/index";
+import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
+import useBridgeTransaction from "@ledgerhq/live-common/bridge/useBridgeTransaction";
 import type { ICPAccount } from "@ledgerhq/live-common/families/internet_computer/types";
 import { Flex, IconBox, IconsLegacy, Log, Text } from "@ledgerhq/native-ui";
 import { useTheme } from "@react-navigation/native";
@@ -19,7 +21,7 @@ import SafeAreaViewFixed from "~/components/SafeAreaView";
 import ValidateSuccess from "~/components/ValidateSuccess";
 import { ScreenName } from "~/const";
 import { accountScreenSelector } from "~/reducers/accounts";
-import SuccessFooter from "../components/SuccessFooter";
+import SyncFooter from "../components/SyncFooter";
 import type { InternetComputerNeuronManageFlowParamList } from "./types";
 
 type Props = BaseComposite<
@@ -39,9 +41,21 @@ export default function ValidationSuccess({ navigation, route }: Props) {
   invariant(account, "account must be defined");
 
   const mainAccount = getMainAccount(account, parentAccount) as ICPAccount;
+  const bridge = getAccountBridge(account);
   const lastUpdatedMSecs = mainAccount.neurons?.lastUpdatedMSecs;
 
   const isListNeurons = transaction?.type === "list_neurons";
+
+  // Create list_neurons transaction for sync
+  const { transaction: syncTransaction, status: syncStatus } = useBridgeTransaction(() => {
+    const tx = bridge.createTransaction(mainAccount);
+    return {
+      account,
+      transaction: bridge.updateTransaction(tx, {
+        type: "list_neurons",
+      }),
+    };
+  });
 
   const onClose = useCallback(() => {
     navigation.getParent<StackNavigatorNavigation<BaseNavigatorStackParamList>>().pop();
@@ -56,13 +70,16 @@ export default function ValidationSuccess({ navigation, route }: Props) {
   }, [navigation, route.params]);
 
   const onSync = useCallback(() => {
-    // Close the current flow and navigate to neuron list for sync
-    navigation.getParent<StackNavigatorNavigation<BaseNavigatorStackParamList>>().pop();
-    // Navigate to neuron list
-    navigation.navigate(ScreenName.InternetComputerNeuronList, {
-      accountId: route.params.accountId,
+    track("buttonClicked", { button: "sync_neurons", currency: "ICP" });
+    if (!syncTransaction) return;
+
+    // Navigate to device selection to sign list_neurons transaction
+    navigation.navigate(ScreenName.InternetComputerNeuronSelectDevice, {
+      ...route.params,
+      transaction: syncTransaction,
+      status: syncStatus,
     });
-  }, [navigation, route.params.accountId]);
+  }, [navigation, route.params, syncTransaction, syncStatus]);
 
   const source = route.params.source?.name ?? "unknown";
 
@@ -80,14 +97,6 @@ export default function ValidationSuccess({ navigation, route }: Props) {
       action: transaction?.type || "unknown",
     });
   }, [source, ticker, transaction?.type]);
-
-  const goToOperationDetails = useCallback(() => {
-    if (!account || !result) return;
-    navigation.navigate(ScreenName.OperationDetails, {
-      accountId: account.id,
-      operation: result,
-    });
-  }, [account, result, navigation]);
 
   // For list_neurons, use the original ValidateSuccess component
   if (isListNeurons) {
@@ -136,13 +145,7 @@ export default function ValidationSuccess({ navigation, route }: Props) {
             <Trans i18nKey="icp.neuronManage.success.description" />
           </Text>
         </Flex>
-        <SuccessFooter
-          lastUpdatedMSecs={lastUpdatedMSecs}
-          lastSyncNeverText={t("icp.neuronManage.list.lastSyncNever")}
-          onSync={onSync}
-          onViewDetails={goToOperationDetails}
-          onClose={onClose}
-        />
+        <SyncFooter lastUpdatedMSecs={lastUpdatedMSecs} onSync={onSync} onClose={onClose} />
       </SafeAreaViewFixed>
     </View>
   );

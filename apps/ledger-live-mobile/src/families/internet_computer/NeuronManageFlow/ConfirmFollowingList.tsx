@@ -48,10 +48,10 @@ export default function ConfirmFollowingList({ navigation, route }: Props) {
   const neurons = mainAccount.neurons?.fullNeurons || [];
   const lastUpdatedMSecs = mainAccount.neurons?.lastUpdatedMSecs;
 
-  // Filter neurons that need voting power refresh (have followees) and add expiry time
+  // Filter neurons that have stake or maturity (same as desktop) and add expiry time
   const neuronsNeedingConfirmation = useMemo(() => {
     return neurons
-      .filter(n => n.followees && n.followees.length > 0)
+      .filter(n => n.cached_neuron_stake_e8s.toString() !== "0" || n.maturity_e8s_equivalent > 0)
       .map(neuron => ({
         neuron,
         secondsTillExpires: getSecondsTillVotingPowerExpires(neuron),
