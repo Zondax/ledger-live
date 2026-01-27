@@ -9,8 +9,8 @@ import {
   createUnsignedListNeuronsTransaction,
   createUnsignedNeuronCommandTransaction,
   createUnsignedSendTransaction,
-  createUnsignedListNeuronsTransaction,
-  createUnsignedNeuronCommandTransaction,
+  hashTransaction,
+  pubkeyToDer,
 } from "@zondax/ledger-live-icp/utils";
 import invariant from "invariant";
 import { Observable } from "rxjs";
