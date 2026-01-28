@@ -335,20 +335,6 @@ export function useNeuronDrawerActions({
       });
     }
 
-    if (canDisburse) {
-      actionsList.push({
-        label: t("icp.neuronManage.actions.disburse"),
-        Icon: (props: IconProps) => (
-          <Circle {...props} bg={rgba(colors.green, 0.2)}>
-            <Withdraw size={iconSize} color={colors.green} />
-          </Circle>
-        ),
-        disabled: false,
-        onPress: () => onNeuronAction("disburse"),
-        event: "ICPNeuronActionDisburse",
-      });
-    }
-
     // Set/Increase Dissolve Delay - always available
     // Label changes based on state: "Set" for Unlocked, "Increase" for Locked/Dissolving
     const dissolveDelayLabel =
@@ -367,6 +353,32 @@ export function useNeuronDrawerActions({
       onPress: () => onNeuronAction("set_dissolve_delay"),
       event: "ICPNeuronActionSetDissolveDelay",
     });
+
+    actionsList.push({
+      label: t("icp.neuronManage.actions.follow"),
+      Icon: (props: IconProps) => (
+        <Circle {...props} bg={rgba(colors.primary, 0.2)}>
+          <Vote size={iconSize} color={colors.primary} />
+        </Circle>
+      ),
+      disabled: false,
+      onPress: () => onNeuronAction("follow"),
+      event: "ICPNeuronActionFollow",
+    });
+
+    if (canDisburse) {
+      actionsList.push({
+        label: t("icp.neuronManage.actions.disburse"),
+        Icon: (props: IconProps) => (
+          <Circle {...props} bg={rgba(colors.green, 0.2)}>
+            <Withdraw size={iconSize} color={colors.green} />
+          </Circle>
+        ),
+        disabled: false,
+        onPress: () => onNeuronAction("disburse"),
+        event: "ICPNeuronActionDisburse",
+      });
+    }
 
     if (canSplit) {
       actionsList.push({
@@ -448,20 +460,9 @@ export function useNeuronDrawerActions({
         </Circle>
       ),
       disabled: false,
-      onPress: () => onNeuronAction("auto_stake_maturity", { autoStakeMaturity: !isAutoStakeEnabled }),
+      onPress: () =>
+        onNeuronAction("auto_stake_maturity", { autoStakeMaturity: !isAutoStakeEnabled }),
       event: "ICPNeuronActionAutoStakeMaturity",
-    });
-
-    actionsList.push({
-      label: t("icp.neuronManage.actions.follow"),
-      Icon: (props: IconProps) => (
-        <Circle {...props} bg={rgba(colors.primary, 0.2)}>
-          <Vote size={iconSize} color={colors.primary} />
-        </Circle>
-      ),
-      disabled: false,
-      onPress: () => onNeuronAction("follow"),
-      event: "ICPNeuronActionFollow",
     });
 
     // Only show refresh voting power at the bottom if neuron has voting power and it's not already at the top
