@@ -13,7 +13,7 @@ import {
 import { MinaApp } from "@zondax/ledger-mina-js";
 import Transport from "@ledgerhq/hw-transport";
 import type { Bridge } from "@ledgerhq/types-live";
-import { MinaCoinConfig } from "@ledgerhq/coin-mina/lib/config";
+import { MinaCoinConfig } from "@ledgerhq/coin-mina/config";
 import { getCryptoCurrencyById } from "@ledgerhq/cryptoassets/currencies";
 import { CreateSigner, createResolver, executeWithSigner } from "../../bridge/setup";
 import type { Resolver } from "../../hw/getAddress/types";

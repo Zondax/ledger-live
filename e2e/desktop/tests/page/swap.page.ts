@@ -346,7 +346,7 @@ export class SwapPage extends AppPage {
   }
 
   @step("Expect asset or account selected $0 to be displayed")
-  async expectSelectedAssetDisplayed(asset: string, electronApp: ElectronApplication) {
+  async expectSelectedAssetDisplayed(asset: string | RegExp, electronApp: ElectronApplication) {
     const [, webview] = electronApp.windows();
     await expect(webview.getByTestId(this.fromAccountCoinSelector)).toContainText(asset);
   }
@@ -464,13 +464,14 @@ export class SwapPage extends AppPage {
 
   @step("Go and wait for Swap app to be ready")
   async goAndWaitForSwapToBeReady(swapFunction: () => Promise<void>) {
-    const appReadyPromise = new Promise<void>(resolve => {
-      this.page.on("console", msg => {
-        if (msg.type() === "info" && msg.text().includes("Swap Live App Loaded")) {
-          resolve();
-        }
+    const appReadyPromise = this.page
+      .waitForEvent("console", {
+        predicate: msg => msg.text().toLowerCase().includes("swap live app loaded"),
+        timeout: 20_000,
+      })
+      .catch(() => {
+        console.log("WARNING: Swap app did not load within the expected time!");
       });
-    });
 
     await swapFunction();
     await appReadyPromise;

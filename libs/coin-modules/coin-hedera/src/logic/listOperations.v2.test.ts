@@ -19,7 +19,7 @@ import {
   getMockedMirrorToken,
   getMockedMirrorTransaction,
 } from "../test/fixtures/mirror.fixture";
-import type { HederaMirrorTransaction, StakingAnalysis, SyntheticBlock } from "../types";
+import type { StakingAnalysis, SyntheticBlock } from "../types";
 import { listOperationsV2 as listOperations } from "./listOperations.v2";
 import * as utils from "./utils";
 
@@ -125,25 +125,23 @@ describe("listOperationsV2", () => {
   });
 
   it("should parse HBAR transfer transactions correctly", async () => {
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "SUCCESS",
-        memo_base64: "test-memo",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [
-          { account: mockMirrorAccount.account, amount: -1000000 },
-          { account: "0.0.67890", amount: 1000000 },
-        ],
-        name: "CRYPTOTRANSFER",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "SUCCESS",
+      memo_base64: "test-memo",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [
+        { account: mockMirrorAccount.account, amount: -1000000 },
+        { account: "0.0.67890", amount: 1000000 },
+      ],
+      name: "CRYPTOTRANSFER",
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
 
@@ -183,28 +181,26 @@ describe("listOperationsV2", () => {
 
   it("should parse HTS token transfer transactions correctly", async () => {
     const mockTokenHTS = getMockedHTSTokenCurrency();
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "SUCCESS",
-        token_transfers: [
-          {
-            token_id: mockTokenHTS.contractAddress,
-            account: mockMirrorAccount.account,
-            amount: -1000,
-          },
-          { token_id: mockTokenHTS.contractAddress, account: "0.0.67890", amount: 1000 },
-        ],
-        staking_reward_transfers: [],
-        transfers: [],
-        name: "CRYPTOTRANSFER",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "SUCCESS",
+      token_transfers: [
+        {
+          token_id: mockTokenHTS.contractAddress,
+          account: mockMirrorAccount.account,
+          amount: -1000,
+        },
+        { token_id: mockTokenHTS.contractAddress, account: "0.0.67890", amount: 1000 },
+      ],
+      staking_reward_transfers: [],
+      transfers: [],
+      name: "CRYPTOTRANSFER",
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
 
@@ -326,7 +322,7 @@ describe("listOperationsV2", () => {
         fee: new BigNumber(300000),
         senders: ["0.0.12345"],
         recipients: ["0.0.67890"],
-        blockHash: mockContractCallResult.block_hash,
+        blockHash: null,
         extra: expect.objectContaining({
           pagingToken: mockMirrorTransaction.consensus_timestamp,
           consensusTimestamp: mockMirrorTransaction.consensus_timestamp,
@@ -415,21 +411,19 @@ describe("listOperationsV2", () => {
   });
 
   it("should parse token associate transactions correctly", async () => {
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "SUCCESS",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [{ account: mockMirrorAccount.account, amount: -500000 }],
-        name: "TOKENASSOCIATE",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "SUCCESS",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [{ account: mockMirrorAccount.account, amount: -500000 }],
+      name: "TOKENASSOCIATE",
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
 
@@ -455,7 +449,7 @@ describe("listOperationsV2", () => {
         hash: "hash1",
         fee: expect.any(Object),
         senders: [mockMirrorAccount.account],
-        recipients: [],
+        recipients: ["0.0.3"],
         extra: {
           pagingToken: "1625097600.000000000",
           consensusTimestamp: "1625097600.000000000",
@@ -466,7 +460,7 @@ describe("listOperationsV2", () => {
 
   it("should include associatedTokenId in extra when ASSOCIATE_TOKEN creates a token", async () => {
     const mockTokenHTS = getMockedHTSTokenCurrency();
-    const mockMirrorTransaction = {
+    const mockMirrorTransaction = getMockedMirrorTransaction({
       consensus_timestamp: "1625097600.000000000",
       transaction_hash: "hash1",
       charged_tx_fee: 500000,
@@ -475,7 +469,7 @@ describe("listOperationsV2", () => {
       staking_reward_transfers: [],
       transfers: [{ account: mockMirrorAccount.account, amount: -500000 }],
       name: "TOKENASSOCIATE",
-    };
+    });
 
     const mockMirrorToken = getMockedMirrorToken({
       token_id: mockTokenHTS.contractAddress,
@@ -515,24 +509,22 @@ describe("listOperationsV2", () => {
 
   it("should skip token operations when token is not found in cryptoassets", async () => {
     const tokenId = "0.0.7890";
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "SUCCESS",
-        token_transfers: [
-          { token_id: tokenId, account: mockMirrorAccount.account, amount: -1000 },
-          { token_id: tokenId, account: "0.0.67890", amount: 1000 },
-        ],
-        staking_reward_transfers: [],
-        transfers: [],
-        name: "CRYPTOTRANSFER",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "SUCCESS",
+      token_transfers: [
+        { token_id: tokenId, account: mockMirrorAccount.account, amount: -1000 },
+        { token_id: tokenId, account: "0.0.67890", amount: 1000 },
+      ],
+      staking_reward_transfers: [],
+      transfers: [],
+      name: "CRYPTOTRANSFER",
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
 
@@ -594,25 +586,23 @@ describe("listOperationsV2", () => {
   });
 
   it("should handle failed transactions", async () => {
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "INVALID_SIGNATURE",
-        memo_base64: "",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [
-          { account: mockMirrorAccount.account, amount: -1000000 },
-          { account: "0.0.67890", amount: 1000000 },
-        ],
-        name: "CRYPTOTRANSFER",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "INVALID_SIGNATURE",
+      memo_base64: "",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [
+        { account: mockMirrorAccount.account, amount: -1000000 },
+        { account: "0.0.67890", amount: 1000000 },
+      ],
+      name: "CRYPTOTRANSFER",
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
 
@@ -636,25 +626,23 @@ describe("listOperationsV2", () => {
   it("should include inferred fees payer in operation extra", async () => {
     (utils.extractFeesPayer as jest.Mock).mockReturnValue("0.0.23");
 
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        transaction_id: "0.0.10067173-1761755118-730000493",
-        charged_tx_fee: 40743,
-        result: "INSUFFICIENT_PAYER_BALANCE",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [
-          { account: "0.0.23", amount: -40743 },
-          { account: "0.0.801", amount: 40743 },
-        ],
-        name: "CRYPTOTRANSFER",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      transaction_id: "0.0.10067173-1761755118-730000493",
+      charged_tx_fee: 40743,
+      result: "INSUFFICIENT_PAYER_BALANCE",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [
+        { account: "0.0.23", amount: -40743 },
+        { account: "0.0.801", amount: 40743 },
+      ],
+      name: "CRYPTOTRANSFER",
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
 
@@ -683,7 +671,7 @@ describe("listOperationsV2", () => {
   });
 
   it("should create REWARD operation when staking rewards are present", async () => {
-    const mockTransaction: Partial<HederaMirrorTransaction> = {
+    const mockTransaction = getMockedMirrorTransaction({
       consensus_timestamp: "1625097600.000000000",
       transaction_hash: "hash1",
       charged_tx_fee: 500000,
@@ -693,7 +681,7 @@ describe("listOperationsV2", () => {
       staking_reward_transfers: [{ account: mockMirrorAccount.account, amount: 1000000 }],
       transfers: [{ account: mockMirrorAccount.account, amount: -500000 }],
       name: "CRYPTOTRANSFER",
-    };
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
       transactions: [mockTransaction],
@@ -821,19 +809,17 @@ describe("listOperationsV2", () => {
   });
 
   it("should create STAKE operation when UPDATE_ACCOUNT transaction stakes to a node", async () => {
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "SUCCESS",
-        memo_base64: "",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [{ account: mockMirrorAccount.account, amount: -500000 }],
-        name: "CRYPTOUPDATEACCOUNT",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "SUCCESS",
+      memo_base64: "",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [{ account: mockMirrorAccount.account, amount: -500000 }],
+      name: "CRYPTOUPDATEACCOUNT",
+    });
 
     const mockStakingAnalysis: StakingAnalysis = {
       operationType: "STAKE",
@@ -843,7 +829,7 @@ describe("listOperationsV2", () => {
     };
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
     (utils.analyzeStakingOperation as jest.Mock).mockResolvedValue(mockStakingAnalysis);
@@ -878,19 +864,17 @@ describe("listOperationsV2", () => {
   });
 
   it("should create UNSTAKE operation when UPDATE_ACCOUNT transaction removes staking", async () => {
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "SUCCESS",
-        memo_base64: "",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [{ account: mockMirrorAccount.account, amount: -500000 }],
-        name: "CRYPTOUPDATEACCOUNT",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "SUCCESS",
+      memo_base64: "",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [{ account: mockMirrorAccount.account, amount: -500000 }],
+      name: "CRYPTOUPDATEACCOUNT",
+    });
 
     const mockStakingAnalysis: StakingAnalysis = {
       operationType: "UNSTAKE",
@@ -900,7 +884,7 @@ describe("listOperationsV2", () => {
     };
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
     (utils.analyzeStakingOperation as jest.Mock).mockResolvedValue(mockStakingAnalysis);
@@ -936,28 +920,26 @@ describe("listOperationsV2", () => {
 
   it("should skip FEES operations for HTS IN transfers", async () => {
     const mockTokenHTS = getMockedHTSTokenCurrency();
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "SUCCESS",
-        token_transfers: [
-          { token_id: mockTokenHTS.contractAddress, account: "0.0.67890", amount: -1000 },
-          {
-            token_id: mockTokenHTS.contractAddress,
-            account: mockMirrorAccount.account,
-            amount: 1000,
-          },
-        ],
-        staking_reward_transfers: [],
-        transfers: [],
-        name: "CRYPTOTRANSFER",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "SUCCESS",
+      token_transfers: [
+        { token_id: mockTokenHTS.contractAddress, account: "0.0.67890", amount: -1000 },
+        {
+          token_id: mockTokenHTS.contractAddress,
+          account: mockMirrorAccount.account,
+          amount: 1000,
+        },
+      ],
+      staking_reward_transfers: [],
+      transfers: [],
+      name: "CRYPTOTRANSFER",
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
 
@@ -1048,28 +1030,26 @@ describe("listOperationsV2", () => {
 
   it("should skip FEES operations when skipFeesForTokenOperations is true", async () => {
     const mockTokenHTS = getMockedHTSTokenCurrency();
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "SUCCESS",
-        token_transfers: [
-          {
-            token_id: mockTokenHTS.contractAddress,
-            account: mockMirrorAccount.account,
-            amount: -1000,
-          },
-          { token_id: mockTokenHTS.contractAddress, account: "0.0.67890", amount: 1000 },
-        ],
-        staking_reward_transfers: [],
-        transfers: [],
-        name: "CRYPTOTRANSFER",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "SUCCESS",
+      token_transfers: [
+        {
+          token_id: mockTokenHTS.contractAddress,
+          account: mockMirrorAccount.account,
+          amount: -1000,
+        },
+        { token_id: mockTokenHTS.contractAddress, account: "0.0.67890", amount: 1000 },
+      ],
+      staking_reward_transfers: [],
+      transfers: [],
+      name: "CRYPTOTRANSFER",
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
 
@@ -1097,25 +1077,23 @@ describe("listOperationsV2", () => {
   });
 
   it("should use encoded hash when useEncodedHash is true", async () => {
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "SUCCESS",
-        memo_base64: "",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [
-          { account: mockMirrorAccount.account, amount: -1000000 },
-          { account: "0.0.67890", amount: 1000000 },
-        ],
-        name: "CRYPTOTRANSFER",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "SUCCESS",
+      memo_base64: "",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [
+        { account: mockMirrorAccount.account, amount: -1000000 },
+        { account: "0.0.67890", amount: 1000000 },
+      ],
+      name: "CRYPTOTRANSFER",
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
 
@@ -1138,25 +1116,23 @@ describe("listOperationsV2", () => {
   });
 
   it("should use synthetic blocks when useSyntheticBlocks is true", async () => {
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000000",
-        transaction_hash: "hash1",
-        charged_tx_fee: 500000,
-        result: "SUCCESS",
-        memo_base64: "",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [
-          { account: mockMirrorAccount.account, amount: -1000000 },
-          { account: "0.0.67890", amount: 1000000 },
-        ],
-        name: "CRYPTOTRANSFER",
-      },
-    ];
+    const mockTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000000",
+      transaction_hash: "hash1",
+      charged_tx_fee: 500000,
+      result: "SUCCESS",
+      memo_base64: "",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [
+        { account: mockMirrorAccount.account, amount: -1000000 },
+        { account: "0.0.67890", amount: 1000000 },
+      ],
+      name: "CRYPTOTRANSFER",
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction],
       nextCursor: null,
     });
 
@@ -1177,6 +1153,77 @@ describe("listOperationsV2", () => {
     expect(utils.getSyntheticBlock).toHaveBeenCalledTimes(1);
     expect(result.coinOperations).toEqual([
       expect.objectContaining({
+        blockHeight: mockSyntheticBlock.blockHeight,
+        blockHash: mockSyntheticBlock.blockHash,
+      }),
+    ]);
+  });
+
+  it("should use synthetic block hash for ERC20 transfers when useSyntheticBlocks is true", async () => {
+    const mockTokenERC20 = getMockedERC20TokenCurrency();
+    const sharedHash = "erc20-transfer-hash-synthetic";
+    const sharedTimestamp = "1625097600.000000000";
+    const mockMirrorTransaction = getMockedMirrorTransaction({
+      consensus_timestamp: sharedTimestamp,
+      transaction_hash: sharedHash,
+      charged_tx_fee: 300000,
+      result: "SUCCESS",
+      name: "CONTRACTCALL",
+      staking_reward_transfers: [],
+      token_transfers: [],
+      transfers: [{ account: mockMirrorAccount.account, amount: -300000 }],
+    });
+    const mockERC20Transfer = getMockedERC20TokenTransfer({
+      transaction_hash: sharedHash,
+      consensus_timestamp: Number(sharedTimestamp.split(".")[0]) * 10 ** 9,
+      sender_account_id: 12345,
+      receiver_account_id: 67890,
+      sender_evm_address: mockMirrorAccount.evm_address,
+      receiver_evm_address: "0xrecipient",
+      payer_account_id: 12345,
+      amount: 5000000,
+    });
+    const mockContractCallResult = getMockedMirrorContractCallResult({
+      block_hash: "0xevm-block-hash-should-not-be-used",
+    });
+    const mockEnrichedERC20Transfer = getMockedEnrichedERC20Transfer({
+      mirrorTransaction: mockMirrorTransaction,
+      contractCallResult: mockContractCallResult,
+      transfer: mockERC20Transfer,
+    });
+
+    jest.spyOn(networkUtils, "enrichERC20Transfers").mockResolvedValue([mockEnrichedERC20Transfer]);
+    (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
+      transactions: [],
+      nextCursor: null,
+    });
+    (hgraphClient.getERC20Transfers as jest.Mock).mockResolvedValue([mockERC20Transfer]);
+    (hgraphClient.getLatestIndexedConsensusTimestamp as jest.Mock).mockResolvedValue(
+      new BigNumber(sharedTimestamp),
+    );
+
+    setupMockCryptoAssetsStore({
+      findTokenByAddressInCurrency: jest.fn().mockResolvedValue(mockTokenERC20),
+    });
+
+    const result = await listOperations({
+      limit: mockLimit,
+      order: mockOrder,
+      currency: mockCurrency,
+      address: mockMirrorAccount.account,
+      evmAddress: mockMirrorAccount.evm_address,
+      mirrorTokens: [],
+      erc20Tokens: [{ token: mockTokenERC20, balance: new BigNumber(10000000) }],
+      fetchAllPages: true,
+      skipFeesForTokenOperations: false,
+      useEncodedHash: false,
+      useSyntheticBlocks: true,
+    });
+
+    expect(result.tokenOperations).toEqual([
+      expect.objectContaining({
+        type: "OUT",
+        standard: "erc20",
         blockHeight: mockSyntheticBlock.blockHeight,
         blockHash: mockSyntheticBlock.blockHash,
       }),
@@ -1250,41 +1297,39 @@ describe("listOperationsV2", () => {
   });
 
   it("should sort with nanosecond precision", async () => {
-    const mockTransactions: Partial<HederaMirrorTransaction>[] = [
-      {
-        consensus_timestamp: "1625097600.000000003",
-        transaction_hash: "hash3",
-        charged_tx_fee: 100000,
-        result: "SUCCESS",
-        name: "CRYPTOTRANSFER",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [{ account: mockMirrorAccount.account, amount: -300000 }],
-      },
-      {
-        consensus_timestamp: "1625097600.000000001",
-        transaction_hash: "hash1",
-        charged_tx_fee: 100000,
-        result: "SUCCESS",
-        name: "CRYPTOTRANSFER",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [{ account: mockMirrorAccount.account, amount: -100000 }],
-      },
-      {
-        consensus_timestamp: "1625097600.000000002",
-        transaction_hash: "hash2",
-        charged_tx_fee: 100000,
-        result: "SUCCESS",
-        name: "CRYPTOTRANSFER",
-        token_transfers: [],
-        staking_reward_transfers: [],
-        transfers: [{ account: mockMirrorAccount.account, amount: -200000 }],
-      },
-    ];
+    const mockTransaction1 = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000003",
+      transaction_hash: "hash3",
+      charged_tx_fee: 100000,
+      result: "SUCCESS",
+      name: "CRYPTOTRANSFER",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [{ account: mockMirrorAccount.account, amount: -300000 }],
+    });
+    const mockTransaction2 = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000001",
+      transaction_hash: "hash1",
+      charged_tx_fee: 100000,
+      result: "SUCCESS",
+      name: "CRYPTOTRANSFER",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [{ account: mockMirrorAccount.account, amount: -100000 }],
+    });
+    const mockTransaction3 = getMockedMirrorTransaction({
+      consensus_timestamp: "1625097600.000000002",
+      transaction_hash: "hash2",
+      charged_tx_fee: 100000,
+      result: "SUCCESS",
+      name: "CRYPTOTRANSFER",
+      token_transfers: [],
+      staking_reward_transfers: [],
+      transfers: [{ account: mockMirrorAccount.account, amount: -200000 }],
+    });
 
     (apiClient.getAccountTransactions as jest.Mock).mockResolvedValue({
-      transactions: mockTransactions,
+      transactions: [mockTransaction1, mockTransaction2, mockTransaction3],
       nextCursor: null,
     });
 

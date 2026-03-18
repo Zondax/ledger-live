@@ -47,6 +47,26 @@ for (const { account, provider, xrayTicket } of ethEarn) {
       userdata: "skip-onboarding-with-last-seen-device",
       speculosApp: account.currency.speculosApp,
       cliCommands: [liveDataWithAddressCommand(account)],
+      featureFlags: {
+        // TODO: sync Firebase environments and remove this override when final variant is chosen
+        stakePrograms: {
+          enabled: true,
+          params: {
+            list: ["ethereum"],
+            redirects: {
+              "ethereum/erc20/usd__coin": {
+                platform: "earn",
+                name: "Earn - Deposit",
+                queryParams: {
+                  cryptoAssetId: "ethereum/erc20/usd__coin",
+                  intent: "deposit",
+                  deposit: "stablecoin",
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     const family = getFamilyByCurrencyId(account.currency.id);
@@ -72,7 +92,9 @@ for (const { account, provider, xrayTicket } of ethEarn) {
       async ({ app }) => {
         await addTmsLink(getDescription(test.info().annotations, "TMS").split(", "));
 
-        await app.earnDashboard.goAndWaitForEarnToBeReady(() => app.layout.goToEarn());
+        await app.earnDashboard.goAndWaitForEarnToBeReady(() =>
+          app.mainNavigation.openTargetFromMainNavigation("earn"),
+        );
         await app.earnDashboard.goToEarnMoreTab();
         await app.earnDashboard.clickStakeCurrencyButton(account);
         const verifyProviderUrlPromise = app.earnDashboard.verifyProviderURL(
@@ -107,7 +129,9 @@ test.describe("Inline Add Account", () => {
     },
     async ({ app }) => {
       await addTmsLink(getDescription(test.info().annotations, "TMS").split(", "));
-      await app.earnDashboard.goAndWaitForEarnToBeReady(() => app.layout.goToEarn());
+      await app.earnDashboard.goAndWaitForEarnToBeReady(() =>
+        app.mainNavigation.openTargetFromMainNavigation("earn"),
+      );
       await app.earnDashboard.clickLearnMoreButton(account.currency.id);
       const selector = await getModularSelector(app, "ACCOUNT");
       if (selector) {
@@ -122,7 +146,7 @@ test.describe("Inline Add Account", () => {
       }
 
       await app.addAccount.close();
-      await app.layout.goToAccounts();
+      await app.mainNavigation.openTargetFromMainNavigation("accounts");
       await app.accounts.expectAccountsCountToBeNotNull();
     },
   );
@@ -207,7 +231,9 @@ for (const { account, xrayTicket, staking } of earnDashboardCurrencies) {
       },
       async ({ app }) => {
         await addTmsLink(getDescription(test.info().annotations, "TMS").split(", "));
-        await app.earnDashboard.goAndWaitForEarnToBeReady(() => app.layout.goToEarn());
+        await app.earnDashboard.goAndWaitForEarnToBeReady(() =>
+          app.mainNavigation.openTargetFromMainNavigation("earn"),
+        );
         if (!staking) {
           await app.earnDashboard.verifyRewardsPotentials();
           await app.earnDashboard.verifyYourEligibleAssets(account.accountName);

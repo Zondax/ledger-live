@@ -115,6 +115,21 @@ function createStakingRewardOperation({
   };
 }
 
+function getOperationTypeFromERC20Details({
+  transferType,
+  senderEvmAddress,
+  evmAddress,
+}: {
+  transferType: string;
+  senderEvmAddress: string;
+  evmAddress: string;
+}): OperationType {
+  if (transferType === "mint") return "IN";
+  if (transferType === "burn") return "OUT";
+
+  return senderEvmAddress.toLowerCase() === evmAddress.toLowerCase() ? "OUT" : "IN";
+}
+
 async function processERC20TokenTransfer({
   enrichedERC20Transfer,
   evmAddress,
@@ -148,11 +163,15 @@ async function processERC20TokenTransfer({
 
   const commonFields = {
     ...commonData,
-    type: senderEvmAddress.toLowerCase() === evmAddress.toLowerCase() ? "OUT" : "IN",
+    type: getOperationTypeFromERC20Details({
+      transferType: enrichedERC20Transfer.transfer.transfer_type,
+      senderEvmAddress,
+      evmAddress,
+    }),
     contract: token.contractAddress,
     standard: "erc20",
     blockHeight: commonData.blockHeight,
-    blockHash: enrichedERC20Transfer.contractCallResult.block_hash,
+    blockHash: commonData.blockHash,
     senders: [senderAddress],
     recipients: [recipientAddress],
     fee: new BigNumber(enrichedERC20Transfer.mirrorTransaction.charged_tx_fee),
