@@ -4,6 +4,7 @@ jest.mock("../config");
 
 import network from "@ledgerhq/live-network";
 import { AxiosError } from "axios";
+import { getCoinConfig } from "../config";
 import {
   MAINNET_NETWORK_IDENTIFIER,
   MINA_API_RETRY_COUNT,
@@ -11,7 +12,7 @@ import {
   MINA_SYMBOL,
   MINA_TOKEN_ID,
 } from "../consts";
-import { getCoinConfig } from "../config";
+import { ValidatorInfoFromAPI } from "./types";
 import {
   makeNetworkRequest,
   addNetworkIdentifier,
@@ -28,7 +29,6 @@ import {
   getDelegateAccount,
   fetchValidators,
 } from "./index";
-import { ValidatorInfoFromAPI } from "./types";
 
 const mockNetwork = network as jest.MockedFunction<typeof network>;
 const mockGetCoinConfig = getCoinConfig as jest.MockedFunction<typeof getCoinConfig>;
@@ -359,9 +359,7 @@ describe("makeDelegateChangePayload", () => {
   });
 
   it("should throw when fee is negative", () => {
-    expect(() => makeDelegateChangePayload(fromAddr, toAddr, -1)).toThrow(
-      "Fee cannot be negative",
-    );
+    expect(() => makeDelegateChangePayload(fromAddr, toAddr, -1)).toThrow("Fee cannot be negative");
   });
 });
 

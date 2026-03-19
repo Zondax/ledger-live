@@ -1,3 +1,4 @@
+import { Currency } from "@ledgerhq/live-common/e2e/enum/Currency";
 import { DelegateType } from "@ledgerhq/live-common/e2e/models/Delegate";
 import { setEnv } from "@ledgerhq/live-env";
 import { device } from "detox";

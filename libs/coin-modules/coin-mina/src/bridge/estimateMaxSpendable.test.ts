@@ -4,8 +4,8 @@ jest.mock("./getEstimatedFees");
 
 import { getMainAccount } from "@ledgerhq/coin-framework/account/index";
 import BigNumber from "bignumber.js";
-import estimateMaxSpendable from "./estimateMaxSpendable";
 import { createTransaction } from "./createTransaction";
+import estimateMaxSpendable from "./estimateMaxSpendable";
 import getEstimatedFees from "./getEstimatedFees";
 
 const mockGetMainAccount = getMainAccount as jest.MockedFunction<typeof getMainAccount>;

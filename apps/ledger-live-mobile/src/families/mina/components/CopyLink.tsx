@@ -28,7 +28,7 @@ class CopyLink extends PureComponent<Props, State> {
     copied: false,
   };
 
-  timeout: NodeJS.Timeout | null = null;
+  timeout: ReturnType<typeof setTimeout> | null = null;
 
   onPress = () => {
     const { string, onCopy } = this.props;

@@ -3,9 +3,7 @@ jest.mock("../../api");
 import { getDelegateAccount } from "../../api";
 import { getDelegateAddress } from "./getDelegateAddress";
 
-const mockGetDelegateAccount = getDelegateAccount as jest.MockedFunction<
-  typeof getDelegateAccount
->;
+const mockGetDelegateAccount = getDelegateAccount as jest.MockedFunction<typeof getDelegateAccount>;
 
 describe("getDelegateAddress", () => {
   beforeEach(() => {

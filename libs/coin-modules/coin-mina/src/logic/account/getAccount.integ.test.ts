@@ -1,8 +1,8 @@
 import { CurrencyConfig } from "@ledgerhq/coin-framework/config";
 import { getCoinConfig } from "../../config";
-import { getAccount } from "./getAccount";
 import { getBlockInfo } from "../history/getBlockInfo";
 import { getTransactions } from "../history/getTransactions";
+import { getAccount } from "./getAccount";
 
 jest.mock("../../config");
 describe("backend api tests", () => {

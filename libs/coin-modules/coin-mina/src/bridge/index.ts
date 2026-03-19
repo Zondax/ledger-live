@@ -7,6 +7,10 @@ import {
 } from "@ledgerhq/ledger-wallet-framework/bridge/jsHelpers";
 import { SignerContext } from "@ledgerhq/ledger-wallet-framework/signer";
 import type { AccountBridge, CurrencyBridge } from "@ledgerhq/types-live";
+import { MinaCoinConfig, setCoinConfig } from "../config";
+import { validateAddress } from "../logic/validateAddress";
+import resolver from "../signer/getAddress";
+import makeCliTools from "../test/cli";
 import type {
   MinaAccount,
   MinaAccountRaw,
@@ -14,10 +18,6 @@ import type {
   Transaction,
   TransactionStatus,
 } from "../types/common";
-import { MinaCoinConfig, setCoinConfig } from "../config";
-import { validateAddress } from "../logic/validateAddress";
-import resolver from "../signer/getAddress";
-import makeCliTools from "../test/cli";
 import { MinaSigner } from "../types/signer";
 import broadcast from "./broadcast";
 import { createTransaction } from "./createTransaction";

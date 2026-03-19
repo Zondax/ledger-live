@@ -30,21 +30,17 @@ describe("cli-transaction", () => {
     const baseTxn = { family: "mina", amount: "1000" };
 
     it("should set memo from opts", () => {
-      const result = inferTransactions(
-        [{ account: {} as any, transaction: baseTxn as any }],
-        { memo: "hello" },
-      );
+      const result = inferTransactions([{ account: {} as any, transaction: baseTxn as any }], {
+        memo: "hello",
+      });
       expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(
-        expect.objectContaining({ family: "mina", memo: "hello" }),
-      );
+      expect(result[0]).toEqual(expect.objectContaining({ family: "mina", memo: "hello" }));
     });
 
     it("should create delegation transaction when delegateAddress is provided", () => {
-      const result = inferTransactions(
-        [{ account: {} as any, transaction: baseTxn as any }],
-        { delegateAddress: "B62qdelegate" },
-      );
+      const result = inferTransactions([{ account: {} as any, transaction: baseTxn as any }], {
+        delegateAddress: "B62qdelegate",
+      });
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual(
         expect.objectContaining({
@@ -57,10 +53,7 @@ describe("cli-transaction", () => {
 
     it("should throw for non-mina family transaction", () => {
       expect(() =>
-        inferTransactions(
-          [{ account: {} as any, transaction: { family: "bitcoin" } as any }],
-          {},
-        ),
+        inferTransactions([{ account: {} as any, transaction: { family: "bitcoin" } as any }], {}),
       ).toThrow();
     });
   });

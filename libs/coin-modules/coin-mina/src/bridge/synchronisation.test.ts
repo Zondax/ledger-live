@@ -1,4 +1,3 @@
-import { getAccountShape, mapRosettaTxnToOperation } from "./synchronisation";
 jest.mock("@ledgerhq/ledger-wallet-framework/account/accountId");
 jest.mock("@ledgerhq/ledger-wallet-framework/bridge/jsHelpers");
 jest.mock("@ledgerhq/ledger-wallet-framework/operation");
@@ -24,6 +23,7 @@ import {
   mockBlockInfo,
   mockAccountData,
 } from "../test/fixtures";
+import { getAccountShape, mapRosettaTxnToOperation } from "./synchronisation";
 
 describe("synchronisation", () => {
   beforeEach(() => {
@@ -190,7 +190,7 @@ describe("synchronisation", () => {
       });
 
       expect(getAccount).toHaveBeenCalledWith("test_address");
-      expect(getTransactions).toHaveBeenCalledWith("test_address");
+      expect(getTransactions).toHaveBeenCalledWith("test_address", 0);
 
       expect(result).toEqual({
         id: "account_id",

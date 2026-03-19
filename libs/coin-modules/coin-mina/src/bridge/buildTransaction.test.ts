@@ -1,7 +1,7 @@
 import { Account } from "@ledgerhq/types-live";
 import { BigNumber } from "bignumber.js";
-import { getAccountNumFromPath } from "../logic/utils";
 import { MINA_MAINNET_NETWORK_ID } from "../consts";
+import { getAccountNumFromPath } from "../logic/utils";
 import { Transaction, TxType } from "../types";
 import { buildTransaction } from "./buildTransaction";
 jest.mock("../logic/utils");

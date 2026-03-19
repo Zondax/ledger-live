@@ -35,9 +35,7 @@ describe("broadcastTransaction", () => {
     } as any);
 
     expect(result).toBe("tx_hash_123");
-    const calledBlob = JSON.parse(
-      (mockRosettaSubmitTransaction.mock.calls[0] as any)[0],
-    );
+    const calledBlob = JSON.parse((mockRosettaSubmitTransaction.mock.calls[0] as any)[0]);
     expect(calledBlob.signature).toBe("sig123");
     expect(calledBlob.payment).not.toBeNull();
     expect(calledBlob.stake_delegation).toBeNull();
@@ -64,9 +62,7 @@ describe("broadcastTransaction", () => {
     } as any);
 
     expect(result).toBe("tx_delegate_hash");
-    const calledBlob = JSON.parse(
-      (mockRosettaSubmitTransaction.mock.calls[0] as any)[0],
-    );
+    const calledBlob = JSON.parse((mockRosettaSubmitTransaction.mock.calls[0] as any)[0]);
     expect(calledBlob.payment).toBeNull();
     expect(calledBlob.stake_delegation).not.toBeNull();
     expect(calledBlob.stake_delegation.new_delegate).toBe("delegate_target");

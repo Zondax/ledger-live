@@ -40,11 +40,14 @@ export function StepValidatorFooter({
   account,
   parentAccount,
   status,
+  bridgePending,
 }: Readonly<StepProps>) {
   const { t } = useTranslation();
   if (!account) return null;
 
+  const hasErrors = Object.keys(status.errors).length > 0;
   const canContinue =
+    !bridgePending && !hasErrors &&
     transaction?.recipient && transaction.recipient !== account.resources?.delegateInfo?.address;
 
   return (

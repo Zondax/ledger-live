@@ -4,9 +4,7 @@ import BigNumber from "bignumber.js";
 import { fetchAccountBalance, fetchNetworkStatus } from "../../api";
 import { getAccount } from "./getAccount";
 
-const mockFetchNetworkStatus = fetchNetworkStatus as jest.MockedFunction<
-  typeof fetchNetworkStatus
->;
+const mockFetchNetworkStatus = fetchNetworkStatus as jest.MockedFunction<typeof fetchNetworkStatus>;
 const mockFetchAccountBalance = fetchAccountBalance as jest.MockedFunction<
   typeof fetchAccountBalance
 >;
