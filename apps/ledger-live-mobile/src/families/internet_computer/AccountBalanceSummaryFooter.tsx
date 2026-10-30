@@ -48,16 +48,20 @@ function ICPBalanceSummaryFooter({ account }: Readonly<{ account: ICPAccount }>)
         key: "available" as const,
         title: t("account.availableBalance"),
         value: account.spendableBalance,
+        showCode: true,
       },
       {
         key: "stakedBalance" as const,
         title: t("internetComputer.summaryFooter.stakedBalance"),
         value: totalStaked,
+        showCode: true,
       },
       {
         key: "totalMaturity" as const,
         title: t("internetComputer.summaryFooter.totalMaturity"),
+        // Maturity is e8s-scaled like ICP but is not ICP (spawning it is subject to maturity modulation).
         value: totalMaturity,
+        showCode: false,
       },
     ],
     [t, account.spendableBalance, totalMaturity, totalStaked],
@@ -82,7 +86,14 @@ function ICPBalanceSummaryFooter({ account }: Readonly<{ account: ICPAccount }>)
           key={item.key}
           title={item.title}
           onPress={onPressInfoCreator(item.key)}
-          value={<CurrencyUnitValue unit={unit} value={item.value} disableRounding />}
+          value={
+            <CurrencyUnitValue
+              unit={unit}
+              value={item.value}
+              showCode={item.showCode}
+              disableRounding
+            />
+          }
           isLast={index === items.length - 1}
         />
       ))}

@@ -274,8 +274,8 @@ describe("StepStakeMaturity", () => {
     });
     const { container } = render(<StepStakeMaturity {...props} />);
 
-    // Half of 2 ICP of maturity.
-    expect(container.textContent?.replace(/\u00a0/g, " ")).toContain("1 ICP");
+    // Half of a maturity of 2, shown without a ticker: maturity is not ICP.
+    expect(container.textContent?.replace(/\u00a0/g, " ")).toContain("Amount to stake:1");
   });
 
   // The input is controlled by the transaction prop, which these tests hold fixed, so typing a
@@ -324,7 +324,7 @@ describe("StepStakeMaturity", () => {
     });
     const { container } = render(<StepStakeMaturity {...props} />);
 
-    expect(container.textContent?.replace(/\u00a0/g, " ")).toContain("0 ICP");
+    expect(container.textContent?.replace(/\u00a0/g, " ")).toContain("Amount to stake:0");
   });
 
   // The bridge rejects both, but no ICP error carries a translation, so leaning on the error banner

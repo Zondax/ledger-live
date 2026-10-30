@@ -224,7 +224,6 @@ const StepManage = ({
             <FormattedVal
               val={toBigNumber(neuron.stakedMaturityE8sEquivalent)}
               unit={unit}
-              showCode
               disableRounding
             />
           }

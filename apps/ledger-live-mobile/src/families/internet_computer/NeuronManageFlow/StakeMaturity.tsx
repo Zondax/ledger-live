@@ -100,7 +100,7 @@ export default function StakeMaturity({ navigation, route }: Props) {
             <Text variant="small" color="neutral.c100">
               <CurrencyUnitValue
                 disableRounding
-                showCode
+                showCode={false}
                 unit={unit}
                 value={toBigNumber(selected)}
               />

@@ -108,7 +108,7 @@ export default function NeuronListScreen({ navigation, route }: Props) {
           <Row label={t("internetComputer.common.maturity")}>
             <CurrencyUnitValue
               disableRounding
-              showCode
+              showCode={false}
               unit={unit}
               value={toBigNumber(neuron.maturityE8sEquivalent + neuron.stakedMaturityE8sEquivalent)}
             />

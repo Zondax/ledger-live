@@ -595,7 +595,8 @@ describe("StepManage", () => {
 
     expect(screen.getByText("Available maturity")).toBeInTheDocument();
     expect(screen.getByText("1.5")).toBeInTheDocument();
-    expect(screen.getByText("2.5")).toBeInTheDocument();
+    // Staked maturity is listed again under the voting-power base, with the same (unitless) figure.
+    expect(screen.getAllByText("2.5")).toHaveLength(2);
     expect(screen.getByText("4")).toBeInTheDocument();
   });
 
@@ -620,7 +621,9 @@ describe("StepManage", () => {
 
     // Once for the neuron's own total, once for the voting-power row that now agrees with it.
     expect(screen.getAllByText("9.5 ICP")).toHaveLength(2);
-    expect(screen.getByText("2 ICP")).toBeInTheDocument();
+    // Staked maturity is not ICP, so it carries no ticker (it is shown again in the maturity section).
+    expect(screen.getAllByText("2").length).toBeGreaterThan(0);
+    expect(screen.queryByText("2 ICP")).not.toBeInTheDocument();
     expect(screen.queryByText("10 ICP")).not.toBeInTheDocument();
   });
 

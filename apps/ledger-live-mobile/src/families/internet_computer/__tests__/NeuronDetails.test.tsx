@@ -237,7 +237,7 @@ describe("NeuronDetails", () => {
     renderDetails();
 
     expect(screen.getByText(/Dissolve delay bonus: \+50%/)).toBeVisible();
-    expect(screen.getByText("1.5 ICP")).toBeVisible();
+    expect(screen.getByText("1.5")).toBeVisible();
   });
 
   it("labels the dissolve delay action Set for a dissolved neuron and Increase otherwise", () => {
@@ -393,7 +393,7 @@ describe("NeuronDetails", () => {
 
     renderDetails();
 
-    expect(screen.getByText("3.75 ICP")).toBeVisible();
+    expect(screen.getByText("3.75")).toBeVisible();
   });
 
   it("reduces the figure in step with the decay the row beside it announces", () => {
@@ -407,8 +407,8 @@ describe("NeuronDetails", () => {
 
     // Half the decay window has passed, so the canister counts half of the 3.75 ICP potential.
     expect(screen.getByText(/Voting power is decaying/)).toBeVisible();
-    expect(screen.getByText("1.875 ICP")).toBeVisible();
-    expect(screen.queryByText("3.75 ICP")).toBeNull();
+    expect(screen.getByText("1.875")).toBeVisible();
+    expect(screen.queryByText("3.75")).toBeNull();
   });
 
   it("reads None once the window has fully elapsed, matching its own warning", () => {
@@ -422,7 +422,7 @@ describe("NeuronDetails", () => {
 
     expect(screen.getByText(/Voting power lost/)).toBeVisible();
     expect(screen.getByText("None")).toBeVisible();
-    expect(screen.queryByText("3.75 ICP")).toBeNull();
+    expect(screen.queryByText("3.75")).toBeNull();
   });
 
   // Staked maturity belongs to two totals — the maturity the neuron holds, and the base its voting

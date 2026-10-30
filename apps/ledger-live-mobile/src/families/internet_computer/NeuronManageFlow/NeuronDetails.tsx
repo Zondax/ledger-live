@@ -198,7 +198,12 @@ export default function NeuronDetails({ navigation, route }: Props) {
           hint={t("internetComputer.manageNeuronFlow.manage.votingPower.tooltip")}
           value={
             votingPower > 0n ? (
-              <CurrencyUnitValue disableRounding unit={unit} value={toBigNumber(votingPower)} />
+              <CurrencyUnitValue
+                disableRounding
+                showCode={false}
+                unit={unit}
+                value={toBigNumber(votingPower)}
+              />
             ) : (
               t("internetComputer.common.none")
             )
@@ -242,7 +247,7 @@ export default function NeuronDetails({ navigation, route }: Props) {
             value={
               <CurrencyUnitValue
                 disableRounding
-                showCode
+                showCode={false}
                 unit={unit}
                 value={toBigNumber(neuron.stakedMaturityE8sEquivalent)}
               />
@@ -317,13 +322,21 @@ export default function NeuronDetails({ navigation, route }: Props) {
         <NeuronSection
           title={t("internetComputer.manageNeuronFlow.manage.maturity.title")}
           hint={t("internetComputer.manageNeuronFlow.manage.maturity.tooltip")}
-          value={<CurrencyUnitValue disableRounding unit={unit} value={toBigNumber(maturity)} />}
+          value={
+            <CurrencyUnitValue
+              disableRounding
+              showCode={false}
+              unit={unit}
+              value={toBigNumber(maturity)}
+            />
+          }
         >
           <NeuronDetailRow
             label={t("internetComputer.manageNeuronFlow.manage.maturity.available")}
             value={
               <CurrencyUnitValue
                 disableRounding
+                showCode={false}
                 unit={unit}
                 value={toBigNumber(neuron.maturityE8sEquivalent)}
               />
@@ -350,6 +363,7 @@ export default function NeuronDetails({ navigation, route }: Props) {
             value={
               <CurrencyUnitValue
                 disableRounding
+                showCode={false}
                 unit={unit}
                 value={toBigNumber(neuron.stakedMaturityE8sEquivalent)}
               />
