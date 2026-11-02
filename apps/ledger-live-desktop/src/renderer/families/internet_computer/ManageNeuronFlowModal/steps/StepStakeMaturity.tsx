@@ -78,7 +78,6 @@ const StepStakeMaturity = ({
         <FormattedVal
           val={toBigNumber(selected)}
           unit={unit}
-          showCode
           disableRounding
           fontSize={3}
           color="neutral.c100"

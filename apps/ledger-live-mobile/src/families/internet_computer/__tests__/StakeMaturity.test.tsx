@@ -67,7 +67,8 @@ describe("StakeMaturity", () => {
     enter("999");
 
     expect(screen.getByTestId("icp-stake-maturity-input")).toHaveDisplayValue("100");
-    expect(screen.getByText("4 ICP")).toBeVisible();
+    expect(screen.getByText("4")).toBeVisible();
+    expect(screen.queryByText("4 ICP")).toBeNull();
   });
 
   it("previews the share of maturity the entered percentage selects", () => {
